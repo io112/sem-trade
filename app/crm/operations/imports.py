@@ -1,5 +1,9 @@
+from app.crm.models.arm import Arm
+from app.crm.models.fiting import Fiting
 from app.db.base import replace_upsert
 from app.crm.models.clutch import Clutch
+from app.crm.models.base import SiteObj
+from app.db.variables import *
 
 
 def import_data(tree):
@@ -9,16 +13,26 @@ def import_data(tree):
         if req is None:
             continue
         type = req[1][1].text
-        obj = parse_objects(i, type)
-        print(obj)
+        obj = parse_object(i, type)
 
 
-def parse_objects(obj, type):
+def parse_object(obj, type):
     req = obj.find("{urn:1C.ru:commerceml_2}ХарактеристикиТовара")
+    site_obj: SiteObj
+    collection = ''
     if req is None:
         return
     if type == 'Муфта':
-        clutch = Clutch(obj[0].text, obj[2].text, obj[3].attrib['НаименованиеПолное'],
-                        req[1][2].text, req[0][2].text, req[2][2].text)
-        replace_upsert('clutch', {"_id": clutch.id}, clutch.convert_to_dict())
-        return clutch
+        site_obj = Clutch.create_from_cml(obj)
+        collection = clutch_collection
+    elif type == 'Фитинг':
+        site_obj = Fiting.create_from_cml(obj)
+        collection = fiting_collection
+    elif type == 'Рукав':
+        site_obj = Arm.create_from_cml(obj)
+        collection = arm_collection
+    else:
+        return
+
+    replace_upsert(collection, {"_id": site_obj.id}, site_obj.convert_to_dict())
+    return site_obj
