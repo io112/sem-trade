@@ -15,11 +15,14 @@ class SiteObj:
                 'type': self.type}
         return data
 
+    def convert_for_update(self):
+        return {"$set": self.convert_to_dict()}
+
     @staticmethod
     def create_from_cml(obj):
         res = SiteObj()
         res.id = obj[0].text
-        res.id = res.id[res.id.find('#') + 1:]
+        res.id = res.id
         res.name = obj[2].text
         res.measure = obj[3].attrib['НаименованиеПолное']
         return res

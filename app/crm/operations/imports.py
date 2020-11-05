@@ -9,7 +9,7 @@ from app.db.variables import *
 
 
 def import_data(tree):
-    if not tree.getroot().find('{urn:1C.ru:commerceml_2}Предложения') is None:
+    if not tree.getroot().find('{urn:1C.ru:commerceml_2}ПакетПредложений') is None:
         import_offers(tree)
     elif not tree.findall('{urn:1C.ru:commerceml_2}Каталог') is None:
         import_objects(tree)
@@ -28,7 +28,7 @@ def import_objects(tree):
 def import_offers(tree):
     items = tree.findall("//{urn:1C.ru:commerceml_2}Предложение")
     for i in items:
-        req = i.find("{urn:1C.ru:commerceml_2}ИдХарактеристики")
+        req = i.find("{urn:1C.ru:commerceml_2}БазоваяЕдиница")
         if req is None:
             continue
         obj = parse_offer(i)
@@ -36,14 +36,17 @@ def import_offers(tree):
 
 def parse_offer(obj):
     offer = Offer.create_from_cml(obj)
-    collection = ''
-    if offer.id == clutch_cat_id:
-        collection = clutch_collection
-    elif offer.id == arm_cat_id:
-        collection = arm_collection
-    elif offer.id == fiting_cat_id:
-        collection = fiting_collection
+    collection_id = offer.id[:36]
+    if collection_id == clutch_cat_id:
+        offer.collection = clutch_collection
+    elif collection_id == arm_cat_id:
+        offer.collection = arm_collection
+    elif collection_id == fiting_cat_id:
+        offer.collection = fiting_collection
+    else:
+        return
 
+    update_upsert(offer.collection, {"_id": offer.id}, offer.convert_for_update())
     return offer
 
 
@@ -65,5 +68,5 @@ def parse_object(obj, type):
     else:
         return
 
-    replace_upsert(collection, {"_id": site_obj.id}, site_obj.convert_to_dict())
+    update_upsert(collection, {"_id": site_obj.id}, site_obj.convert_for_update())
     return site_obj
