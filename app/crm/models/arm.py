@@ -7,10 +7,11 @@ class Arm(SiteObj):
 
     def __init__(self):
         super().__init__()
-        self.category_id = arm_cat_id
         self.init_params()
 
     def init_params(self):
+        self.category_id = arm_cat_id
+
         self.diameter = ''
         self.type = 'arm'
 

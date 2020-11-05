@@ -9,11 +9,11 @@ class Clutch(SiteObj):
 
     def __init__(self):
         super().__init__()
-        self.category_id = clutch_cat_id
         self.init_params()
 
     def init_params(self):
         self.type = 'clutch'
+        self.category_id = clutch_cat_id
 
         self.diameter = ''
         self.clutch_type = ''

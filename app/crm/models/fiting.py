@@ -12,11 +12,11 @@ class Fiting(SiteObj):
 
     def __init__(self):
         super().__init__()
-        self.category_id = fiting_cat_id
         self.init_params()
 
     def init_params(self):
         self.type = 'fiting'
+        self.category_id = fiting_cat_id
 
         self.diameter = ''
         self.clutch_type = ''
