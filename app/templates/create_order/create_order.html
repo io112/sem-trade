@@ -1,0 +1,136 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+  <!-- Page content -->
+  <div class="row">
+    <div class="col-xl-4 order-xl-2">
+      <div class="card card-profile">
+        <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+          <div class="d-flex">
+            <h1 class="display-2">Итог</h1>
+          </div>
+          <hr class="my-4">
+        </div>
+        <div class="card-body pt-0">
+          <div class="table-responsive">
+            <table class="table align-items-center table-flush">
+              <thead class="thead-light">
+              <tr>
+                <th scope="col" class="sort" data-sort="name">Наименование</th>
+                <th scope="col" class="sort" data-sort="number">Количество</th>
+                <th scope="col" class="sort" data-sort="fullprice">цена</th>
+              </tr>
+              </thead>
+              <tbody class="list">
+              <tr>
+                <td>
+                  <span class="name mb-0 text-sm"><b>Рукав DK test</b></span>
+                </td>
+                <td class="number">
+                  <b>1</b>
+                </td>
+                <td class="fullprice">
+                  <b>1₽</b>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+            <hr class="my-4">
+            <div class="d-flex justify-content-center">
+              <button type="button" class="btn btn-primary">Печать чека</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-8 order-xl-1">
+      <div class="card">
+        <div class="card-header">
+          <div class="row align-items-center">
+            <div class="col-8">
+              <h3 class="mb-0">Редактирование заказа </h3>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form>
+            <h6 class="heading-small text-muted mb-4">Информация о клиенте</h6>
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-lg">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-clientname">Организация или имя
+                      клиента</label>
+                    <input type="text" id="input-clientname" class="form-control"
+                           placeholder="ООО &#34Рога и Копыта&#34">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <hr class="my-4"/>
+            <!-- Address -->
+            <div class="row align-items-center">
+              <div class="col-8">
+                <h3 class="heading-small text-muted mb-4">Состав заказа</h3>
+              </div>
+              <div class="col-4 text-right">
+                <a href="#!" class="btn btn-sm btn-primary" data-toggle="modal"
+                   data-target="#addModal">Добавить рукав</a>
+
+              </div>
+              <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                  <thead class="thead-light">
+                  <tr>
+                    <th scope="col" class="sort" data-sort="name">Наименование</th>
+                    <th scope="col" class="sort" data-sort="number">Количество</th>
+                    <th scope="col" class="sort" data-sort="price">цена за штуку</th>
+                    <th scope="col" class="sort" data-sort="fullprice">Общая цена</th>
+                    <th scope="col"></th>
+                  </tr>
+                  </thead>
+                  <tbody class="list">
+                  <tr>
+                    <td>
+                      <span class="name mb-0 text-sm">Рукав DK test</span>
+                    </td>
+                    <td class="number">
+                      <input class="form-control" type="number" placeholder="количество" value="1">
+                    </td>
+                    <td class="price">
+                      <input class="form-control" type="number" placeholder="цена" value="1">
+                    </td>
+                    <td class="fullprice">
+                      1₽
+                    </td>
+                    <td>
+                      <a class="nav-link" href="/main">
+                        <i class="fa fa-trash-alt text-red"></i>
+                      </a>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <hr class="my-4"/>
+            <!-- Description -->
+            <h6 class="heading-small text-muted mb-4">Комментарии</h6>
+            <div class="pl-lg-4">
+              <div class="form-group">
+                <label class="form-control-label">Комментарий к заказу</label>
+                <textarea rows="4" class="form-control" placeholder="Собрать к 20:30"></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal -->
+  {% include 'create_order/modal.html' %}
+
+  <script src="../../static/assets/js/rvd/form_submitter.js"></script>
+{% endblock %}
+

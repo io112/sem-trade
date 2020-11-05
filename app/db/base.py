@@ -12,6 +12,12 @@ def replace_upsert(collection, query, update):
     db[collection].bulk_write(requests)
 
 
+def replace(collection, query, update, upsert=False):
+    update: dict
+    requests = [ReplaceOne(query, update, upsert=upsert)]
+    db[collection].bulk_write(requests)
+
+
 def update_upsert(collection, query, update):
     update: dict
     requests = [UpdateOne(query, update, upsert=True)]
@@ -24,3 +30,11 @@ def find_one(collection, query):
 
 def find(collection, query):
     return db[collection].find(query)
+
+
+def find_one(collection, query):
+    return db[collection].find_one(query)
+
+
+def remove(collection, query):
+    return db[collection].delete_one(query)
