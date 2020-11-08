@@ -25,13 +25,15 @@ def verify_password(username, password):
         return username
 
 
+testitem = {'name': 'testitem', 'amount': 5, 'price': 500}
+
 @app.route('/', methods=['GET'])
 def home():
     sid = request.args.get('sid')
     cs = check_sid(sid)
     if not cs:
         redirect(url_for('home', sid=start_session().get_id()))
-    return render_template('create_order/create_order.html')
+    return render_template('create_order/create_order.html', items=[testitem])
 
 
 @app.route('/api/update_session', methods=['POST'])

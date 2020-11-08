@@ -13,34 +13,7 @@
           <hr class="my-4">
         </div>
         <div class="card-body pt-0">
-          <div class="table-responsive">
-            <table class="table align-items-center table-flush">
-              <thead class="thead-light">
-              <tr>
-                <th scope="col" class="sort" data-sort="name">Наименование</th>
-                <th scope="col" class="sort" data-sort="number">Количество</th>
-                <th scope="col" class="sort" data-sort="fullprice">цена</th>
-              </tr>
-              </thead>
-              <tbody class="list">
-              <tr>
-                <td>
-                  <span class="name mb-0 text-sm"><b>Рукав DK test</b></span>
-                </td>
-                <td class="number">
-                  <b>1</b>
-                </td>
-                <td class="fullprice">
-                  <b>1₽</b>
-                </td>
-              </tr>
-              </tbody>
-            </table>
-            <hr class="my-4">
-            <div class="d-flex justify-content-center">
-              <button type="button" class="btn btn-primary">Печать чека</button>
-            </div>
-          </div>
+          {% include 'create_order/order_list.html' %}
         </div>
       </div>
     </div>
