@@ -1,0 +1,45 @@
+<form id="arm_section">
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="form-group">
+        <label class="form-control-label" for="input-arm-diameter">Диаметр</label>
+        <select name="diameter" class="form-control fstdropdown-select" id="input-arm-diameter">
+          <option value="">Выберите диаметр</option>
+          {% for diameter in offer.arms | map(attribute='diameter') | list | unique %}
+            <option type="number" value="{{ diameter }}">{{ diameter }} мм</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="form-group">
+        <label class="form-control-label" for="input-arm-braid">Тип оплетки</label>
+        <select name="braid" class="form-control fstdropdown-select" id="input-arm-braid">
+          <option value="">Выберите оплетку</option>
+          {% for braid in offer.arms | map(attribute='braid') | list | unique %}
+            <option type="number" value="{{ braid }}">{{ braid }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="form-group">
+        <label class="form-control-label" for="input-arm-vendor">Производитель</label>
+        <select name="vendor" class="form-control fstdropdown-select" id="input-arm-vendor">
+          <option value="">Выберите производителя</option>
+          {% for vendor in offer.arms | map(attribute='vendor') | list | unique %}
+            <option type="number" value="{{ vendor }}">{{ vendor }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="form-group">
+        <label class="form-control-label" for="input-length">Длина рукава (м)</label>
+        <input id="input-length" class="form-control" type="number" placeholder="1">
+      </div>
+    </div>
+  </div>
+</form>

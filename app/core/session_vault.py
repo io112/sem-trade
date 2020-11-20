@@ -7,6 +7,8 @@ session_collection = 'session'
 def get_session(sid):
     query = {"_id": sid}
     res = db.find_one(session_collection, query)
+    if res is None:
+        return None
     session = Session()
     session.create_from_struct(res)
     return session

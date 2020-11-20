@@ -1,0 +1,21 @@
+{% for item in items %}
+  <tr>
+    <td>
+      <span class="name mb-0 text-sm">{{ item.name }}</span>
+    </td>
+    <td class="number">
+      <input class="form-control" type="number" placeholder="количество" value="{{ item.amount }}">
+    </td>
+    <td class="price">
+      <input class="form-control" type="number" placeholder="цена" value="{{ item.price }}">
+    </td>
+    <td class="fullprice">
+      1₽
+    </td>
+    <td>
+      <a class="nav-link" onclick="">
+        <i class="fa fa-trash-alt text-red"></i>
+      </a>
+    </td>
+  </tr>
+{% endfor %}

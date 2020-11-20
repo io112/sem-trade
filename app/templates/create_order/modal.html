@@ -12,47 +12,10 @@
         <!-- Рукав -->
         <h6 class="heading-small text-muted mb-4">Выбор рукава</h6>
         <div class="pl-lg-4">
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="form-group">
-                <label class="form-control-label" for="input-diameter">Диаметр</label>
-                <select class="form-control fstdropdown-select" id="input-diameter">
-                  <option value="">Выберите диаметр</option>
-                  <option value="1">5 мм</option>
-                  <option value="2">10 мм</option>
-                  <option value="3">12 мм</option>
-                </select>
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <div class="form-group">
-                <label class="form-control-label" for="input-braid">Тип оплетки</label>
-                <select class="form-control fstdropdown-select" id="input-braid">
-                  <option value="">Выберите оплетку</option>
-                  <option value="1">15N</option>
-                  <option value="2">25N</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="form-group">
-                <label class="form-control-label" for="input-pipe">Шланг</label>
-                <select class="form-control fstdropdown-select" id="input-pipe">
-                  <option value="">Выберите шланг</option>
-                  <option value="1">Рукав 1</option>
-                  <option value="2">Рукав 2</option>
-                </select>
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <div class="form-group">
-                <label class="form-control-label" for="input-length">Длина рукава (м)</label>
-                <input id="input-length" class="form-control" type="number" placeholder="1">
-              </div>
-            </div>
-          </div>
+          {% include 'create_order/arm_section.html' %}
+        </div>
+        <div class="col-4 text-left">
+          <a href="#!" onclick="dropArm()" class="btn btn-sm btn-primary">Сбросить рукав</a>
         </div>
         <hr class="my-4"/>
         <!-- Фитинги -->

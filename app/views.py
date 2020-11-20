@@ -1,6 +1,8 @@
 from flask import request, render_template, redirect, url_for
+import json
 from flask_httpauth import HTTPBasicAuth
 from app.constants import *
+from app.core.models.offer import RVDOffer
 from app.crm import base
 from app import app
 from werkzeug.security import check_password_hash
@@ -26,14 +28,18 @@ def verify_password(username, password):
 
 
 testitem = {'name': 'testitem', 'amount': 5, 'price': 500}
+testoffer = {'arms': [{'diameter': 5}, {'diameter': 10}]}
+
 
 @app.route('/', methods=['GET'])
 def home():
     sid = request.args.get('sid')
     cs = check_sid(sid)
     if not cs:
-        redirect(url_for('home', sid=start_session().get_id()))
-    return render_template('create_order/create_order.html', items=[testitem])
+        return redirect(url_for('home', sid=start_session().get_id()))
+    session = get_session(sid)
+    offer = RVDOffer(session).to_dict()
+    return render_template('create_order/create_order.html', items=[testitem], offer=offer)
 
 
 @app.route('/api/update_session', methods=['POST'])
@@ -42,11 +48,24 @@ def update_session_view():
     cs = check_sid(sid)
     if not cs:
         return 'fail', 403
-    data = json.loads(request.form.get('data', {}))
+    data = json.loads(request.form.get('data', []))
     session = get_session(sid)
     session.add_data(data)
     update_session(session)
     return 'success'
+
+
+@app.route('/api/update_arm_section', methods=['POST'])
+def update_arm_sec():
+    sid = request.form.get('sid')
+    cs = check_sid(sid)
+    if not cs:
+        return 'fail', 403
+    session = get_session(sid)
+    offer = RVDOffer(session).to_dict()
+    offer_string = json.dumps(offer).encode('utf-8')
+    print(offer_string)
+    return offer_string
 
 
 @app.route('/bitrix/admin/1c_exchange.php', methods=['GET', 'POST'])

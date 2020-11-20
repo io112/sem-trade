@@ -12,8 +12,8 @@
           </div>
           <hr class="my-4">
         </div>
-        <div class="card-body pt-0">
-          {% include 'create_order/order_list.html' %}
+        <div class="card-body pt-0" id="checkout_list">
+          {% include 'create_order/checkout_list.html' %}
         </div>
       </div>
     </div>
@@ -35,7 +35,7 @@
                   <div class="form-group">
                     <label class="form-control-label" for="input-clientname">Организация или имя
                       клиента</label>
-                    <input type="text" id="input-clientname" class="form-control"
+                    <input type="text" id="input-clientname" class="form-control" value="{{ client_name }}"
                            placeholder="ООО &#34Рога и Копыта&#34">
                   </div>
                 </div>
@@ -50,7 +50,6 @@
               <div class="col-4 text-right">
                 <a href="#!" class="btn btn-sm btn-primary" data-toggle="modal"
                    data-target="#addModal">Добавить рукав</a>
-
               </div>
               <div class="table-responsive">
                 <table class="table align-items-center table-flush">
@@ -64,25 +63,7 @@
                   </tr>
                   </thead>
                   <tbody class="list">
-                  <tr>
-                    <td>
-                      <span class="name mb-0 text-sm">Рукав DK test</span>
-                    </td>
-                    <td class="number">
-                      <input class="form-control" type="number" placeholder="количество" value="1">
-                    </td>
-                    <td class="price">
-                      <input class="form-control" type="number" placeholder="цена" value="1">
-                    </td>
-                    <td class="fullprice">
-                      1₽
-                    </td>
-                    <td>
-                      <a class="nav-link" href="/main">
-                        <i class="fa fa-trash-alt text-red"></i>
-                      </a>
-                    </td>
-                  </tr>
+                    {% include "create_order/items_list.html" %}
                   </tbody>
                 </table>
               </div>

@@ -29,11 +29,38 @@ def find_one(collection, query):
 
 
 def find(collection, query):
-    return db[collection].find(query)
+    if query is None:
+        query = {}
+    resp = db[collection].find(query)
+    result = []
+    for i in resp:
+        result.append(i)
+    return result
 
 
-def find_one(collection, query):
-    return db[collection].find_one(query)
+def join_queries(*queries):
+    res = {}
+    for i in queries:
+        if not isinstance(i, dict):
+            continue
+        res.update(i)
+    return res
+
+
+def join_queries_and_find(collection, *queries):
+    return find(collection, join_queries(*queries))
+
+
+def distinct_find(collection, query):
+    if query is None:
+        query = {}
+    resp = db[collection].find(query)
+    for i in query:
+        resp = resp.distinct(i)
+    result = []
+    for i in resp:
+        result.append(i)
+    return result
 
 
 def remove(collection, query):
