@@ -3,3 +3,4 @@ venv
 __pycache__
 crm/tmp
 pythonenv3.8
+app/argon-dashboard-master

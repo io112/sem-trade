@@ -26,10 +26,10 @@
   <div class="row">
     <div class="col-lg-6">
       <div class="form-group">
-        <label class="form-control-label" for="input-arm-vendor">Производитель</label>
-        <select name="vendor" class="form-control fstdropdown-select" id="input-arm-vendor">
-          <option value="">Выберите производителя</option>
-          {% for vendor in offer.arms | map(attribute='vendor') | list | unique %}
+        <label class="form-control-label" for="input-arm-type">Тип рукава</label>
+        <select name="arm_type" class="form-control fstdropdown-select" id="input-arm-type">
+          <option value="">Выберите тип рукава</option>
+          {% for vendor in offer.arms | map(attribute='arm_type') | list | unique %}
             <option type="number" value="{{ vendor }}">{{ vendor }}</option>
           {% endfor %}
         </select>

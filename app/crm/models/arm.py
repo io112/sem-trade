@@ -6,6 +6,7 @@ class Arm(SiteObj):
     diameter_name = 'Диаметр'
     vendor_name = 'Производитель'
     braid_name = 'Тип оплетки'
+    arm_type_name = 'Тип рукава'
 
     def __init__(self):
         super().__init__()
@@ -17,6 +18,7 @@ class Arm(SiteObj):
         self.diameter = 'Не задан'
         self.vendor = 'Не задан'
         self.braid = 'Не задан'
+        self.arm_type = 'Не задан'
         self.type = 'arm'
 
     def convert_to_dict(self):
@@ -24,6 +26,7 @@ class Arm(SiteObj):
         data['diameter'] = self.diameter
         data['vendor'] = self.vendor
         data['braid'] = self.braid
+        data['arm_type'] = self.arm_type
         return data
 
     @staticmethod
@@ -40,4 +43,6 @@ class Arm(SiteObj):
                 res.vendor = i[2].text
             elif i[1].text == Arm.braid_name:
                 res.braid = i[2].text
+            elif i[1].text == Arm.arm_type_name:
+                res.arm_type = i[2].text
         return res

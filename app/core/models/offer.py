@@ -32,7 +32,14 @@ class RVDOffer:
         selection = session.data.get('selection')
         if selection is None:
             selection = {}
+        fitings = selection.get('fitings')
+        arm = selection.get('arm')
+        if fitings is None:
+            fitings = {}
+        if arm is None:
+            arm = {}
         self.selection = selection
-        self.arms = db.join_queries_and_find(dbvars.arm_collection, selection.get('arm'), self.not_zero_amount)
-        self.cluthes = db.join_queries_and_find(dbvars.clutch_collection, selection.get('clutch'), self.not_zero_amount)
-        self.fitings = db.join_queries_and_find(dbvars.fiting_collection, selection.get('fiting'), self.not_zero_amount)
+        self.arms = db.join_queries_and_find(dbvars.arm_collection, arm, self.not_zero_amount)
+        self.cluthes = db.join_queries_and_find(dbvars.clutch_collection, selection.get('clutch'), arm.get('braid'), self.not_zero_amount)
+        self.fitings['1'] = db.join_queries_and_find(dbvars.fiting_collection, fitings.get('1'), self.not_zero_amount)
+        self.fitings['2'] = db.join_queries_and_find(dbvars.fiting_collection, fitings.get('2'), self.not_zero_amount)

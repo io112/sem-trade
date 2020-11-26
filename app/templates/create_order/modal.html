@@ -21,72 +21,10 @@
         <!-- Фитинги -->
         <h6 class="heading-small text-muted mb-4">Фитинги</h6>
         <div class="pl-lg-4">
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="form-group">
-                <label class="form-control-label" for="input-fit-std-1">Стандарт фитинга 1</label>
-                <select class="form-control fstdropdown-select" id="input-fit-std-1">
-                  <option value="">Выберите стандарт фитинга</option>
-                  <option value="1">DK</option>
-                  <option value="2">DKI</option>
-                </select>
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <div class="form-group">
-                <label class="form-control-label" for="input-fit-std-2">Стандарт фитинга 2</label>
-                <select class="form-control fstdropdown-select" id="input-fit-std-2">
-                  <option value="">Выберите стандарт фитинга</option>
-                  <option value="1">DK</option>
-                  <option value="2">DKI</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="form-group">
-                <label class="form-control-label" for="input-fit-1">Фитинг</label>
-                <select class="form-control fstdropdown-select" id="input-fit-1">
-                  <option value="">Выберите фитинг</option>
-                  <option value="1">DK 2x03</option>
-                  <option value="2">DK 2x06</option>
-                </select>
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <div class="form-group">
-                <label class="form-control-label" for="input-fit-2">Фитинг</label>
-                <select class="form-control fstdropdown-select" id="input-fit-2">
-                  <option value="">Выберите фитинг</option>
-                  <option value="1">DK 2x03</option>
-                  <option value="2">DK 2x06</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="form-group">
-                <label class="form-control-label" for="input-muf-1">Муфта</label>
-                <select class="form-control fstdropdown-select" id="input-muf-1">
-                  <option value="">Выберите муфту</option>
-                  <option value="1">Муфта 2x03</option>
-                  <option value="2">Муфта 2x06</option>
-                </select>
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <div class="form-group">
-                <label class="form-control-label" for="input-muf-2">Муфта</label>
-                <select class="form-control fstdropdown-select" id="input-muf-2">
-                  <option value="">Выберите муфту</option>
-                  <option value="1">Муфта 2x03</option>
-                  <option value="2">Муфта 2x06</option>
-                </select>
-              </div>
-            </div>
-          </div>
+          {% include 'create_order/fiting_section.html' %}
+        </div>
+        <div class="col-4 text-left">
+          <a href="#!" onclick="dropFits()" class="btn btn-sm btn-primary">Сбросить рукав</a>
         </div>
         <hr class="my-4"/>
         <!-- Description -->

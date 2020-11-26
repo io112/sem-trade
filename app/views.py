@@ -55,8 +55,8 @@ def update_session_view():
     return 'success'
 
 
-@app.route('/api/update_arm_section', methods=['POST'])
-def update_arm_sec():
+@app.route('/api/update_selection', methods=['POST'])
+def update_select():
     sid = request.form.get('sid')
     cs = check_sid(sid)
     if not cs:
