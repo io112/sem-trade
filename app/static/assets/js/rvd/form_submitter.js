@@ -1,25 +1,27 @@
+'use strict'
+
 document.addEventListener("DOMContentLoaded", init);
-as = ''
-fs = ''
-fs1 = ''
-fs2 = ''
+let as = ''
+let fs = ''
+let fs1 = ''
+let fs2 = ''
 
 let sid = ""
-let current_selection = ""
+let current_selection = {"arm": {}, "fitings": {}, "clutches": {}, "final": {}}
 
 function init() {
     let url = new URL(window.location.href);
     sid = url.searchParams.get("sid");
-    $('#input-clientname').on("input", submitClient)
-    as = $('#arm_section')
-    fs = $('#fiting_section')
-    fs1 = $('#fiting_1_section')
-    fs2 = $('#fiting_2_section')
-    as.on('change', submitArm)
-    fs1.on('change', submitFits)
-    fs2.on('change', submitFits)
+    $('#input-clientname').on("input", submitClient);
+    as = $('#arm_section');
+    fs = $('#fiting_section');
+    fs1 = $('#fiting_1_section');
+    fs2 = $('#fiting_2_section');
+    as.on('change', submitArm);
+    fs1.on('change', submitFits);
+    fs2.on('change', submitFits);
     updateArmSection();
-    updateFitSections()
+    updateFitSections();
 }
 
 function submitClient() {
@@ -29,56 +31,66 @@ function submitClient() {
 }
 
 function submitArm() {
-    let data = {"selection": {"arm": {}}}
+    current_selection["arm"] = {}
     let formRes = as.serializeArray()
     formRes.forEach(i => {
         if (i.value !== "")
-            data["selection"]["arm"][i.name] = i.value
+            current_selection["arm"][i.name] = i.value
     })
-    let resp = writeToSession(sid, data).then(() => updateArmSection())
+    let req = {"selection": current_selection}
+    console.log(req)
+    let resp = writeToSession(sid, req).then(() => updateArmSection())
 }
 
 function submitFits() {
-    let data = {"selection": {"fitings": {}}}
+    current_selection["fitings"] = {}
+    current_selection["clutches"] = {}
     let fit1 = fs1.serializeArray()
     let fit2 = fs2.serializeArray()
-    data["selection"]["fitings"]['1'] = {}
-    data["selection"]["fitings"]['2'] = {}
+    current_selection["clutches"]['1'] = {}
+    current_selection["clutches"]['2'] = {}
+    current_selection["fitings"]['1'] = {}
+    current_selection["fitings"]['2'] = {}
     fit1.forEach(i => {
-        if (i.value !== "")
-            data["selection"]["fitings"]['1'][i.name] = i.value
+        if (i.value !== "") {
+            if (i.name === "clutch_name")
+                current_selection["clutches"]['1']["name"] = i.value
+            else current_selection["fitings"]['1'][i.name] = i.value
+        }
     })
     fit2.forEach(i => {
-        if (i.value !== "")
-            data["selection"]["fitings"]['2'][i.name] = i.value
+        if (i.value !== "") {
+            if (i.name === "clutch_name")
+                current_selection["clutches"]['2']["name"] = i.value
+            else current_selection["fitings"]['2'][i.name] = i.value
+        }
     })
-    let resp = writeToSession(sid, data).then(() => updateFitSections())
-}
-
-function submitFit(dict, name) {
-    let data = {"selection": {"fitings": {}}}
-    let formRes = dict
-    console.log(formRes)
-    data["selection"]["fitings"][name] = {}
-    formRes.forEach(i => {
-        if (i.value !== "")
-            data["selection"]["fitings"][name][i.name] = i.value
-    })
-    let resp = writeToSession(sid, data).then(() => updateFitSections())
+    let req = {"selection": current_selection}
+    let resp = writeToSession(sid, req).then(() => updateFitSections())
 }
 
 function dropArm() {
-    let data = {"selection": {"arm": {}}}
+    current_selection["arm"] = {}
 
-    let resp = writeToSession(sid, data).then(() => updateArmSection())
+    let req = {"selection": current_selection}
+    let resp = writeToSession(sid, req).then(() => updateArmSection())
 }
 
 function dropFits() {
-    let data = {"selection": {"fitings": {}}}
-    data["selection"]["fitings"]['1'] = {}
-    data["selection"]["fitings"]['2'] = {}
+    current_selection["fitings"]['1'] = {}
+    current_selection["fitings"]['2'] = {}
 
-    let resp = writeToSession(sid, data).then(() => updateFitSections())
+    let req = {"selection": current_selection}
+    console.log(req)
+    let resp = writeToSession(sid, req).then(() => updateFitSections())
+}
+
+function dropClutches() {
+    current_selection["clutches"]['1'] = {}
+    current_selection["clutches"]['2'] = {}
+
+    let req = {"selection": current_selection}
+    let resp = writeToSession(sid, req).then(() => updateFitSections())
 }
 
 function writeToSession(sid, data) {
@@ -87,18 +99,22 @@ function writeToSession(sid, data) {
 }
 
 function updateArmSection() {
-    send('/api/update_selection').then((resp) => {
-        resp = JSON.parse(resp)
+    getCurrentSelection().then((resp) => {
+        console.log(resp)
         const diameter_select = $('#input-arm-diameter')
         const braid_select = $('#input-arm-braid')
         const type_select = $('#input-arm-type')
+        const length_select = $('#input-arm-length')
         diameter_select.empty().append(new Option("Выберите диаметр", ""));
         braid_select.empty().append(new Option("Выберите оплетку", ""));
         type_select.empty().append(new Option("Выберите тип рукава", ""));
         let offer = createUniqueArmOffer(resp)
-        let selection = resp['selection']['arm']
+        let selection = current_selection['arm']
         if (selection === undefined) {
             selection = {}
+        }
+        if (current_selection["arm"]['length'] !== undefined) {
+            length_select.val(parseInt(current_selection["arm"]['length']))
         }
         offer[0].forEach((diameter) => {
             diameter_select.append(new Option(diameter + ' мм', diameter));
@@ -122,13 +138,13 @@ function updateArmSection() {
         document.getElementById('input-arm-diameter').fstdropdown.rebind()
         document.getElementById('input-arm-type').fstdropdown.rebind()
         document.getElementById('input-arm-braid').fstdropdown.rebind()
+        updateFitSections();
     })
 
 }
 
 function updateFitSections() {
-    send('/api/update_selection').then((resp) => {
-        resp = JSON.parse(resp);
+    getCurrentSelection().then((resp) => {
         ['1', '2'].forEach((num) => updateFitSection(num, resp));
     })
 }
@@ -137,15 +153,20 @@ function updateFitSection(num, resp) {
     const standart_select = $('#input-fit-std-' + num)
     const diameter_select = $('#input-fit-d-' + num)
     const fit_select = $('#input-fit-' + num)
+    const muf_select = $('#input-muf-' + num)
     diameter_select.empty().append(new Option("Выберите диаметр", ""));
     standart_select.empty().append(new Option("Выберите стандарт фитинга", ""));
     fit_select.empty().append(new Option("Выберите фитинг", ""));
+    muf_select.empty().append(new Option("Выберите муфту", ""));
     let offer = createUniqueFitOffer(resp, num)
-    let selection = resp['selection']['fitings']
+    let selection = current_selection['fitings']
     if (selection === undefined) {
         selection = {'1': {}, '2': {}}
     }
     selection = selection[num]
+    if (selection === undefined) {
+        selection = {}
+    }
     offer[0].forEach((diameter) => {
         diameter_select.append(new Option(diameter + ' мм', diameter));
     })
@@ -154,6 +175,9 @@ function updateFitSection(num, resp) {
     })
     offer[2].forEach((fit) => {
         fit_select.append(new Option(fit, fit));
+    })
+    resp['clutches'].forEach((muf) => {
+        muf_select.append(new Option(muf['name'], muf['name']));
     })
     if (selection['fiting_type'] !== undefined) {
         $('#input-fit-std-' + num + " option:last").attr("selected", "selected");
@@ -164,10 +188,14 @@ function updateFitSection(num, resp) {
     if (selection['name'] !== undefined) {
         $("#input-fit-" + num + " option:last").attr("selected", "selected");
     }
+    if (current_selection['clutches'] !== undefined && current_selection['clutches'][num]['name'] !== undefined) {
+        $("#input-muf-" + num + " option:last").attr("selected", "selected");
+    }
 
     document.getElementById('input-fit-std-' + num).fstdropdown.rebind()
     document.getElementById('input-fit-d-' + num).fstdropdown.rebind()
     document.getElementById('input-fit-' + num).fstdropdown.rebind()
+    document.getElementById('input-muf-' + num).fstdropdown.rebind()
 }
 
 function createUniqueDict(dict) {
@@ -237,3 +265,60 @@ async function send(endpoint, data) {
         }
     });
 }
+
+async function getCurrentSelection() {
+    let resp = await send('/api/update_selection');
+    resp = JSON.parse(resp);
+    if (resp['selection'] !== undefined) {
+        current_selection = resp['selection']
+    }
+    if (current_selection["clutches"] === undefined)
+        current_selection["clutches"] = {"1": {}, "2": {}}
+    if (current_selection["fitings"] === undefined)
+        current_selection["fitings"] = {"1": {}, "2": {}}
+    updateSelectionSubtotal()
+    return resp;
+}
+
+function changeSelectAmount() {
+    if (current_selection["subtotal"] === undefined) {
+        current_selection["subtotal"] = {}
+    }
+    current_selection["subtotal"]["amount"] = parseInt($('#subtotal_amount').val());
+    let req = {"selection": current_selection}
+    let resp = writeToSession(sid, req).then(() => {
+        getCurrentSelection()
+    })
+
+}
+
+function updateSelectionSubtotal() {
+    let name = current_selection["subtotal"]["name"]
+    let price = current_selection["subtotal"]["price"]
+    let amount = current_selection["subtotal"]["amount"]
+    let total_price = current_selection["subtotal"]["total_price"]
+    console.log(current_selection["subtotal"])
+    $('#select_subtotal tbody').empty().append('<tr>\n' +
+        '<td>\n' +
+        '<span class="name mb-0 text-sm">' + name + '</span>\n' +
+        '</td>\n' +
+        '<td class="number">\n' +
+        '<input class="form-control" id="subtotal_amount" onchange="changeSelectAmount()" type="number" placeholder="количество" value="' + amount + '">\n' +
+        '</td>\n' +
+        '<td class="price">\n' + price +
+        ' ₽\n' +
+        '</td>\n' +
+        '<td class="fullprice">\n' + total_price +
+        ' ₽\n' +
+        '</td>\n' +
+        '</tr>'
+    );
+}
+
+function addToCart() {
+    submitArm()
+    submitFits()
+    let res = send("/api/submit_selection", {'sid': sid});
+    return res
+}
+

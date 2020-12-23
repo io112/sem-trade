@@ -68,6 +68,18 @@ def update_select():
     return offer_string
 
 
+@app.route('/api/submit_selection', methods=['POST'])
+def move_selection_to_cart():
+    sid = request.form.get('sid')
+    cs = check_sid(sid)
+    if not cs:
+        return 'fail', 403
+    session = get_session(sid)
+    offer = RVDOffer(session)
+    offer.create_cart_item(session, False)
+    return 'success'
+
+
 @app.route('/bitrix/admin/1c_exchange.php', methods=['GET', 'POST'])
 @auth.login_required
 def exchange():

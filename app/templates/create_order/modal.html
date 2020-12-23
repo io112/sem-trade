@@ -24,20 +24,20 @@
           {% include 'create_order/fiting_section.html' %}
         </div>
         <div class="col-4 text-left">
-          <a href="#!" onclick="dropFits()" class="btn btn-sm btn-primary">Сбросить рукав</a>
+          <a href="#!" onclick="dropFits()" class="btn btn-sm btn-primary">Сбросить фитинги</a>
+          <a href="#!" onclick="dropClutches()" class="btn btn-sm btn-primary">Сбросить муфты</a>
         </div>
         <hr class="my-4"/>
         <!-- Description -->
         <h6 class="heading-small text-muted mb-4">Подытог</h6>
         <div class="table-responsive">
-          <table class="table align-items-center table-flush">
+          <table id="select_subtotal" class="table align-items-center table-flush">
             <thead class="thead-light">
             <tr>
               <th scope="col" class="sort" data-sort="name">Наименование</th>
               <th scope="col" class="sort" data-sort="number">Количество</th>
               <th scope="col" class="sort" data-sort="price">цена за штуку</th>
               <th scope="col" class="sort" data-sort="fullprice">Общая цена</th>
-              <th scope="col"></th>
             </tr>
             </thead>
             <tbody class="list">
@@ -66,7 +66,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-        <button type="button" class="btn btn-primary">Сохранить</button>
+        <button onclick="addToCart()" type="button" class="btn btn-primary" data-dismiss="modal">Сохранить</button>
       </div>
     </div>
   </div>
