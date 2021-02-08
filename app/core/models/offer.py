@@ -1,6 +1,8 @@
 import app.db.base as db
 import app.db.variables as dbvars
 from app.core.models.RVDItem import RVDItem
+from app.core.models.selection import RVDSelection
+from app.core.models.session import Session
 from app.core.sessions import update_session
 
 
@@ -121,32 +123,25 @@ class RVDOffer:
         # TODO: clear selection and decrement amounts
         return 'success'
 
-    def filter_by_session(self, session):
+    def filter_by_session(self, session: Session):
         clutch_params = {}
-        selection = session.data.get('selection')
+        selection = RVDSelection(session)
         self.selection = selection
         self.selection["subtotal"] = self.make_subtotal()
-        session.add_data({'selection': self.selection})
+        session.add_data({'selection': self.selection.__get__()})
         update_session(session)
-        if selection is None:
-            selection = {}
-        fitings = selection.get('fitings')
-        arm = selection.get('arm')
-        if fitings is None:
-            fitings = {}
-        if arm is None:
-            arm = {}
-        if arm.get('diameter') is not None:
-            clutch_params = {'diameter': arm.get('diameter')}
+        fiting1 = selection.fiting1
+        fiting2 = selection.fiting2
+        arm = selection.arm
+        if arm['diameter'] is not None:
+            clutch_params = {'diameter': arm['diameter']}
         self.selection = selection
-        arm_len = arm.get('length')
-        if arm_len is not None:
-            arm.__delitem__('length')
-        self.arms = db.join_queries_and_find(dbvars.arm_collection, arm, self.not_zero_amount)
+        self.arms = db.join_queries_and_find(dbvars.arm_collection, arm.get_filter_params(), self.not_zero_amount)
         self.clutches = db.join_queries_and_find(dbvars.clutch_collection, clutch_params, self.not_zero_amount)
-        self.fitings['1'] = db.join_queries_and_find(dbvars.fiting_collection, fitings.get('1'), self.not_zero_amount)
-        self.fitings['2'] = db.join_queries_and_find(dbvars.fiting_collection, fitings.get('2'), self.not_zero_amount)
-        arm['length'] = arm_len
+        self.fitings['1'] = db.join_queries_and_find(dbvars.fiting_collection, fiting1.get_filter_params(),
+                                                     self.not_zero_amount)
+        self.fitings['2'] = db.join_queries_and_find(dbvars.fiting_collection, fiting2.get_filter_params(),
+                                                     self.not_zero_amount)
 
     def get_component_price(self, collection, component):
         res = self.get_component(collection, component)
