@@ -31,7 +31,7 @@ function submitClient() {
 }
 
 function submitArm() {
-    current_selection["arm"] = {}
+    current_selection["arm"] = {'type': 'arm'}
     let formRes = as.serializeArray()
     formRes.forEach(i => {
         if (i.value !== "")
@@ -43,26 +43,25 @@ function submitArm() {
 }
 
 function submitFits() {
-    current_selection["fitings"] = {}
-    current_selection["clutches"] = {}
     let fit1 = fs1.serializeArray()
     let fit2 = fs2.serializeArray()
-    current_selection["clutches"]['1'] = {}
-    current_selection["clutches"]['2'] = {}
-    current_selection["fitings"]['1'] = {}
-    current_selection["fitings"]['2'] = {}
+    current_selection["clutch1"] = {'type': 'clutch'}
+    current_selection["clutch2"] = {'type': 'clutch'}
+    current_selection["fiting1"] = {'type': 'fiting'}
+    current_selection["fiting2"] = {'type': 'fiting'}
     fit1.forEach(i => {
         if (i.value !== "") {
             if (i.name === "clutch_name")
-                current_selection["clutches"]['1']["name"] = i.value
-            else current_selection["fitings"]['1'][i.name] = i.value
+                current_selection["clutch1"]["name"] = i.value
+            else
+                current_selection["fiting1"][i.name] = i.value
         }
     })
     fit2.forEach(i => {
         if (i.value !== "") {
             if (i.name === "clutch_name")
-                current_selection["clutches"]['2']["name"] = i.value
-            else current_selection["fitings"]['2'][i.name] = i.value
+                current_selection["clutch2"]["name"] = i.value
+            else current_selection["fiting2"][i.name] = i.value
         }
     })
     let req = {"selection": current_selection}
@@ -77,8 +76,8 @@ function dropArm() {
 }
 
 function dropFits() {
-    current_selection["fitings"]['1'] = {}
-    current_selection["fitings"]['2'] = {}
+    current_selection["fiting1"] = {}
+    current_selection["fiting2"] = {}
 
     let req = {"selection": current_selection}
     console.log(req)
@@ -86,8 +85,8 @@ function dropFits() {
 }
 
 function dropClutches() {
-    current_selection["clutches"]['1'] = {}
-    current_selection["clutches"]['2'] = {}
+    current_selection["clutch1"] = {}
+    current_selection["clutch2"] = {}
 
     let req = {"selection": current_selection}
     let resp = writeToSession(sid, req).then(() => updateFitSections())
@@ -113,8 +112,10 @@ function updateArmSection() {
         if (selection === undefined) {
             selection = {}
         }
-        if (current_selection["arm"]['length'] !== undefined) {
+        if (current_selection["arm"] !== undefined && current_selection["arm"]['length'] !== undefined) {
             length_select.val(parseInt(current_selection["arm"]['length']))
+        } else {
+            length_select.val(0);
         }
         offer[0].forEach((diameter) => {
             diameter_select.append(new Option(diameter + ' мм', diameter));

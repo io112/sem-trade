@@ -1,6 +1,7 @@
 import app.db.base as db
 import app.db.variables as dbvars
 from app.core.models.RVDItem import RVDItem
+from app.core.models.items.base import BaseItem
 from app.core.models.selection import RVDSelection
 from app.core.models.session import Session
 from app.core.sessions import update_session
@@ -13,7 +14,7 @@ class RVDOffer:
         self.arms = {}
         self.clutches = {}
         self.fitings = {}
-        self.selection = {}
+        self.selection = RVDSelection(session)
         self.select_subtotal = {'name': '', 'amount': 1, 'price': 0, 'total_price': 0}
         if session is None:
             self.make_offer()
@@ -34,50 +35,21 @@ class RVDOffer:
                   'fit2': ''
                   }
         components_price = 0
-
         if self.selection is not None:
-            subt = self.selection.get('subtotal')
-            if subt is not None:
-                self.select_subtotal = subt
-                result = subt
-            arm = self.selection.get('arm')
-            fitings = self.selection.get('fitings')
-            clutches = self.selection.get('clutches')
+            arm = self.selection['arm']
+            fiting1 = self.selection['fiting1']
+            fiting2 = self.selection['fiting2']
+            clutches = self.selection['clutches']
 
-            if arm is not None and len(arm.keys()) != 0:
-                params["arm_type"] = arm.get('arm_type')
-                params["braid"] = arm.get('braid')
-                params["diameter"] = arm.get('diameter')
-                arm_len = int(arm.get('length', 1))
-                if arm.get('length') is not None:
-                    arm.__delitem__('length')
-                arm_price = self.get_component_price(dbvars.arm_collection, arm)
-                arm["length"] = str(arm_len)
-                components_price += arm_price * arm_len
+            components_price += arm.get_price()
+            components_price += fiting1.get_price()
+            components_price += fiting2.get_price()
+            components_price += clutches.get_price()
 
-            if fitings is not None:
-                fiting = fitings.get('1')
-                if fiting is not None and len(fiting.keys()) != 0:
-                    params["fit1"] = fiting.get('fiting_type')
-                    components_price += self.get_component_price(dbvars.fiting_collection, fiting)
+        for i in params:
+            if params[i] is None:
+                params[i] = ''
 
-                fiting = fitings.get('2')
-                if fiting is not None and len(fiting.keys()) != 0:
-                    params["fit2"] = fiting.get('fiting_type')
-                    components_price += self.get_component_price(dbvars.fiting_collection, fiting)
-
-            if clutches is not None:
-                clutch = clutches.get('1')
-                if clutch is not None and len(clutch.keys()) != 0:
-                    components_price += self.get_component_price(dbvars.clutch_collection, clutch)
-
-                clutch = clutches.get('2')
-                if clutch is not None and len(clutch.keys()) != 0:
-                    components_price += self.get_component_price(dbvars.clutch_collection, clutch)
-
-            for i in params:
-                if params[i] is None:
-                    params[i] = ''
         result["name"] = f'Рукав {params["arm_type"]}x{params["diameter"]} ' \
                          f'{params["braid"]} {params["fit1"]}+{params["fit2"]}'
         result["price"] = components_price
@@ -86,10 +58,11 @@ class RVDOffer:
         return result
 
     def to_dict(self):
+        self.selection: RVDSelection
         res = {'arms': self.arms,
                'clutches': self.clutches,
                'fitings': self.fitings,
-               'selection': self.selection,
+               'selection': self.selection.__get__(),
                }
         return res
 
@@ -125,14 +98,13 @@ class RVDOffer:
 
     def filter_by_session(self, session: Session):
         clutch_params = {}
-        selection = RVDSelection(session)
-        self.selection = selection
-        self.selection["subtotal"] = self.make_subtotal()
+        selection = self.selection
+        self.selection.set_subtotal(self.make_subtotal())
         session.add_data({'selection': self.selection.__get__()})
         update_session(session)
-        fiting1 = selection.fiting1
-        fiting2 = selection.fiting2
-        arm = selection.arm
+        fiting1 = selection["fiting1"]
+        fiting2 = selection["fiting2"]
+        arm = selection["arm"]
         if arm['diameter'] is not None:
             clutch_params = {'diameter': arm['diameter']}
         self.selection = selection

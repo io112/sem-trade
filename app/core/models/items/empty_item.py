@@ -2,10 +2,13 @@ from app.core.models.items.base import BaseItem
 
 
 class EmptyItem(BaseItem):
-    @property
-    def param_name(self): return "None"
+    @staticmethod
+    def get_param_name(): return "None"
 
     def get_filter_params(self):
+        return {}
+
+    def __get__(self, instance=None, owner=None) -> dict:
         return {}
 
     def __getitem__(self, item):
