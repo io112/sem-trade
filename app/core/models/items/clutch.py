@@ -4,7 +4,8 @@ import app.db.variables as dbvars
 
 class Clutch(BaseItem):
 
-    def __init__(self):
+    def __init__(self, out_name):
+        super().__init__(out_name)
         self.name = ""
         self.arm_type = ""
         self.diameter = ""
@@ -27,7 +28,7 @@ class Clutch(BaseItem):
         res = {}
         for i in self.__dict__:
             res.update(self.not_zero_prop(i))
-        return {self.param_name: res}
+        return {self.outer_name: res}
 
     def __getitem__(self, item: str) -> str:
         res = self.__dict__.get(item)

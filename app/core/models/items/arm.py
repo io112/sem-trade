@@ -4,7 +4,8 @@ import app.db.variables as dbvars
 
 class Arm(BaseItem):
 
-    def __init__(self):
+    def __init__(self, out_name):
+        super().__init__(out_name)
         self.name = ""
         self.length = "0"
         self.braid = ""
@@ -20,7 +21,7 @@ class Arm(BaseItem):
         res = {}
         for i in self.__dict__:
             res.update(self.not_zero_prop(i))
-        return {'arm': res}
+        return {self.outer_name: res}
 
     def get_filter_params(self) -> dict:
         dictvals = ["name",
@@ -54,3 +55,11 @@ class Arm(BaseItem):
         for i in data:
             if self.__dict__.get(i) is not None:
                 self.__dict__[i] = data[i]
+
+    def get_clutch_params(self):
+        dictvals = ["arm_type",
+                    "diameter"]
+        res = {}
+        for i in dictvals:
+            res.update(self.not_zero_prop(i))
+        return res

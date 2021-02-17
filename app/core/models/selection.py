@@ -11,12 +11,12 @@ class RVDSelection:
     objects = {Arm.get_param_name(): Arm, Clutch.get_param_name(): Clutch, Fiting.get_param_name(): Fiting}
 
     @staticmethod
-    def create_object(name: str) -> BaseItem:
+    def create_object(name: str, out_name: str) -> BaseItem:
         if name is None:
             name = ""
         for i in RVDSelection.objects:
             if i == name:
-                return RVDSelection.objects[i]()
+                return RVDSelection.objects[i](out_name)
         return EmptyItem()
 
     def __init__(self, session: Session):
@@ -27,10 +27,13 @@ class RVDSelection:
         if selection is not None:
             self.selection = selection
         for i in self.selection:
+            if i == "subtotal" and self.selection[i]["amount"] is not None:
+                self.subtotal["amount"] = self.selection[i]["amount"]
+                continue
             item_type = ""
             if self.selection[i] is not None:
                 item_type = self.selection[i].get("type")
-            item = self.create_object(item_type)
+            item = self.create_object(item_type, i)
             item.create_from_dict(self.selection[i])
             self.items[i] = item
 
@@ -48,6 +51,12 @@ class RVDSelection:
         for i in self.items:
             res.update(self.items[i].__get__())
         res.update(self.get_subtotal())
+        return res
+
+    def calc_subtotal(self):
+        res = 0
+        for i in self.items.values():
+            res += i.get_price()
         return res
 
     def set_subtotal(self, subtotal: dict):

@@ -5,6 +5,9 @@ import app.db.base as db
 
 class BaseItem(ABC):
 
+    def __init__(self, out_name: str):
+        self.outer_name = out_name
+
     def not_zero_prop(self, prop):
         res = None
         val = self.__dict__[prop]

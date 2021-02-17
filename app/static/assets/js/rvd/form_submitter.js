@@ -7,7 +7,14 @@ let fs1 = ''
 let fs2 = ''
 
 let sid = ""
-let current_selection = {"arm": {}, "fitings": {}, "clutches": {}, "final": {}}
+let current_selection = {
+    "arm": {},
+    "fiting1": {},
+    "fiting2": {},
+    "clutch1": {},
+    "clutch2": {},
+    "final": {}
+}
 
 function init() {
     let url = new URL(window.location.href);
@@ -36,10 +43,18 @@ function submitArm() {
     formRes.forEach(i => {
         if (i.value !== "")
             current_selection["arm"][i.name] = i.value
+        if (i.name === "diameter") {
+            current_selection["clutch1"] = {'type': 'clutch', 'diameter': i.value}
+            current_selection["clutch2"] = {'type': 'clutch', 'diameter': i.value}
+        }
+
     })
     let req = {"selection": current_selection}
     console.log(req)
-    let resp = writeToSession(sid, req).then(() => updateArmSection())
+    let resp = writeToSession(sid, req).then(() => {
+        updateArmSection()
+        updateFitSections()
+    })
 }
 
 function submitFits() {
@@ -70,6 +85,8 @@ function submitFits() {
 
 function dropArm() {
     current_selection["arm"] = {}
+    current_selection["clutch1"] = {}
+    current_selection["clutch2"] = {}
 
     let req = {"selection": current_selection}
     let resp = writeToSession(sid, req).then(() => updateArmSection())
@@ -160,11 +177,7 @@ function updateFitSection(num, resp) {
     fit_select.empty().append(new Option("Выберите фитинг", ""));
     muf_select.empty().append(new Option("Выберите муфту", ""));
     let offer = createUniqueFitOffer(resp, num)
-    let selection = current_selection['fitings']
-    if (selection === undefined) {
-        selection = {'1': {}, '2': {}}
-    }
-    selection = selection[num]
+    let selection = current_selection['fiting' + num]
     if (selection === undefined) {
         selection = {}
     }
@@ -189,7 +202,7 @@ function updateFitSection(num, resp) {
     if (selection['name'] !== undefined) {
         $("#input-fit-" + num + " option:last").attr("selected", "selected");
     }
-    if (current_selection['clutches'] !== undefined && current_selection['clutches'][num]['name'] !== undefined) {
+    if (current_selection['clutch' + num] !== undefined && current_selection['clutch' + num]['name'] !== undefined) {
         $("#input-muf-" + num + " option:last").attr("selected", "selected");
     }
 
@@ -273,10 +286,6 @@ async function getCurrentSelection() {
     if (resp['selection'] !== undefined) {
         current_selection = resp['selection']
     }
-    if (current_selection["clutches"] === undefined)
-        current_selection["clutches"] = {"1": {}, "2": {}}
-    if (current_selection["fitings"] === undefined)
-        current_selection["fitings"] = {"1": {}, "2": {}}
     updateSelectionSubtotal()
     return resp;
 }

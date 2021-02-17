@@ -2,6 +2,10 @@ from app.core.models.items.base import BaseItem
 
 
 class EmptyItem(BaseItem):
+
+    def __init__(self):
+        super(EmptyItem, self).__init__("Empty")
+
     @staticmethod
     def get_param_name(): return "None"
 

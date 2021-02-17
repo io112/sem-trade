@@ -4,10 +4,12 @@ import app.db.variables as dbvars
 
 class Fiting(BaseItem):
 
-    def __init__(self):
+    def __init__(self, out_name):
+        super().__init__(out_name)
         self.carving = ""
         self.diameter = ""
         self.name = ""
+        self.fiting_type = ""
         self.type = self.get_param_name()
 
     @staticmethod
@@ -17,6 +19,7 @@ class Fiting(BaseItem):
     def get_filter_params(self) -> dict:
         dictvals = ["name",
                     "carving",
+                    "fiting_type",
                     "diameter"]
         res = {}
         for i in dictvals:
@@ -27,7 +30,7 @@ class Fiting(BaseItem):
         res = {}
         for i in self.__dict__:
             res.update(self.not_zero_prop(i))
-        return {'fiting': res}
+        return {self.outer_name: res}
 
     def __getitem__(self, item: str) -> str:
         res = self.__dict__.get(item)

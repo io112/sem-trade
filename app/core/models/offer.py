@@ -1,6 +1,7 @@
 import app.db.base as db
 import app.db.variables as dbvars
 from app.core.models.RVDItem import RVDItem
+from app.core.models.items.arm import Arm
 from app.core.models.items.base import BaseItem
 from app.core.models.selection import RVDSelection
 from app.core.models.session import Session
@@ -27,6 +28,7 @@ class RVDOffer:
         self.fitings = db.find(dbvars.fiting_collection, self.not_zero_amount)
 
     def make_subtotal(self):
+        self.selection: RVDSelection
         result = {'name': '', 'amount': 1, 'price': 0, 'total_price': 0}
         params = {'arm_type': '',
                   'braid': '',
@@ -34,26 +36,21 @@ class RVDOffer:
                   'fit1': '',
                   'fit2': ''
                   }
-        components_price = 0
-        if self.selection is not None:
-            arm = self.selection['arm']
-            fiting1 = self.selection['fiting1']
-            fiting2 = self.selection['fiting2']
-            clutches = self.selection['clutches']
+        arm = self.selection['arm']
+        fiting1 = self.selection['fiting1']
+        fiting2 = self.selection['fiting2']
 
-            components_price += arm.get_price()
-            components_price += fiting1.get_price()
-            components_price += fiting2.get_price()
-            components_price += clutches.get_price()
+        components_price = self.selection.calc_subtotal()
+        amount = self.selection.get_subtotal()['subtotal'].get("amount")
+        print(self.selection.get_subtotal())
+        if amount is None:
+            amount = 1
 
-        for i in params:
-            if params[i] is None:
-                params[i] = ''
-
-        result["name"] = f'Рукав {params["arm_type"]}x{params["diameter"]} ' \
-                         f'{params["braid"]} {params["fit1"]}+{params["fit2"]}'
+        result["name"] = f'Рукав {arm["arm_type"]}x{arm["diameter"]} ' \
+                         f'{arm["braid"]} {fiting1["name"]}+{fiting2["name"]}'
         result["price"] = components_price
-        result["total_price"] = components_price * self.select_subtotal["amount"]
+        result["total_price"] = components_price * amount
+        result["amount"] = amount
         self.select_subtotal = result
         return result
 
@@ -97,7 +94,6 @@ class RVDOffer:
         return 'success'
 
     def filter_by_session(self, session: Session):
-        clutch_params = {}
         selection = self.selection
         self.selection.set_subtotal(self.make_subtotal())
         session.add_data({'selection': self.selection.__get__()})
@@ -105,28 +101,14 @@ class RVDOffer:
         fiting1 = selection["fiting1"]
         fiting2 = selection["fiting2"]
         arm = selection["arm"]
-        if arm['diameter'] is not None:
-            clutch_params = {'diameter': arm['diameter']}
+        clutch_params = {}
+        if arm.get_param_name() == Arm.get_param_name():
+            clutch_params = arm.get_clutch_params()
         self.selection = selection
         self.arms = db.join_queries_and_find(dbvars.arm_collection, arm.get_filter_params(), self.not_zero_amount)
-        self.clutches = db.join_queries_and_find(dbvars.clutch_collection, clutch_params, self.not_zero_amount)
+        self.clutches = db.join_queries_and_find(dbvars.clutch_collection, clutch_params,
+                                                 self.not_zero_amount)
         self.fitings['1'] = db.join_queries_and_find(dbvars.fiting_collection, fiting1.get_filter_params(),
                                                      self.not_zero_amount)
         self.fitings['2'] = db.join_queries_and_find(dbvars.fiting_collection, fiting2.get_filter_params(),
                                                      self.not_zero_amount)
-
-    def get_component_price(self, collection, component):
-        res = self.get_component(collection, component)
-        if res is None:
-            return 0
-        component_price = int(res["price"])
-        return component_price
-
-    @staticmethod
-    def get_component(collection, component: dict):
-        if component.get('length') is not None:
-            component.__delitem__('length')
-        res = db.join_queries_and_find(collection, component)
-        if len(res) == 0:
-            return None
-        return res[0]
