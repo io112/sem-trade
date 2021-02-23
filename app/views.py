@@ -64,7 +64,6 @@ def update_select():
     session = get_session(sid)
     offer = RVDOffer(session).to_dict()
     offer_string = json.dumps(offer).encode('utf-8')
-    print(offer_string)
     return offer_string
 
 
@@ -76,8 +75,8 @@ def move_selection_to_cart():
         return 'fail', 403
     session = get_session(sid)
     offer = RVDOffer(session)
-    offer.create_cart_item(session, False)
-    return 'success'
+    result = offer.create_cart_item(session, False)
+    return result
 
 
 @app.route('/bitrix/admin/1c_exchange.php', methods=['GET', 'POST'])

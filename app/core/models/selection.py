@@ -64,4 +64,23 @@ class RVDSelection:
 
     def get_subtotal(self):
         return {"subtotal": self.subtotal}
-    # def get_price
+
+    def check_presence(self) -> list:
+        candidates = {}
+        req_amounts = {}
+        errors = []
+        for key in self.items:
+            i: BaseItem = self.items[key]
+            if not i.candidate == {}:
+                candidate = i.candidate
+                cid = candidate["_id"]
+                if cid not in candidates:
+                    candidates[cid] = candidate
+                    req_amounts[cid] = 0
+                req_amounts[cid] += i.get_amount()
+                req_amount = req_amounts[cid] * self.subtotal["amount"]
+                if req_amount > int(candidate["amount"]):
+                    errors.append(
+                        f"не хватает материалов: {candidate['name']}, доступно: {candidate['amount']},"
+                        f" требуется: {req_amount}.")
+        return errors

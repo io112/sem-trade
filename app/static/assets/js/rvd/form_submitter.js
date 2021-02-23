@@ -326,9 +326,16 @@ function updateSelectionSubtotal() {
 }
 
 function addToCart() {
-    submitArm()
-    submitFits()
-    let res = send("/api/submit_selection", {'sid': sid});
-    return res
+    send("/api/submit_selection", {'sid': sid}).then(
+        (ans) => {
+            if (ans === 'success') {
+                $('#addModal').modal('hide');
+            } else {
+                alert(ans)
+            }
+        }
+    );
+
+
 }
 

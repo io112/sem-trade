@@ -10,7 +10,7 @@ class EmptyItem(BaseItem):
     def get_param_name(): return "None"
 
     def get_filter_params(self):
-        return {}
+        return self.not_zero_amount
 
     def __get__(self, instance=None, owner=None) -> dict:
         return {}
@@ -22,6 +22,9 @@ class EmptyItem(BaseItem):
         pass
 
     def get_price(self):
+        return 0
+
+    def get_amount(self):
         return 0
 
     def create_from_dict(self, data: dict):

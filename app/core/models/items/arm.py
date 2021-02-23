@@ -3,58 +3,45 @@ import app.db.variables as dbvars
 
 
 class Arm(BaseItem):
+    required_params = ["diameter", "arm_type"]
+    collection = dbvars.arm_collection
 
     def __init__(self, out_name):
         super().__init__(out_name)
+        self.amount = 1
         self.name = ""
-        self.length = "0"
+        self.length = 0
         self.braid = ""
         self.arm_type = ""
         self.diameter = ""
         self.type = self.get_param_name()
 
+    def get_amount(self):
+        return int(self.length) * int(self.amount)
+
     @staticmethod
     def get_param_name() -> str:
         return "arm"
-
-    def __get__(self, instance=None, owner=None) -> dict:
-        res = {}
-        for i in self.__dict__:
-            res.update(self.not_zero_prop(i))
-        return {self.outer_name: res}
 
     def get_filter_params(self) -> dict:
         dictvals = ["name",
                     "braid",
                     "arm_type",
                     "diameter"]
-        res = {}
-        for i in dictvals:
-            res.update(self.not_zero_prop(i))
+        res = self.get_props(dictvals)
+        res["amount"] = {'$gte': int(self.length) * int(self.amount)}
         return res
-
-    def __getitem__(self, item: str) -> str:
-        res = self.__dict__.get(item)
-        if res is not None:
-            return res
-        return ""
-
-    def __setitem__(self, key: str, value: str):
-        self.__dict__[key] = value
 
     def get_price(self) -> float:
         length = 0
         if self["length"] != "":
             length = float(self["length"])
 
-        return float(self.get_component_price(dbvars.arm_collection,
-                                              self.get_filter_params())) \
-               * length
+        if self.candidate == {}:
+            return 0
 
-    def create_from_dict(self, data: dict):
-        for i in data:
-            if self.__dict__.get(i) is not None:
-                self.__dict__[i] = data[i]
+        res = float(self.candidate["price"]) * length
+        return res
 
     def get_clutch_params(self):
         dictvals = ["arm_type",
@@ -62,4 +49,5 @@ class Arm(BaseItem):
         res = {}
         for i in dictvals:
             res.update(self.not_zero_prop(i))
+        res.update(self.not_zero_amount)
         return res
