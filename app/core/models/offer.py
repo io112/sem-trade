@@ -2,6 +2,7 @@ import app.db.base as db
 import app.db.variables as dbvars
 from app.core.models.items.arm import Arm
 from app.core.models.items.base import BaseItem
+from app.core.models.items.composite_item import CompositeItem
 from app.core.models.selection import RVDSelection
 from app.core.models.session import Session
 from app.core.sessions import update_session
@@ -61,16 +62,21 @@ class RVDOffer:
                }
         return res
 
-    def create_cart_item(self, session, is_repair=False):
+    def create_cart_item(self, session, is_repair=False) -> CompositeItem:
         self.selection: RVDSelection
         errors = self.selection.check_presence()
-        ans = 'success'
+        ans = self.selection.finish_selection()
         if len(errors) != 0:
             ans = '\r\n'.join(errors)
             print(errors)
+            raise Exception('selection has problems: ' + ans)
         else:
             print('success')
-        return ans
+            return ans
+
+    def get_errors(self):
+        self.selection: RVDSelection
+        return self.selection.check_presence()
 
     def filter_by_session(self, session: Session):
         selection = self.selection

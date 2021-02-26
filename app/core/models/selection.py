@@ -1,6 +1,7 @@
 from app.core.models.items.arm import Arm
 from app.core.models.items.base import BaseItem
 from app.core.models.items.clutch import Clutch
+from app.core.models.items.composite_item import CompositeItem
 from app.core.models.items.empty_item import EmptyItem
 from app.core.models.items.fiting import Fiting
 from app.core.models.session import Session
@@ -64,6 +65,13 @@ class RVDSelection:
 
     def get_subtotal(self):
         return {"subtotal": self.subtotal}
+
+    def finish_selection(self) -> CompositeItem:
+        if len(self.check_presence()) != 0:
+            raise Exception('some of items not available')
+        res = CompositeItem('rvd_item')
+        res.items = self.items
+        return res
 
     def check_presence(self) -> list:
         candidates = {}

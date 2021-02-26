@@ -75,6 +75,9 @@ def move_selection_to_cart():
         return 'fail', 403
     session = get_session(sid)
     offer = RVDOffer(session)
+    errors = offer.get_errors()
+    if errors:
+        return '\r\n'.join(errors)
     result = offer.create_cart_item(session, False)
     return result
 

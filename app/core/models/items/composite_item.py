@@ -17,4 +17,8 @@ class CompositeItem(BaseItem):
         return self.get_props(dictvals)
 
     def get_price(self) -> float:
-        pass
+        res = 0
+        for i in self.items:
+            i: BaseItem
+            res += i.get_price()
+        return res * self.amount
