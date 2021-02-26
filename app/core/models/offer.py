@@ -1,5 +1,6 @@
 import app.db.base as db
 import app.db.variables as dbvars
+from app.core.models.cart import Cart
 from app.core.models.items.arm import Arm
 from app.core.models.items.base import BaseItem
 from app.core.models.items.composite_item import CompositeItem
@@ -20,6 +21,7 @@ class RVDOffer:
         if session is None:
             self.make_offer()
         else:
+            self.session = session
             self.filter_by_session(session)
 
     def make_offer(self):
@@ -62,17 +64,20 @@ class RVDOffer:
                }
         return res
 
-    def create_cart_item(self, session, is_repair=False) -> CompositeItem:
+    def create_cart_item(self, is_repair=False) -> list:
         self.selection: RVDSelection
         errors = self.selection.check_presence()
-        ans = self.selection.finish_selection()
-        if len(errors) != 0:
-            ans = '\r\n'.join(errors)
+        if errors:
+            response = '\r\n'.join(errors)
             print(errors)
-            raise Exception('selection has problems: ' + ans)
+            raise Exception('selection has problems: ' + response)
         else:
-            print('success')
-            return ans
+            ans = self.selection.finish_selection()
+            cart = Cart.create_from_session(self.session)
+            cart.add(ans)
+            self.session.add_data(cart.__get__())
+            update_session(self.session)
+            return []
 
     def get_errors(self):
         self.selection: RVDSelection

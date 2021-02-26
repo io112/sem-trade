@@ -78,8 +78,9 @@ def move_selection_to_cart():
     errors = offer.get_errors()
     if errors:
         return '\r\n'.join(errors)
-    result = offer.create_cart_item(session, False)
-    return result
+    result = offer.create_cart_item(False)
+    if not result:
+        return 'success'
 
 
 @app.route('/bitrix/admin/1c_exchange.php', methods=['GET', 'POST'])

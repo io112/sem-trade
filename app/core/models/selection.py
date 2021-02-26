@@ -1,24 +1,12 @@
-from app.core.models.items.arm import Arm
 from app.core.models.items.base import BaseItem
-from app.core.models.items.clutch import Clutch
 from app.core.models.items.composite_item import CompositeItem
 from app.core.models.items.empty_item import EmptyItem
-from app.core.models.items.fiting import Fiting
 from app.core.models.session import Session
+from app.core.models.utils import create_simple_item
 
 
 class RVDSelection:
     param_name = "selection"
-    objects = {Arm.get_param_name(): Arm, Clutch.get_param_name(): Clutch, Fiting.get_param_name(): Fiting}
-
-    @staticmethod
-    def create_object(name: str, out_name: str) -> BaseItem:
-        if name is None:
-            name = ""
-        for i in RVDSelection.objects:
-            if i == name:
-                return RVDSelection.objects[i](out_name)
-        return EmptyItem()
 
     def __init__(self, session: Session):
         selection = session.data.get(self.param_name)
@@ -34,7 +22,7 @@ class RVDSelection:
             item_type = ""
             if self.selection[i] is not None:
                 item_type = self.selection[i].get("type")
-            item = self.create_object(item_type, i)
+            item = create_simple_item(item_type, i)
             item.create_from_dict(self.selection[i])
             self.items[i] = item
 
@@ -70,7 +58,8 @@ class RVDSelection:
         if len(self.check_presence()) != 0:
             raise Exception('some of items not available')
         res = CompositeItem('rvd_item')
-        res.items = self.items
+        res.items = self.items.values()
+        res.name = self.subtotal['name']
         return res
 
     def check_presence(self) -> list:

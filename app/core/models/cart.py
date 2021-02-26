@@ -1,4 +1,6 @@
 from app.core.models.items.base import BaseItem
+from app.core.models.session import Session
+from app.core.models.utils import create_item
 
 
 class Cart:
@@ -16,18 +18,28 @@ class Cart:
         self.items.append(item)
 
     def __get__(self, instance=None, owner=None):
-        items = {}
+        items = []
         for i in self.items:
             i: BaseItem
-            items.update(i.__get__())
+            items.append(i.__get__())
         cart = {'cart': {'items': items}}
+        return cart
 
     @staticmethod
     def create_from_dict(cart_dict: dict):
         res = Cart()
         items = cart_dict['items']
         for i in items:
-            item = BaseItem(i)
-            item.create_from_dict(items[i])
+            elem = list(i.values())[0]
+            item = create_item(elem['type'], elem['outer_name'])
+            item.create_from_dict(elem)
             res.add(item)
+        return res
+
+    @staticmethod
+    def create_from_session(session: Session):
+        res = Cart()
+        current_cart = session.data.get('cart')
+        if current_cart is not None:
+            res = Cart.create_from_dict(current_cart)
         return res

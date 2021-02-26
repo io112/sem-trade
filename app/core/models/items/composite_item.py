@@ -1,4 +1,5 @@
 from app.core.models.items.base import BaseItem
+from app.core.models.utils import create_simple_item
 
 
 class CompositeItem(BaseItem):
@@ -6,6 +7,7 @@ class CompositeItem(BaseItem):
     def __init__(self, out_name: str):
         super().__init__(out_name)
         self.name = ""
+        self.type = self.get_param_name()
         self.items = []
 
     @staticmethod
@@ -22,3 +24,26 @@ class CompositeItem(BaseItem):
             i: BaseItem
             res += i.get_price()
         return res * self.amount
+
+    def create_from_dict(self, data: dict):
+        for i in data:
+            if i == 'items':
+                self.process_items(data[i])
+            elif self.__dict__.get(i) is not None:
+                self.__dict__[i] = data[i]
+
+    def process_items(self, items: dict):
+        for item in items:
+            item_type = items[item]['type']
+            res = create_simple_item(item_type, item)
+            res.create_from_dict(items[item])
+            self.items.append(res)
+
+    def __get__(self, instance=None, owner=None) -> dict:
+        res = {'name': self.name, 'type': self.type, 'outer_name': self.outer_name}
+        items = {}
+        for i in self.items:
+            i: BaseItem
+            items.update(i.__get__())
+        res['items'] = items
+        return {self.outer_name: res}
