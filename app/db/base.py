@@ -6,21 +6,24 @@ def insert(collection, data):
     db[collection].insert(data)
 
 
-def replace_upsert(collection, query, update):
-    update: dict
-    requests = [ReplaceOne(query, update, upsert=True)]
+def replace_upsert(collection, query, update_data):
+    update_data: dict
+    requests = [ReplaceOne(query, update_data, upsert=True)]
     db[collection].bulk_write(requests)
 
 
-def replace(collection, query, update, upsert=False):
-    update: dict
-    requests = [ReplaceOne(query, update, upsert=upsert)]
+def replace(collection, query, update_data, upsert=False):
+    update_data: dict
+    requests = [ReplaceOne(query, update_data, upsert=upsert)]
     db[collection].bulk_write(requests)
 
 
-def update_upsert(collection, query, update):
-    update: dict
-    requests = [UpdateOne(query, update, upsert=True)]
+def update_upsert(collection, query, update_data: dict):
+    update(collection, query, update_data, True)
+
+
+def update(collection, query, update_data: dict, upsert=False):
+    requests = [UpdateOne(query, update_data, upsert=upsert)]
     db[collection].bulk_write(requests)
 
 

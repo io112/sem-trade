@@ -16,6 +16,10 @@ class Session:
         self.data[key] = val
         self.last_modified = datetime.utcnow()
 
+    def remove_data(self, key):
+        del self.data[key]
+        self.last_modified = datetime.utcnow()
+
     def to_dict(self):
         return {"_id": self._id,
                 "user": self.user,

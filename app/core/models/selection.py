@@ -59,6 +59,7 @@ class RVDSelection:
             raise Exception('some of items not available')
         res = CompositeItem('rvd_item')
         res.items = self.items.values()
+        res.amount = self.subtotal["amount"]
         res.name = self.subtotal['name']
         return res
 
@@ -80,4 +81,6 @@ class RVDSelection:
                     errors.append(
                         f"не хватает материалов: {candidate['name']}, доступно: {candidate['amount']},"
                         f" требуется: {req_amount}.")
+            else:
+                errors.append(f'Выбраны не все компоненты.')
         return errors

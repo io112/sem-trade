@@ -74,8 +74,13 @@ class RVDOffer:
         else:
             ans = self.selection.finish_selection()
             cart = Cart.create_from_session(self.session)
-            cart.add(ans)
+            err = cart.add(ans)
+            if err != 'success':
+                print('err: ' + err)
+            else:
+                del self.selection
             self.session.add_data(cart.__get__())
+            self.session.remove_data('selection')
             update_session(self.session)
             return []
 

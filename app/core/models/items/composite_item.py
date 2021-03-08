@@ -2,11 +2,13 @@ from app.core.models.items.base import BaseItem
 from app.core.models.utils import create_simple_item
 
 
+# noinspection SpellCheckingInspection
 class CompositeItem(BaseItem):
 
     def __init__(self, out_name: str):
         super().__init__(out_name)
         self.name = ""
+        self.amount = 0
         self.type = self.get_param_name()
         self.items = []
 
@@ -40,10 +42,43 @@ class CompositeItem(BaseItem):
             self.items.append(res)
 
     def __get__(self, instance=None, owner=None) -> dict:
-        res = {'name': self.name, 'type': self.type, 'outer_name': self.outer_name}
+        res = {'name': self.name, 'type': self.type, 'outer_name': self.outer_name,
+               'amount': self.amount}
         items = {}
         for i in self.items:
             i: BaseItem
             items.update(i.__get__())
         res['items'] = items
         return {self.outer_name: res}
+
+    def reserve_item(self) -> str:
+        errors = "success"
+        completed_items = []
+        for i in self.items:
+            i: BaseItem
+            err = i.reserve_item_amount(self.amount * i.amount)
+            if err != 'success':
+                errors += err
+            else:
+                completed_items.append(i)
+        if errors != "success":
+            for i in completed_items:
+                i.unreserve_item()
+        return errors
+
+    def unreserve_item(self):
+        for i in self.items:
+            i.unreserve_item()
+
+    def find_candidate(self):
+        for i in self.items:
+            i: BaseItem
+            i.find_candidate()
+        return 'success'
+
+    def check_validity(self) -> bool:
+        res = True
+        for i in self.items:
+            i: BaseItem
+            res = res and i.check_validity()
+        return res

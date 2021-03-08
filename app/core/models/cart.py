@@ -14,8 +14,15 @@ class Cart:
     def __setitem__(self, key: int, value: BaseItem):
         self.items[key] = value
 
-    def add(self, item: BaseItem):
+    def add(self, item: BaseItem) -> str:
+        item.find_candidate()
+        if not item.check_validity():
+            return 'Item not valid: ' + item.outer_name
+        error = item.reserve_item()
+        if error != 'success':
+            return error
         self.items.append(item)
+        return 'success'
 
     def __get__(self, instance=None, owner=None):
         items = []

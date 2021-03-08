@@ -8,16 +8,15 @@ class Arm(BaseItem):
 
     def __init__(self, out_name):
         super().__init__(out_name)
-        self.amount = 1
+        self.amount = 0
         self.name = ""
-        self.length = 0
         self.braid = ""
         self.arm_type = ""
         self.diameter = ""
         self.type = self.get_param_name()
 
     def get_amount(self):
-        return int(self.length) * int(self.amount)
+        return self.amount
 
     @staticmethod
     def get_param_name() -> str:
@@ -29,7 +28,7 @@ class Arm(BaseItem):
                     "arm_type",
                     "diameter"]
         res = self.get_props(dictvals)
-        res["amount"] = {'$gte': int(self.length) * int(self.amount)}
+        res["amount"] = {'$gte': self.amount}
         return res
 
     def get_price(self) -> float:
@@ -40,7 +39,7 @@ class Arm(BaseItem):
         if self.candidate == {}:
             return 0
 
-        res = float(self.candidate["price"]) * length
+        res = float(self.candidate["price"]) * self.amount
         return res
 
     def get_clutch_params(self):

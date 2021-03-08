@@ -129,8 +129,8 @@ function updateArmSection() {
         if (selection === undefined) {
             selection = {}
         }
-        if (current_selection["arm"] !== undefined && current_selection["arm"]['length'] !== undefined) {
-            length_select.val(parseInt(current_selection["arm"]['length']))
+        if (current_selection["arm"] !== undefined && current_selection["arm"]['amount'] !== undefined) {
+            length_select.val(parseInt(current_selection["arm"]['amount']))
         } else {
             length_select.val(0);
         }
@@ -325,10 +325,17 @@ function updateSelectionSubtotal() {
     );
 }
 
+function updateAllSections(){
+    updateFitSections()
+    updateArmSection()
+    updateSelectionSubtotal()
+}
+
 function addToCart() {
     send("/api/submit_selection", {'sid': sid}).then(
         (ans) => {
             if (ans === 'success') {
+                updateAllSections()
                 $('#addModal').modal('hide');
             } else {
                 alert(ans)

@@ -6,7 +6,7 @@ import app.db.base as db
 class BaseItem(ABC):
     required_params = [""]
     collection = ""
-    not_zero_amount = {'amount': {'$not': {'$eq': '0'}}}
+    not_zero_amount = {'amount': {'$not': {'$eq': 0}}}
 
     def __init__(self, out_name: str):
         self.candidate = {}
@@ -49,6 +49,8 @@ class BaseItem(ABC):
             candidate = self.get_component(self.collection, self.get_filter_params())
             if candidate is not None:
                 self.candidate = candidate
+            else:
+                candidate = {}
 
     @abstractmethod
     def get_price(self) -> float:
@@ -57,7 +59,12 @@ class BaseItem(ABC):
     def create_from_dict(self, data: dict):
         for i in data:
             if self.__dict__.get(i) is not None:
-                self.__dict__[i] = data[i]
+                val = data[i]
+                try:
+                    val = float(val)
+                except Exception:
+                    pass
+                self.__dict__[i] = val
         self.find_candidate()
 
     @staticmethod
@@ -88,5 +95,44 @@ class BaseItem(ABC):
                 res = False
         return res
 
+    def check_validity(self) -> bool:
+        res = self.check_required_params()
+        if self.candidate == {}:
+            return False
+        return res
+
     def get_amount(self):
         return int(self.amount)
+
+    def reserve_item(self) -> str:
+        return self.reserve_item_amount(self.amount)
+
+    def reserve_item_amount(self, amount) -> str:
+        fin_amount = self.candidate['amount'] - amount
+        if fin_amount < 0:
+            return 'not enough amount'
+        if self.candidate == {}:
+            print('Candidate not found')
+            return 'No candidate found'
+        else:
+            self.update_item_amount(fin_amount)
+            return 'success'
+
+    def unreserve_item(self):
+        return self.unreserve_item_amount(self.amount)
+
+    def unreserve_item_amount(self, amount):
+        if self.candidate == {}:
+            print('Candidate not found')
+            return 'No candidate found'
+        else:
+            self.update_item_amount(self.candidate['amount'] + amount)
+            return 'success'
+
+    def update_item_amount(self, new_amount) -> str:
+        item_id = self.candidate['_id']
+        q = {'_id': item_id}
+        update_data = {'$set': {'amount': new_amount}}
+        self.candidate['amount'] = new_amount
+        db.update(self.collection, q, update_data)
+        return 'success'
