@@ -11,6 +11,8 @@ class BaseItem(ABC):
     def __init__(self, out_name: str):
         self.candidate = {}
         self.amount = 1
+        self.final_price = 0
+        self.is_finish = False
         self.outer_name = out_name
 
     def not_zero_prop(self, prop):
@@ -27,6 +29,10 @@ class BaseItem(ABC):
 
     @abstractmethod
     def get_filter_params(self) -> dict:
+        pass
+
+    @abstractmethod
+    def get_item_params(self) -> list:
         pass
 
     def __get__(self, instance=None, owner=None) -> dict:
@@ -50,11 +56,15 @@ class BaseItem(ABC):
             if candidate is not None:
                 self.candidate = candidate
             else:
-                candidate = {}
+                self.candidate = {}
 
-    @abstractmethod
     def get_price(self) -> float:
-        pass
+        return self.get_price_for_amount(self.amount)
+
+    def get_price_for_amount(self, amount) -> float:
+        if self.candidate == {}:
+            return 0
+        return float(self.candidate["price"]) * amount
 
     def create_from_dict(self, data: dict):
         for i in data:
@@ -105,9 +115,10 @@ class BaseItem(ABC):
         return int(self.amount)
 
     def reserve_item(self) -> str:
-        return self.reserve_item_amount(self.amount)
+        return self._reserve_item_amount(self.amount)
 
-    def reserve_item_amount(self, amount) -> str:
+    def _reserve_item_amount(self, amount) -> str:
+        self.find_candidate()
         fin_amount = self.candidate['amount'] - amount
         if fin_amount < 0:
             return 'not enough amount'
@@ -115,24 +126,35 @@ class BaseItem(ABC):
             print('Candidate not found')
             return 'No candidate found'
         else:
-            self.update_item_amount(fin_amount)
+            self.__update_item_amount(amount * -1)
             return 'success'
 
     def unreserve_item(self):
-        return self.unreserve_item_amount(self.amount)
+        return self._unreserve_item_amount(self.amount)
 
-    def unreserve_item_amount(self, amount):
+    def _unreserve_item_amount(self, amount):
+        self.find_candidate()
         if self.candidate == {}:
             print('Candidate not found')
             return 'No candidate found'
         else:
-            self.update_item_amount(self.candidate['amount'] + amount)
+            self.__update_item_amount(amount)
             return 'success'
 
-    def update_item_amount(self, new_amount) -> str:
+    def __update_item_amount(self, amount) -> str:
         item_id = self.candidate['_id']
         q = {'_id': item_id}
-        update_data = {'$set': {'amount': new_amount}}
-        self.candidate['amount'] = new_amount
+        update_data = {'$inc': {'amount': amount}}
+        self.candidate['amount'] = amount
         db.update(self.collection, q, update_data)
+        return 'success'
+
+    def finish_item(self) -> str:
+        if not self.check_validity():
+            return 'Error: item not valid'
+        self.is_finish = True
+        for i in self.get_item_params():
+            if self.candidate.get(i) is not None:
+                self.__dict__[i] = self.candidate[i]
+        self.final_price = self.get_price()
         return 'success'

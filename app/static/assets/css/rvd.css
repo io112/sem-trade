@@ -1,0 +1,13 @@
+.scrolling-wrapper-flexbox {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.client_card {
+    flex: 0 0 auto;
+    margin: 25px 10px;
+    width: 18rem;
+}

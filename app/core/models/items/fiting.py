@@ -28,7 +28,6 @@ class Fiting(BaseItem):
         res["amount"] = {'$gte': int(self.amount)}
         return res
 
-    def get_price(self) -> float:
-        if self.candidate == {}:
-            return 0
-        return float(self.candidate["price"])
+    def get_item_params(self) -> list:
+        return ["_id", "carving", "diameter", "fiting_type", "measure", "name", "type",
+                "price"]

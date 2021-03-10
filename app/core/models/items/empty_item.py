@@ -27,5 +27,8 @@ class EmptyItem(BaseItem):
     def get_amount(self):
         return 0
 
+    def get_item_params(self) -> list:
+        pass
+
     def create_from_dict(self, data: dict):
         pass
