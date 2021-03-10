@@ -7,6 +7,7 @@ class Cart:
 
     def __init__(self):
         self.items = []
+        self.subtotal = 0.0
 
     def __getitem__(self, item: int) -> BaseItem:
         return self.items[item]
@@ -16,7 +17,7 @@ class Cart:
 
     def add(self, item: BaseItem) -> str:
         item.find_candidate()
-        if not item.check_validity():
+        if item.finish_item() != 'success':
             return 'Item not valid: ' + item.outer_name
         error = item.reserve_item()
         if error != 'success':
@@ -24,13 +25,21 @@ class Cart:
         self.items.append(item)
         return 'success'
 
-    def __get__(self, instance=None, owner=None):
+    def __get__(self, instance=None, owner=None) -> dict:
         items = []
         for i in self.items:
             i: BaseItem
             items.append(i.__get__())
-        cart = {'cart': {'items': items}}
+        self.get_subtotal()
+        cart = {'cart': {'items': items, 'subtotal': self.subtotal}}
         return cart
+
+    def get_subtotal(self):
+        subt = 0
+        for i in self.items:
+            i: BaseItem
+            subt += i.final_price
+        self.subtotal = subt
 
     @staticmethod
     def create_from_dict(cart_dict: dict):
@@ -40,7 +49,7 @@ class Cart:
             elem = list(i.values())[0]
             item = create_item(elem['type'], elem['outer_name'])
             item.create_from_dict(elem)
-            res.add(item)
+            res.items.append(item)
         return res
 
     @staticmethod

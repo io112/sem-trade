@@ -4,20 +4,7 @@
 
   <!-- Page content -->
   <div class="row">
-    <div class="col-xl-4 order-xl-2">
-      <div class="card card-profile">
-        <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
-          <div class="d-flex">
-            <h1 class="display-2">Итог</h1>
-          </div>
-          <hr class="my-4">
-        </div>
-        <div class="card-body pt-0" id="checkout_list">
-          {% include 'create_order/checkout_list.html' %}
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-8 order-xl-1">
+    <div class="col-xl-9 order-xl-1">
       <div class="card">
         <div class="card-header">
           <div class="row align-items-center">
@@ -35,11 +22,13 @@
                   <div class="form-group">
                     <label class="form-control-label" for="input-clientname">Организация или имя
                       клиента</label>
-                    <input type="text" id="input-clientname" class="form-control" value="{{ client_name }}"
+                    <input oninput="update_clients()" type="text" id="input-clientname" class="form-control" value="{{ client_name }}"
                            placeholder="ООО &#34Рога и Копыта&#34">
                   </div>
                 </div>
               </div>
+            </div>
+            <div id="client_div" class="scrolling-wrapper-flexbox">
             </div>
             <hr class="my-4"/>
             <!-- Address -->
@@ -50,9 +39,10 @@
               <div class="col-4 text-right">
                 <a href="#!" class="btn btn-sm btn-primary" data-toggle="modal"
                    data-target="#addModal">Добавить рукав</a>
+                <a href="#!" onclick="update_cart()" class="btn btn-sm btn-primary">Обновить корзину</a>
               </div>
               <div class="table-responsive">
-                <table class="table align-items-center table-flush">
+                <table id="items_list" class="table align-items-center table-flush">
                   <thead class="thead-light">
                   <tr>
                     <th scope="col" class="sort" data-sort="name">Наименование</th>
@@ -63,7 +53,7 @@
                   </tr>
                   </thead>
                   <tbody class="list">
-                    {% include "create_order/items_list.html" %}
+                  {% include "create_order/items_list.html" %}
                   </tbody>
                 </table>
               </div>
@@ -78,6 +68,19 @@
               </div>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 order-xl-2">
+      <div class="card card-profile">
+        <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+          <div class="d-flex">
+            <h1 class="display-2">Итог</h1>
+          </div>
+          <hr class="my-4">
+        </div>
+        <div class="card-body pt-0" id="checkout_list">
+          {% include 'create_order/checkout_list.html' %}
         </div>
       </div>
     </div>

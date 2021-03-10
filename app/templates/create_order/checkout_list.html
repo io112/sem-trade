@@ -1,28 +1,21 @@
 <div class="table-responsive">
-  <table class="table align-items-center table-flush">
-    <thead class="thead-light">
-    <tr>
-      <th scope="col" class="sort" data-sort="name">Наименование</th>
-      <th scope="col" class="sort" data-sort="number">Количество</th>
-      <th scope="col" class="sort" data-sort="fullprice">цена</th>
-    </tr>
-    </thead>
-    <tbody class="list">
-    {% for item in items %}
-      <tr>
-        <td>
-          <span class="name mb-0 text-sm"><b>{{ item.name }}</b></span>
-        </td>
-        <td class="number">
-          <b>{{ item.amount }}</b>
-        </td>
-        <td class="fullprice">
-          <b>{{ item.price }} ₽</b>
-        </td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
+
+  <div class="col mb-4">
+    <select name="sale" class="form-control fstdropdown-select" id="input-sale">
+      <option value="">Выберите скидку</option>
+      <option type="number" value="0">0%</option>
+    </select>
+  </div>
+    <div class="text-center mt-4 mb-4">
+    <h5 class="h4">
+      Клиент: <span id="client_name"></span>
+    </h5>
+  </div>
+  <div class="text-center mt-4 mb-4">
+    <h5 class="h4">
+      Сумма: <span id="cart_total"></span> ₽
+    </h5>
+  </div>
   <hr class="my-4">
   <div class="d-flex justify-content-center">
     <button type="button" class="btn btn-primary">Печать чека</button>

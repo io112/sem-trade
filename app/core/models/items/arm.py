@@ -31,16 +31,9 @@ class Arm(BaseItem):
         res["amount"] = {'$gte': self.amount}
         return res
 
-    def get_price(self) -> float:
-        length = 0
-        if self["length"] != "":
-            length = float(self["length"])
-
-        if self.candidate == {}:
-            return 0
-
-        res = float(self.candidate["price"]) * self.amount
-        return res
+    def get_item_params(self) -> list:
+        return ["_id", "name", "diameter", "measure",
+                "type", "price", "braid", "arm_type"]
 
     def get_clutch_params(self):
         dictvals = ["arm_type",

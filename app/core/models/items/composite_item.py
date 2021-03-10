@@ -43,7 +43,7 @@ class CompositeItem(BaseItem):
 
     def __get__(self, instance=None, owner=None) -> dict:
         res = {'name': self.name, 'type': self.type, 'outer_name': self.outer_name,
-               'amount': self.amount}
+               'amount': self.amount, 'final_price': self.final_price, 'price': self.get_price_for_amount(1)}
         items = {}
         for i in self.items:
             i: BaseItem
@@ -51,12 +51,19 @@ class CompositeItem(BaseItem):
         res['items'] = items
         return {self.outer_name: res}
 
+    def get_price_for_amount(self, amount) -> float:
+        price = 0
+        for i in self.items:
+            i: BaseItem
+            price += i.final_price
+        return price
+
     def reserve_item(self) -> str:
         errors = "success"
         completed_items = []
         for i in self.items:
             i: BaseItem
-            err = i.reserve_item_amount(self.amount * i.amount)
+            err = i._reserve_item_amount(self.amount * i.amount)
             if err != 'success':
                 errors += err
             else:
@@ -65,6 +72,17 @@ class CompositeItem(BaseItem):
             for i in completed_items:
                 i.unreserve_item()
         return errors
+
+    def finish_item(self) -> str:
+        self.final_price = 0
+        for i in self.items:
+            i: BaseItem
+            err = i.finish_item()
+            if err != 'success':
+                return err
+            self.final_price += i.final_price
+        self.final_price *= self.amount
+        return 'success'
 
     def unreserve_item(self):
         for i in self.items:
@@ -82,3 +100,6 @@ class CompositeItem(BaseItem):
             i: BaseItem
             res = res and i.check_validity()
         return res
+
+    def get_item_params(self) -> list:
+        pass

@@ -1,7 +1,8 @@
-from flask import request, render_template, redirect, url_for
+from flask import request, render_template, redirect, url_for, jsonify
 import json
 from flask_httpauth import HTTPBasicAuth
 from app.constants import *
+from app.core.models.cart import Cart
 from app.core.models.offer import RVDOffer
 from app.crm import base
 from app import app
@@ -81,6 +82,17 @@ def move_selection_to_cart():
     result = offer.create_cart_item(False)
     if not result:
         return 'success'
+
+
+@app.route('/api/get_cart', methods=['POST'])
+def get_cart():
+    sid = request.form.get('sid')
+    cs = check_sid(sid)
+    if not cs:
+        return 'fail', 403
+    session = get_session(sid)
+    cart = Cart.create_from_session(session)
+    return jsonify(cart.__get__())
 
 
 @app.route('/bitrix/admin/1c_exchange.php', methods=['GET', 'POST'])

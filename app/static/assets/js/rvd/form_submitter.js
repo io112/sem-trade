@@ -19,7 +19,6 @@ let current_selection = {
 function init() {
     let url = new URL(window.location.href);
     sid = url.searchParams.get("sid");
-    $('#input-clientname').on("input", submitClient);
     as = $('#arm_section');
     fs = $('#fiting_section');
     fs1 = $('#fiting_1_section');
@@ -29,12 +28,7 @@ function init() {
     fs2.on('change', submitFits);
     updateArmSection();
     updateFitSections();
-}
-
-function submitClient() {
-    name = document.getElementById("input-clientname").value;
-    let data = [{"name": name}]
-    writeToSession(sid, data)
+    update_cart();
 }
 
 function submitArm() {
@@ -263,7 +257,7 @@ function createUniqueFitOffer(dict, num) {
     return [diameters, standarts, fits]
 }
 
-async function send(endpoint, data) {
+async function send(endpoint, data = {}) {
     if (data === undefined)
         data = []
     var request = {"data": JSON.stringify(data), "sid": sid}
@@ -325,7 +319,7 @@ function updateSelectionSubtotal() {
     );
 }
 
-function updateAllSections(){
+function updateAllSections() {
     updateFitSections()
     updateArmSection()
     updateSelectionSubtotal()
@@ -340,6 +334,7 @@ function addToCart() {
             } else {
                 alert(ans)
             }
+            update_cart();
         }
     );
 
