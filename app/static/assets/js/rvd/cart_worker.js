@@ -74,11 +74,8 @@ function get_card(id, name, inn, icon, icon_color, orgtext) {
     let c_org = $('<h5>').attr('class', 'card-title text-uppercase text-muted mb-0').text(orgtext)
     let c_orgname = $('<span>').attr('class', 'h3 font-weight-bold mb-0').text(name)
     const c_inn = $('<p>').attr('class', 'mt-3 mb-0 text-sm').append($('<span>').attr('class', 'text-nowrap')
-<<<<<<< HEAD
         .text('ИНН: ' + inn))
-=======
-        .text(inn))
->>>>>>> master
+
     const icon_div = $('<div>').attr('class', 'icon icon-shape ' + icon_color + ' text-white rounded-circle shadow')
         .append($('<i>').attr('class', 'ni ' + icon))
     const c_body = $('<div>').attr('class', 'card card-stats')
