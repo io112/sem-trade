@@ -144,7 +144,7 @@ class BaseItem(ABC):
     def __update_item_amount(self, amount) -> str:
         item_id = self.candidate['_id']
         q = {'_id': item_id}
-        update_data = {'$inc': {'amount': amount}}
+        update_data = {'$inc': {'amount': amount, 'reserved': -1 * amount}}
         self.candidate['amount'] = amount
         db.update(self.collection, q, update_data)
         return 'success'

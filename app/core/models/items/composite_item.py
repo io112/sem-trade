@@ -86,7 +86,8 @@ class CompositeItem(BaseItem):
 
     def unreserve_item(self):
         for i in self.items:
-            i.unreserve_item()
+            i: BaseItem
+            i._unreserve_item_amount(self.amount * i.amount)
 
     def find_candidate(self):
         for i in self.items:

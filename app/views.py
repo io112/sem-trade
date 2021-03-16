@@ -95,6 +95,20 @@ def get_cart():
     return jsonify(cart.__get__())
 
 
+@app.route('/api/del_cart_item', methods=['POST'])
+def del_cart_item():
+    sid = request.form.get('sid')
+    cs = check_sid(sid)
+    if not cs:
+        return 'fail', 403
+    session = get_session(sid)
+    cart = Cart.create_from_session(session)
+    data = json.loads(request.form.get('data', []))
+    del cart[data['id']]
+    cart.save(session)
+    return jsonify(cart.__get__())
+
+
 @app.route('/bitrix/admin/1c_exchange.php', methods=['GET', 'POST'])
 @auth.login_required
 def exchange():

@@ -1,6 +1,7 @@
 from app.core.models.items.base import BaseItem
 from app.core.models.session import Session
 from app.core.models.utils import create_item
+from app.core.sessions import update_session
 
 
 class Cart:
@@ -14,6 +15,13 @@ class Cart:
 
     def __setitem__(self, key: int, value: BaseItem):
         self.items[key] = value
+
+    def __delitem__(self, key: int):
+        if key < len(self.items):
+            item = self.items[key]
+            item: BaseItem
+            item.unreserve_item()
+            del self.items[key]
 
     def add(self, item: BaseItem) -> str:
         item.find_candidate()
@@ -59,3 +67,7 @@ class Cart:
         if current_cart is not None:
             res = Cart.create_from_dict(current_cart)
         return res
+
+    def save(self, session: Session):
+        session.add_data(self.__get__())
+        update_session(session)
