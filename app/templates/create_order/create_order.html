@@ -14,60 +14,67 @@
           </div>
         </div>
         <div class="card-body">
-          <form>
-            <h6 class="heading-small text-muted mb-4">Информация о клиенте</h6>
-            <div class="pl-lg-4">
-              <div class="row">
-                <div class="col-lg">
-                  <div class="form-group">
-                    <label class="form-control-label" for="input-clientname">Организация или имя
-                      клиента</label>
-                    <input oninput="update_clients()" type="text" id="input-clientname" class="form-control" value="{{ client_name }}"
-                           placeholder="ООО &#34Рога и Копыта&#34">
+          <h6 class="heading-small text-muted mb-4">Информация о клиенте</h6>
+          <div class="pl-lg-4">
+            <div class="row">
+              <div class="col-lg">
+                <div class="form-group">
+                  <div class="row mb-3"><label class="form-control-label" for="input-clientname">Организация или имя
+                    клиента</label>
+                    <div class="flex-fill justify-content-end text-right">
+                      <div class= "text-right col">
+                        <a href="#!" onclick="remove_contragent()" class="btn btn-sm btn-primary">Сбросить
+                        клиента</a>
+                      </div>
+                    </div>
                   </div>
+
+                  <input oninput="update_clients()" type="text" id="input-clientname" class="form-control"
+                         value="{{ client_name }}"
+                         placeholder="ООО &#34Рога и Копыта&#34">
                 </div>
               </div>
             </div>
-            <div id="client_div" class="scrolling-wrapper-flexbox">
+          </div>
+          <div id="client_div" class="scrolling-wrapper-flexbox">
+          </div>
+          <hr class="my-4"/>
+          <!-- Address -->
+          <div class="row align-items-center">
+            <div class="col-8">
+              <h3 class="heading-small text-muted mb-4">Состав заказа</h3>
             </div>
-            <hr class="my-4"/>
-            <!-- Address -->
-            <div class="row align-items-center">
-              <div class="col-8">
-                <h3 class="heading-small text-muted mb-4">Состав заказа</h3>
-              </div>
-              <div class="col-4 text-right">
-                <a href="#!" class="btn btn-sm btn-primary" data-toggle="modal"
-                   data-target="#addModal">Добавить рукав</a>
-                <a href="#!" onclick="update_cart()" class="btn btn-sm btn-primary">Обновить корзину</a>
-              </div>
-              <div class="table-responsive">
-                <table id="items_list" class="table align-items-center table-flush">
-                  <thead class="thead-light">
-                  <tr>
-                    <th scope="col" class="sort" data-sort="name">Наименование</th>
-                    <th scope="col" class="sort" data-sort="number">Количество</th>
-                    <th scope="col" class="sort" data-sort="price">цена за штуку</th>
-                    <th scope="col" class="sort" data-sort="fullprice">Общая цена</th>
-                    <th scope="col"></th>
-                  </tr>
-                  </thead>
-                  <tbody class="list">
-                  {% include "create_order/items_list.html" %}
-                  </tbody>
-                </table>
-              </div>
+            <div class="col-4 text-right">
+              <a href="#!" class="btn btn-sm btn-primary" data-toggle="modal"
+                 data-target="#addModal">Добавить рукав</a>
+              <a href="#!" onclick="update_cart()" class="btn btn-sm btn-primary">Обновить корзину</a>
             </div>
-            <hr class="my-4"/>
-            <!-- Description -->
-            <h6 class="heading-small text-muted mb-4">Комментарии</h6>
-            <div class="pl-lg-4">
-              <div class="form-group">
-                <label class="form-control-label">Комментарий к заказу</label>
-                <textarea rows="4" class="form-control" placeholder="Собрать к 20:30"></textarea>
-              </div>
+            <div class="table-responsive">
+              <table id="items_list" class="table align-items-center table-flush">
+                <thead class="thead-light">
+                <tr>
+                  <th scope="col" class="sort" data-sort="name">Наименование</th>
+                  <th scope="col" class="sort" data-sort="number">Количество</th>
+                  <th scope="col" class="sort" data-sort="price">цена за штуку</th>
+                  <th scope="col" class="sort" data-sort="fullprice">Общая цена</th>
+                  <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody class="list">
+                {% include "create_order/items_list.html" %}
+                </tbody>
+              </table>
             </div>
-          </form>
+          </div>
+          <hr class="my-4"/>
+          <!-- Description -->
+          <h6 class="heading-small text-muted mb-4">Комментарии</h6>
+          <div class="pl-lg-4">
+            <div class="form-group">
+              <label class="form-control-label">Комментарий к заказу</label>
+              <textarea rows="4" class="form-control" placeholder="Собрать к 20:30"></textarea>
+            </div>
+          </div>
         </div>
       </div>
     </div>

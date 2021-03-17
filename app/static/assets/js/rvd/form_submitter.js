@@ -19,6 +19,7 @@ let current_selection = {
 function init() {
     let url = new URL(window.location.href);
     sid = url.searchParams.get("sid");
+    init_cw()
     as = $('#arm_section');
     fs = $('#fiting_section');
     fs1 = $('#fiting_1_section');
@@ -269,6 +270,7 @@ async function send(endpoint, data = {}) {
             return e
         },
         fail: function (e) {
+            alert(e)
             return e
         }
     });

@@ -1,7 +1,10 @@
+import sys
+
 from flask import request, render_template, redirect, url_for, jsonify
 import json
 from flask_httpauth import HTTPBasicAuth
 from app.constants import *
+from app.core.models.Contragent import Contragent
 from app.core.models.cart import Cart
 from app.core.models.offer import RVDOffer
 from app.crm import base
@@ -107,6 +110,66 @@ def del_cart_item():
     del cart[data['id']]
     cart.save(session)
     return jsonify(cart.__get__())
+
+
+@app.route('/api/create_contragent', methods=['POST'])
+def create_contragent():
+    data = json.loads(request.form.get('data', []))
+    contragent = Contragent.create_from_form(data)
+    print(contragent.__get__())
+    contragent.save_to_db()
+    return 'success'
+
+
+@app.route('/api/find_contragents', methods=['POST'])
+def find_contragents():
+    data = json.loads(request.form.get('data', []))
+    return jsonify(Contragent.find_contragents(data))
+
+
+@app.route('/api/set_contragent', methods=['POST'])
+def set_contragent():
+    sid = request.form.get('sid')
+    cs = check_sid(sid)
+    if not cs:
+        return 'fail', 403
+    session = get_session(sid)
+    contragent_id = json.loads(request.form.get('data', []))
+    try:
+        contragent = Contragent.create_by_id(contragent_id)
+        contragent.save_to_session(session)
+        return contragent.get()
+    except Exception:
+        print(sys.exc_info()[0])
+        return str(sys.exc_info()[0]), 404
+
+
+@app.route('/api/get_contragent', methods=['POST'])
+def get_contragent():
+    sid = request.form.get('sid')
+    cs = check_sid(sid)
+    if not cs:
+        return 'fail', 403
+    session = get_session(sid)
+    try:
+        contragent = Contragent.create_from_session(session)
+        return contragent.get()
+    except Exception:
+        print(sys.exc_info()[0])
+        return jsonify({})
+
+
+@app.route('/api/remove_contragent', methods=['POST'])
+def remove_contragent():
+    sid = request.form.get('sid')
+    cs = check_sid(sid)
+    if not cs:
+        return 'fail', 403
+    session = get_session(sid)
+    if 'contragent' in session.data:
+        session.remove_data('contragent')
+        update_session(session)
+    return jsonify({})
 
 
 @app.route('/bitrix/admin/1c_exchange.php', methods=['GET', 'POST'])

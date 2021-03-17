@@ -1,3 +1,20 @@
+let is_org_slider = ""
+
+function init_cw() {
+    is_org_slider = $('#contragent_is_org');
+    is_org_slider.on('change', change_contragent_type);
+    get_contragent()
+}
+
+function change_contragent_type() {
+    if ($('#contragent_is_org').is(':checked')) {
+        $('#contragent_surname_block').hide()
+        $('#contragent_surname').val('')
+    } else {
+        $('#contragent_surname_block').show()
+    }
+}
+
 async function get_cart() {
     let endpoint = '/api/get_cart'
     return await send(endpoint)
@@ -27,11 +44,77 @@ function render_cart(cart) {
 
 }
 
+let clients_fixture = [{
+    'id': '1',
+    'name': 'test1',
+    'surname': 'test4',
+    'phone': '+71234567890',
+    'is_org': false
+}, {
+    'id': '2',
+    'name': 'test2',
+    'phone': '+71234561234',
+    'is_org': true
+},
+]
+
 function update_clients() {
+    send('api/find_contragents', $('#input-clientname').val()).then(
+        res => {
+            console.log(res)
+            render_clients(res)
+        }
+    )
+}
+
+function remove_contragent() {
+    send('api/remove_contragent').then(resp => {
+        render_contragent(resp)
+    })
+}
+
+function set_contragent(id) {
+    send('api/set_contragent', id).then(resp => {
+        render_contragent(resp)
+    })
+}
+
+function get_contragent() {
+    send('api/get_contragent').then(resp => {
+        render_contragent(resp)
+    })
+}
+
+function render_contragent(resp) {
+    const inp = $('#input-clientname')
+    if (Object.keys(resp).length !== 0) {
+        let name = resp['name']
+        if (!resp['is_org'])
+            name += ' ' + resp['surname']
+        inp.val(name)
+        inp.prop('disabled', true)
+    } else {
+        inp.val('')
+        inp.prop('disabled', false)
+    }
+    clear_finder()
+}
+
+function clear_finder() {
+    const cd = $('#client_div')
+    cd.empty()
+}
+
+function render_clients(data) {
     const cd = $('#client_div')
     cd.empty()
     cd.append(get_add_card())
-    cd.append(get_client_card(1, 'test', 1111, true))
+    data.forEach(i => {
+        let name = i['name']
+        if (!i['is_org'])
+            name += ' ' + i['surname']
+        cd.append(get_client_card(i['_id'], name, i['phone'], i['is_org']))
+    })
 }
 
 function del_item(id) {
@@ -62,7 +145,16 @@ function get_items_table_row(id, name, amount, price, fullprice) {
 }
 
 
-function get_client_card(id, name, inn, isorg) {
+function create_contragent() {
+    let mas = $('#contragent_form').serializeArray()
+    send('api/create_contragent', mas).then(resp => {
+        $('#addContragentModal').modal('hide');
+    })
+    console.log(mas)
+}
+
+
+function get_client_card(id, name, tel, isorg) {
     let icon = 'ni-briefcase-24'
     let icon_color = 'bg-orange'
     let orgtext = 'Организация'
@@ -71,16 +163,16 @@ function get_client_card(id, name, inn, isorg) {
         icon = 'ni-single-02'
         icon_color = 'bg-blue'
     }
-    return get_card(id, name, inn, icon, icon_color, orgtext)
+    return get_card(id, name, tel, icon, icon_color, orgtext)
 }
 
-function get_card(id, name, inn, icon, icon_color, orgtext) {
+function get_card(id, name, tel, icon, icon_color, orgtext) {
     const res = $('<div>')
-    const fin = $('<a>').attr('href', '#!').append(res).attr('onClick', 'console.log("a")').attr('class', 'client_card')
+    const fin = $('<a>').attr('href', '#!').append(res).attr('onClick', `set_contragent('${id}')`).attr('class', 'client_card')
     let c_org = $('<h5>').attr('class', 'card-title text-uppercase text-muted mb-0').text(orgtext)
     let c_orgname = $('<span>').attr('class', 'h3 font-weight-bold mb-0').text(name)
     const c_inn = $('<p>').attr('class', 'mt-3 mb-0 text-sm').append($('<span>').attr('class', 'text-nowrap')
-        .text('ИНН: ' + inn))
+        .text('Тел: ' + tel))
 
     const icon_div = $('<div>').attr('class', 'icon icon-shape ' + icon_color + ' text-white rounded-circle shadow')
         .append($('<i>').attr('class', 'ni ' + icon))
@@ -109,7 +201,7 @@ function get_add_card() {
     let c_org = $('<h5>').attr('class', 'card-title text-uppercase text-muted mb-0').text(orgtext)
     let c_orgname = $('<span>').attr('class', 'h3 font-weight-bold mb-0').text(name)
     const c_inn = $('<p>').attr('class', 'mt-3 mb-0 text-sm').append($('<span>').attr('class', 'text-nowrap')
-        .text('ИНН: ' + inn))
+        .text('Тел: ' + inn))
 
     const icon_div = $('<div>').attr('class', 'icon icon-shape ' + icon_color + ' text-white rounded-circle shadow')
         .append($('<i>').attr('class', 'ni ' + icon))

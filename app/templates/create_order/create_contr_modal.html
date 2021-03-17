@@ -1,6 +1,6 @@
 <div class="modal fade" id="addContragentModal" tabindex="-1" role="dialog" aria-labelledby="addContragentModalLabel"
      aria-hidden="true">
-  <div class="modal-dialog modal-xl" role="document">
+  <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Добавление контрагента</h5>
@@ -9,11 +9,29 @@
         </button>
       </div>
       <div class="modal-body">
-
+        <form id="contragent_form">
+          <label class="form-control-label" for="contragent_name">Название организации или имя</label>
+          <input id="contragent_name" name="name" type="text" class="form-control"
+                 placeholder="ООО &#34Рога и Копыта&#34">
+          <div id="contragent_surname_block">
+            <label class="mt-3 form-control-label" for="contragent_surname">Фамилия</label>
+            <input id="contragent_surname" name="surname" type="text" class="form-control"
+                   placeholder="Иванов">
+          </div>
+          <label class="mt-3 form-control-label" for="contragent_phone">Номер телефона</label>
+          <input id="contragent_phone" name="phone" type="tel" class="form-control" placeholder="+71234567890">
+          <label class="mt-3 form-control-label" for="contragent_is_org">Юридическое лицо</label>
+          <div>
+            <label class="custom-toggle">
+              <input id="contragent_is_org" name="is_org" type="checkbox">
+              <span class="custom-toggle-slider rounded-circle"></span>
+            </label>
+          </div>
+        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-        <button onclick="" type="button" class="btn btn-primary">Сохранить</button>
+        <button onclick="create_contragent()" type="button" class="btn btn-primary">Сохранить</button>
       </div>
     </div>
   </div>
