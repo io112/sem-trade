@@ -17,7 +17,8 @@ class Session:
         self.last_modified = datetime.utcnow()
 
     def remove_data(self, key):
-        del self.data[key]
+        if key in self.data:
+            del self.data[key]
         self.last_modified = datetime.utcnow()
 
     def to_dict(self):

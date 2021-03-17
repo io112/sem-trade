@@ -23,3 +23,7 @@ def end_session(sid):
 
 def update_session(session):
     set_session(session)
+
+
+def get_session_ids(user=None):
+    return get_sessions(user, True)

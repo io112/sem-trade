@@ -21,6 +21,17 @@ def set_session(session):
     return res
 
 
+def get_sessions(user=None, only_ids=False):
+    query = {}
+    fields = {}
+    if user is not None:
+        query = {"user": user}
+    if only_ids:
+        fields = {'_id': 1}
+    res = db.find(session_collection, query, fields)
+    return res
+
+
 def create_session(sid):
     session = Session()
     session.set_id(sid)

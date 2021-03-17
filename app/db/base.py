@@ -31,10 +31,10 @@ def find_one(collection, query):
     return db[collection].find_one(query)
 
 
-def find(collection, query):
+def find(collection, query, fields=None):
     if query is None:
         query = {}
-    resp = db[collection].find(query)
+    resp = db[collection].find(query, fields)
     result = []
     for i in resp:
         result.append(i)

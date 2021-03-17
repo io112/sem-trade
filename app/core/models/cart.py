@@ -68,6 +68,11 @@ class Cart:
             res = Cart.create_from_dict(current_cart)
         return res
 
+    def remove_cart(self):
+        for i in self.items:
+            i: BaseItem
+            i.unreserve_item()
+
     def save(self, session: Session):
         session.add_data(self.__get__())
         update_session(session)

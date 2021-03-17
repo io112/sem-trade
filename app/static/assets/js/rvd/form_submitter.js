@@ -17,8 +17,8 @@ let current_selection = {
 }
 
 function init() {
-    let url = new URL(window.location.href);
-    sid = url.searchParams.get("sid");
+    sid = Cookies.get('current_order');
+    console.log(sid)
     init_cw()
     as = $('#arm_section');
     fs = $('#fiting_section');
@@ -30,6 +30,7 @@ function init() {
     updateArmSection();
     updateFitSections();
     update_cart();
+    init_sessions();
 }
 
 function submitArm() {

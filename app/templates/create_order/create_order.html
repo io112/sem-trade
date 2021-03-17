@@ -11,6 +11,14 @@
             <div class="col-8">
               <h3 class="mb-0">Редактирование заказа </h3>
             </div>
+            <div class="flex-fill justify-content-end text-right">
+              <div>
+                <a class="col-md-1" href="#!" onclick="del_order()">
+                  <i class="fa fa-trash-alt text-red">
+                  </i>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
         <div class="card-body">
@@ -22,9 +30,9 @@
                   <div class="row mb-3"><label class="form-control-label" for="input-clientname">Организация или имя
                     клиента</label>
                     <div class="flex-fill justify-content-end text-right">
-                      <div class= "text-right col">
+                      <div class="text-right col">
                         <a href="#!" onclick="remove_contragent()" class="btn btn-sm btn-primary">Сбросить
-                        клиента</a>
+                          клиента</a>
                       </div>
                     </div>
                   </div>
@@ -91,6 +99,17 @@
         </div>
       </div>
     </div>
+  </div>
+  <div class="card col">
+    <div class="card-header">
+      <div class="row align-items-center">
+        <div class="col-8">
+          <h3 class="mb-0">Мои корзины</h3>
+        </div>
+      </div>
+    </div>
+    <nav id="nav-pager" aria-label="..." class="pt-3 ml-3">
+    </nav>
   </div>
   <!-- Modal -->
   {% include 'create_order/modal.html' %}
