@@ -26,4 +26,8 @@ def update_session(session):
 
 
 def get_session_ids(user=None):
-    return get_sessions(user, True)
+    return get_sessions(user, ['_id'])
+
+
+def get_user_sessions(user=None, fields=None):
+    return get_sessions(user, fields)

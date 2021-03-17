@@ -43,7 +43,8 @@
         <div class="container-fluid d-flex align-items-center">
           <div class="row">
             <div class="col-lg-20 col-md">
-              <h1 class="display-2 text-white">Создание заказа</h1>
+              <h1 class="display-2 text-white">
+                {% block pagename %}Создание заказа {% endblock %}</h1>
             </div>
           </div>
         </div>
@@ -58,7 +59,7 @@
           <div class="row align-items-center justify-content-lg-between">
             <div class="col-lg-6">
               <div class="copyright text-center  text-lg-left  text-muted">
-                &copy; 2020 СтройЭксперт-М
+                &copy; 2021 СтройЭксперт-М
               </div>
             </div>
           </div>
@@ -77,9 +78,13 @@
   <script src="../static/assets/vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js"></script>
   <!-- Argon JS -->
   <script src="../static/assets/js/argon.js?v=1.2.0"></script>
-  <script src="../static/assets/js/rvd/cart_worker.js"></script>
-  <script src="../static/assets/js/rvd/sessions.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+  <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+  <script src="https://momentjs.com/downloads/moment-timezone-with-data.js"></script>
+{% endblock %}
+
+{% block additional_scripts %}
+
 {% endblock %}
 </body>
 </html>

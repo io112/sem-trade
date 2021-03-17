@@ -1,34 +1,74 @@
-function init_sessions() {
-    get_sessions()
+document.addEventListener("DOMContentLoaded", init);
+
+
+function init() {
+    get_session_list()
 }
 
-function get_sessions() {
-    send('api/get_carts').then(carts => {
-        render_changer(carts)
+async function send(endpoint, data = {}) {
+    if (data === undefined)
+        data = []
+    var request = {"data": JSON.stringify(data)}
+    return await $.ajax({
+        type: "POST",
+        url: endpoint,
+        data: request,
+        success: function (e) {
+            return e
+        },
+        fail: function (e) {
+            alert(e)
+            return e
+        }
+    });
+}
+
+
+function get_session_list() {
+    send('api/get_sessions').then(data => {
+        render_session_list(data)
     })
 }
 
-function render_changer(data) {
-    const nav = $('#nav-pager')
-    nav.empty()
-    const list = $('<ul>').attr('class', 'pagination pagination-lg')
-    let i = 1
-    data.forEach(btn => {
-        let btn_sid = btn['_id']
-        console.log(`${sid} ${btn_sid}`)
-        let is_active = btn_sid === sid;
-        list.append(get_btn(btn_sid, i, is_active))
-        i += 1
+function render_session_list(list) {
+    const tb = $('#sessions_table')
+    tb.empty()
+    list.forEach(session => {
+        console.log(session)
+        tb.append(get_session_row(session['_id'], session['last_modified'], session['user']))
     })
-    list.append(get_btn('', '+', false))
-    nav.append(list)
+
 }
 
-function get_btn(link, text, is_active) {
-    let classes = 'page-item'
-    if (is_active)
-        classes += ' active'
-    const btn = $('<li>').attr('class', classes)
-    btn.append($('<a>').attr('class', 'page-link').attr('href', `/?sid=${link}`).text(text))
-    return btn
+
+function get_session_row(session_id, time, user) {
+    time = moment(time).tz('Europe/Moscow').format('YYYY-MM-DD HH:mm z')
+    return '<tr>\n' +
+        '                  <th scope="row">\n' +
+        `                    <span class="name mb-0 text-sm">${session_id}</span>\n` +
+        '                  </th>\n' +
+        `                  <td>${time}</td>\n` +
+        `                  <td>${user}</td>\n` +
+        '                  <td class="text-right">\n' +
+        '                    <div class="row">\n' +
+        `                      <a class="nav-link" href="#!" onclick="del_session('${session_id}')">\n` +
+        '                        <i class="fa fa-trash-alt text-red"></i>\n' +
+        '                      </a>\n' +
+        `                      <a class="nav-link" href="#!" onclick="open_session('${session_id}')">\n` +
+        '                        <i class="fa fa-edit text-blue"></i>\n' +
+        '                      </a>\n' +
+        '                    </div>\n' +
+        '                  </td>\n' +
+        '                </tr>'
+}
+
+function open_session(new_sid) {
+    window.location.href = '/?sid=' + new_sid
+}
+
+function del_session(del_id) {
+    console.log(del_id)
+    send('api/remove_session', del_id).then(list => {
+        render_session_list(list)
+    })
 }
