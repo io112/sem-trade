@@ -89,6 +89,16 @@ class CompositeItem(BaseItem):
             i: BaseItem
             i._unreserve_item_amount(self.amount * i.amount)
 
+    def cancel_item(self):
+        for i in self.items:
+            i: BaseItem
+            i._cancel_item_amount(self.amount * i.amount)
+
+    def checkout_item(self):
+        for i in self.items:
+            i: BaseItem
+            i._checkout_item_amount(self.amount * i.amount)
+
     def find_candidate(self):
         for i in self.items:
             i: BaseItem

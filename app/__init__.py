@@ -9,7 +9,7 @@ app.config['SECRET_KEY'] = constants.secret_key
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-from app import views
+from app import base_views, api_views
 
 if __name__ == '__main__':
     init()

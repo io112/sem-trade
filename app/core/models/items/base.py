@@ -141,11 +141,29 @@ class BaseItem(ABC):
             self.__update_item_amount(amount)
             return 'success'
 
+    def cancel_item(self):
+        self.__update_reserved_amount(self.amount * -1)
+
+    def _cancel_item_amount(self, amount):
+        self.__update_reserved_amount(amount * -1)
+
+    def checkout_item(self):
+        self.__update_reserved_amount(self.amount)
+
+    def _checkout_item_amount(self, amount):
+        self.__update_reserved_amount(amount)
+
+    def __update_reserved_amount(self, amount):
+        item_id = self.candidate['_id']
+        q = {'_id': item_id}
+        update_data = {'$inc': {'reserved': amount}}
+        db.update(self.collection, q, update_data)
+        return 'success'
+
     def __update_item_amount(self, amount) -> str:
         item_id = self.candidate['_id']
         q = {'_id': item_id}
         update_data = {'$inc': {'amount': amount, 'reserved': -1 * amount}}
-        self.candidate['amount'] = amount
         db.update(self.collection, q, update_data)
         return 'success'
 
