@@ -7,7 +7,7 @@ from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.urls import url_parse
 
 from app.constants import *
-from app.core.models.Contragent import Contragent
+from app.core.models.сontragent import Contragent
 from app.core.models.cart import Cart
 from app.core.models.offer import RVDOffer
 from app.core.models.user import User

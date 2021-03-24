@@ -1,5 +1,5 @@
 from app import app
-from app.core.models.Contragent import Contragent
+from app.core.models.сontragent import Contragent
 from app.core.models.cart import Cart
 from app.core.models.items.base import BaseItem
 from app.core.models.user import User

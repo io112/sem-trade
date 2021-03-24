@@ -8,7 +8,7 @@ from app.base_views import sid_required, check_sid, remove_session_by_session
 
 from flask_login import login_user, current_user, login_required, logout_user
 
-from app.core.models.Contragent import Contragent
+from app.core.models.сontragent import Contragent
 from app.core.models.cart import Cart
 from app.core.models.offer import RVDOffer
 from app.core.sessions import *
