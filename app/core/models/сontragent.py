@@ -1,8 +1,8 @@
 from bson import ObjectId
 
+import app.db.base as db
 from app.core.models.session import Session
 from app.core.sessions import update_session
-import app.db.base as db
 from app.db.variables import contragent_collection
 
 
@@ -43,7 +43,7 @@ class Contragent:
     def create_from_session(session: Session):
         cont_data = session.data.get('contragent')
         if cont_data is None:
-            raise Exception('Contragent not defined')
+            raise NotImplementedError('Contragent not defined')
         contragent = Contragent.create_from_dict(cont_data)
         contragent.__session = session
         return contragent

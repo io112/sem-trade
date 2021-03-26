@@ -1,5 +1,16 @@
 let is_org_slider = ""
 
+// ENDPOINTS
+const get_carts_endpoint = 'api/make_order/get_carts'
+const get_cart_endpoint = '/api/make_order/get_cart'
+const find_contragents_endpoint = 'api/contragent/find_contragents'
+const remove_contragent_endpoint = 'api/make_order/remove_contragent'
+const set_contragent_endpoint = 'api/make_order/set_contragent'
+const get_contragent_endpoint = 'api/make_order/get_contragent'
+const cancel_order_endpoint = 'api/make_order/cancel'
+const del_cart_item_endpoint = 'api/make_order/del_cart_item'
+const create_contragent_endpoint = 'api/contragent/create_contragent'
+
 function init_cw() {
     is_org_slider = $('#contragent_is_org');
     is_org_slider.on('change', change_contragent_type);
@@ -11,7 +22,7 @@ function init_sessions() {
 }
 
 function get_sessions() {
-    send('api/get_carts').then(carts => {
+    send(get_carts_endpoint).then(carts => {
         render_changer(carts)
     })
 }
@@ -52,8 +63,7 @@ function change_contragent_type() {
 }
 
 async function get_cart() {
-    let endpoint = '/api/get_cart'
-    return await send(endpoint)
+    return await send(get_cart_endpoint)
 }
 
 function update_cart() {
@@ -95,7 +105,7 @@ let clients_fixture = [{
 ]
 
 function update_clients() {
-    send('api/find_contragents', $('#input-clientname').val()).then(
+    send(find_contragents_endpoint, $('#input-clientname').val()).then(
         res => {
             console.log(res)
             render_clients(res)
@@ -104,19 +114,19 @@ function update_clients() {
 }
 
 function remove_contragent() {
-    send('api/remove_contragent').then(resp => {
+    send(remove_contragent_endpoint).then(resp => {
         render_contragent(resp)
     })
 }
 
 function set_contragent(id) {
-    send('api/set_contragent', id).then(resp => {
+    send(set_contragent_endpoint, id).then(resp => {
         render_contragent(resp)
     })
 }
 
 function get_contragent() {
-    send('api/get_contragent').then(resp => {
+    send(get_contragent_endpoint).then(resp => {
         render_contragent(resp)
     })
 }
@@ -154,7 +164,7 @@ function render_clients(data) {
 }
 
 function del_order() {
-    send('api/remove_order').then(new_sid => {
+    send(cancel_order_endpoint).then(new_sid => {
         if (new_sid !== '')
             window.location.href = `/?sid=${new_sid}`;
         else
@@ -167,7 +177,7 @@ function create_order() {
 }
 
 function del_item(id) {
-    send('api/del_cart_item', {'id': id}).then(render_cart)
+    send(del_cart_item_endpoint, {'id': id}).then(render_cart)
 }
 
 function get_items_table_row(id, name, amount, price, fullprice) {
@@ -197,7 +207,7 @@ function get_items_table_row(id, name, amount, price, fullprice) {
 
 function create_contragent() {
     let mas = $('#contragent_form').serializeArray()
-    send('api/create_contragent', mas).then(resp => {
+    send(create_contragent_endpoint, mas).then(resp => {
         $('#addContragentModal').modal('hide');
     })
     console.log(mas)

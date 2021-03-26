@@ -25,7 +25,7 @@ async function send(endpoint, data = {}) {
 
 
 function get_session_list() {
-    send('api/get_sessions').then(data => {
+    send('api/sessions/get_sessions').then(data => {
         render_session_list(data)
     })
 }
@@ -68,7 +68,7 @@ function open_session(new_sid) {
 
 function del_session(del_id) {
     console.log(del_id)
-    send('api/remove_session', del_id).then(list => {
+    send('api/sessions/remove_session', del_id).then(list => {
         render_session_list(list)
     })
 }

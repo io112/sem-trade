@@ -106,7 +106,7 @@ function dropClutches() {
 }
 
 function writeToSession(sid, data) {
-    let res = send("/api/update_session", data);
+    let res = send("/api/make_order/update_session", data);
     return res
 }
 
@@ -278,7 +278,7 @@ async function send(endpoint, data = {}) {
 }
 
 async function getCurrentSelection() {
-    let resp = await send('/api/update_selection');
+    let resp = await send('/api/make_order/update_selection');
     resp = JSON.parse(resp);
     if (resp['selection'] !== undefined) {
         current_selection = resp['selection']
@@ -329,7 +329,7 @@ function updateAllSections() {
 }
 
 function addToCart() {
-    send("/api/submit_selection", {'sid': sid}).then(
+    send("/api/make_order/submit_selection", {'sid': sid}).then(
         (ans) => {
             if (ans === 'success') {
                 updateAllSections()
