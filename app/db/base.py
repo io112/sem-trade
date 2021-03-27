@@ -3,7 +3,7 @@ from pymongo import ReplaceOne, UpdateOne
 
 
 def insert(collection, data):
-    db[collection].insert(data)
+    return db[collection].insert_one(data).inserted_id
 
 
 def replace_upsert(collection, query, update_data):

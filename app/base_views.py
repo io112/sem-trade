@@ -122,23 +122,6 @@ def login_route():
             return redirect(next_page)
     return render_template('login.html')
 
-
-@app.route('/create_user', methods=['POST'])
-@login_required
-def create_user():
-    username = request.form.get('username')
-    password = request.form.get('password')
-    name = request.form.get('name')
-    surname = request.form.get('surname')
-    user = User()
-    user.username = username
-    user.name = name
-    user.surname = surname
-    user.password = generate_password_hash(password)
-    user.save()
-    return 'ok'
-
-
 # -----------------[1C ROUTES]-----------------
 
 @app.route('/bitrix/admin/1c_exchange.php', methods=['GET', 'POST'])

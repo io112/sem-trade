@@ -9,6 +9,7 @@ from app.base_views import sid_required, check_sid, remove_session_by_session
 from app.core.models.cart import Cart
 from app.core.models.offer import RVDOffer
 from app.core.models.order import Order
+from app.core.models.user import User
 from app.core.models.сontragent import Contragent
 from app.core.sessions import *
 
@@ -212,3 +213,21 @@ def create_contragent():
 def find_contragents():
     data = json.loads(request.form.get('data', []))
     return jsonify(Contragent.find_contragents(data))
+
+
+# ----------------USER ROUTES------------------
+
+
+@app.route('/api/create_user', methods=['POST'])
+@login_required
+def create_user():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    name = request.form.get('name')
+    surname = request.form.get('surname', '')
+    role = request.form.get('role', '')
+    try:
+        user = User.create_user(username, password, name, surname, role)
+        return user.get_id()
+    except ValueError:
+        abort(409, 'user already exists')
