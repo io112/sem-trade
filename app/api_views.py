@@ -195,6 +195,24 @@ def checkout_order_view():
     return resp  # TODO: reload page on answer
 
 
+@app.route('/api/make_order/set_comment', methods=['POST'])
+@sid_required
+@login_required
+def set_comment_view():
+    session = get_session(request.cookies.get('current_order'))
+    session.add_data({'comment': json.loads(request.form.get('data', ''))})
+    update_session(session)
+    return session.data['comment']
+
+
+@app.route('/api/make_order/get_comment', methods=['POST'])
+@sid_required
+@login_required
+def get_comment_view():
+    session = get_session(request.cookies.get('current_order'))
+    return session.data.get('comment', '')
+
+
 # ----------------CONTRAGENT ENDPOINTS---------------
 
 

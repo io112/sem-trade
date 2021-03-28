@@ -58,6 +58,7 @@ class Cart:
             item = create_item(elem['type'], elem['outer_name'])
             item.create_from_dict(elem)
             res.items.append(item)
+        res.get_subtotal()
         return res
 
     @staticmethod

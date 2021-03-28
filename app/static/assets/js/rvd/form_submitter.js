@@ -46,7 +46,6 @@ function submitArm() {
 
     })
     let req = {"selection": current_selection}
-    console.log(req)
     let resp = writeToSession(sid, req).then(() => {
         updateArmSection()
         updateFitSections()
@@ -93,7 +92,6 @@ function dropFits() {
     current_selection["fiting2"] = {}
 
     let req = {"selection": current_selection}
-    console.log(req)
     let resp = writeToSession(sid, req).then(() => updateFitSections())
 }
 
@@ -112,7 +110,6 @@ function writeToSession(sid, data) {
 
 function updateArmSection() {
     getCurrentSelection().then((resp) => {
-        console.log(resp)
         const diameter_select = $('#input-arm-diameter')
         const braid_select = $('#input-arm-braid')
         const type_select = $('#input-arm-type')
@@ -304,7 +301,6 @@ function updateSelectionSubtotal() {
     let price = current_selection["subtotal"]["price"]
     let amount = current_selection["subtotal"]["amount"]
     let total_price = current_selection["subtotal"]["total_price"]
-    console.log(current_selection["subtotal"])
     $('#select_subtotal tbody').empty().append('<tr>\n' +
         '<td>\n' +
         '<span class="name mb-0 text-sm">' + name + '</span>\n' +

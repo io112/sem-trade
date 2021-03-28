@@ -148,10 +148,10 @@ class BaseItem(ABC):
         self.__update_reserved_amount(amount * -1)
 
     def checkout_item(self):
-        self.__update_reserved_amount(self.amount)
+        self.__update_reserved_amount(self.amount * -1)
 
     def _checkout_item_amount(self, amount):
-        self.__update_reserved_amount(amount)
+        self.__update_reserved_amount(amount * -1)
 
     def __update_reserved_amount(self, amount):
         item_id = self.candidate['_id']

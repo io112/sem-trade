@@ -9,7 +9,6 @@ from app.db.variables import *
 class Order:
     def __init__(self):
         self._id = None
-        self.items = []
         self.contragent = None
         self.user = None
         self.comment = ""
@@ -25,7 +24,7 @@ class Order:
     @staticmethod
     def create(cart: Cart, contragent: Contragent, comment: str):
         order = Order()
-        order.items = cart.items
+        order.cart = cart
         order.contragent = contragent
         order.comment = comment
         return order
@@ -44,13 +43,14 @@ class Order:
     def checkout_order(self) -> None:
         if self.is_checked_out:
             raise OverflowError('Order is already checked out')
-        for i in self.items:
+        for i in self.cart.items:
             i: BaseItem
             i.checkout_item()
+        self.is_checked_out = True
 
     def count_price(self) -> None:
         self._price = 0
-        for i in self.items:
+        for i in self.cart.items:
             i: BaseItem
             self._price += i.get_price()
 
@@ -70,8 +70,10 @@ class Order:
 
     def get_db_dict(self):
         res = self.__dict__
-        res['cart'] = self.cart.__get__()
+        res.update(self.cart.__get__())
         res['contragent'] = self.contragent.__get__()
+        if self._id is None:
+            del res['_id']
         return res
 
     def save(self):

@@ -10,11 +10,35 @@ const get_contragent_endpoint = 'api/make_order/get_contragent'
 const cancel_order_endpoint = 'api/make_order/cancel'
 const del_cart_item_endpoint = 'api/make_order/del_cart_item'
 const create_contragent_endpoint = 'api/contragent/create_contragent'
+const set_comment_endpoint = 'api/make_order/set_comment'
+const get_comment_endpoint = 'api/make_order/get_comment'
+const checkout_endpoint = 'api/make_order/checkout'
 
 function init_cw() {
     is_org_slider = $('#contragent_is_org');
+    $('#comment_text').on('blur', set_comment);
+    $('#checkout_btn').on('click', checkout);
     is_org_slider.on('change', change_contragent_type);
-    get_contragent()
+    get_contragent();
+    render_comment();
+}
+
+function checkout() {
+    set_comment();
+    send(checkout_endpoint).then(() => {
+        window.location.href = '/'
+    })
+
+}
+
+function set_comment() {
+    send(set_comment_endpoint, $('#comment_text').val()).then()
+}
+
+function render_comment() {
+    send(get_comment_endpoint).then(comment => {
+        $('#comment_text').val(comment)
+    })
 }
 
 function init_sessions() {
@@ -34,7 +58,6 @@ function render_changer(data) {
     let i = 1
     data.forEach(btn => {
         let btn_sid = btn['_id']
-        console.log(`${sid} ${btn_sid}`)
         let is_active = btn_sid === sid;
         list.append(get_btn(btn_sid, i, is_active))
         i += 1
@@ -71,7 +94,6 @@ function update_cart() {
 }
 
 function render_cart(cart) {
-    console.log(cart)
     cart = cart['cart']
     const cart_table = $('#items_list tbody')
 
@@ -107,7 +129,6 @@ let clients_fixture = [{
 function update_clients() {
     send(find_contragents_endpoint, $('#input-clientname').val()).then(
         res => {
-            console.log(res)
             render_clients(res)
         }
     )
@@ -210,7 +231,6 @@ function create_contragent() {
     send(create_contragent_endpoint, mas).then(resp => {
         $('#addContragentModal').modal('hide');
     })
-    console.log(mas)
 }
 
 
@@ -259,7 +279,7 @@ function get_add_card() {
     let icon_color = 'bg-dark'
     let orgtext = ""
     const res = $('<div>')
-    const fin = $('<a>').attr('data-toggle', 'modal').attr('data-target', '#addContragentModal').attr('href', '#!').append(res).attr('onClick', 'console.log("a")').attr('class', 'client_card')
+    const fin = $('<a>').attr('data-toggle', 'modal').attr('data-target', '#addContragentModal').attr('href', '#!').append(res).attr('class', 'client_card')
     let c_org = $('<h5>').attr('class', 'card-title text-uppercase text-muted mb-0').text(orgtext)
     let c_orgname = $('<span>').attr('class', 'h3 font-weight-bold mb-0').text(name)
     const c_inn = $('<p>').attr('class', 'mt-3 mb-0 text-sm').append($('<span>').attr('class', 'text-nowrap')
