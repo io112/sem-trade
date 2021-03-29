@@ -5,6 +5,7 @@ import app.db.variables as dbvars
 class Clutch(BaseItem):
     required_params = ["name"]
     collection = dbvars.clutch_collection
+    NomenclatureType = 'Муфта'
 
     def __init__(self, out_name):
         super().__init__(out_name)

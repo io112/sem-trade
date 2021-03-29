@@ -1,5 +1,6 @@
 from app.core.models.items.base import BaseItem
 from app.core.models.utils import create_simple_item
+import xml.etree.ElementTree as ET
 
 
 # noinspection SpellCheckingInspection
@@ -98,6 +99,19 @@ class CompositeItem(BaseItem):
         for i in self.items:
             i: BaseItem
             i._checkout_item_amount(self.amount * i.amount)
+
+    def create_xml(self, amount=-1) -> list:
+        res = {}
+        result = []
+        for i in self.items:
+            i: BaseItem
+            if i._id not in res:
+                res[i._id] = [0, i]
+            res[i._id][0] += i.amount * self.amount
+        for i in res.values():
+            i: list
+            result.extend(i[1].create_xml(i[0]))
+        return result
 
     def find_candidate(self):
         for i in self.items:

@@ -1,17 +1,24 @@
 from abc import ABC, abstractmethod
 
 import app.db.base as db
+import xml.etree.ElementTree as ET
 
 
 class BaseItem(ABC):
     required_params = [""]
     collection = ""
     not_zero_amount = {'amount': {'$not': {'$eq': 0}}}
+    MeasureCode = '796'
+    MeasureName = 'Штука'
+    MeasureInt = 'PCE'
+    MeasureText = 'штук'
+    NomenclatureType = ''
 
     def __init__(self, out_name: str):
         self.candidate = {}
         self.amount = 1
         self.final_price = 0
+        self._id = ''
         self.is_finish = False
         self.outer_name = out_name
 
@@ -176,3 +183,30 @@ class BaseItem(ABC):
                 self.__dict__[i] = self.candidate[i]
         self.final_price = self.get_price()
         return 'success'
+
+    def create_xml(self, amount=-1) -> list:
+        amount = self.amount if amount == -1 else amount
+        res = ET.Element('Товар')
+        ET.SubElement(res, 'Ид').text = str(self._id)
+        ET.SubElement(res, 'Наименование').text = self.NomenclatureType
+        measure = ET.Element('БазоваяЕдиница')
+        measure.text = self.MeasureText
+        measure.attrib['Код'] = self.MeasureCode
+        measure.attrib['НаименованиеПолное'] = self.MeasureName
+        measure.attrib['МеждународноеСокращение'] = self.MeasureInt
+        res.append(measure)
+        ET.SubElement(res, 'ЦенаЗаЕдиницу').text = str(self.get_price_for_amount(1))
+        ET.SubElement(res, 'Количество').text = str(amount)
+        ET.SubElement(res, 'Сумма').text = str(self.get_price_for_amount(amount))
+        recs = ET.Element('ЗначенияРеквизитов')
+        rec1 = ET.Element('ЗначенияРеквизита')
+        ET.SubElement(rec1, 'Наименование').text = 'ВидНоменклатуры'
+        ET.SubElement(rec1, 'Значение').text = self.NomenclatureType
+        rec2 = ET.Element('ЗначенияРеквизита')
+        ET.SubElement(rec2, 'Наименование').text = 'ТипНоменклатуры'
+        ET.SubElement(rec2, 'Значение').text = 'Товар'
+        recs.append(rec1)
+        recs.append(rec2)
+        res.append(recs)
+
+        return [res]

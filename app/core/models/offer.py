@@ -79,7 +79,7 @@ class RVDOffer:
                 print('err: ' + err)
             else:
                 del self.selection
-            self.session.add_data(cart.__get__())
+            self.session.add_data(cart.dict)
             self.session.remove_data('selection')
             update_session(self.session)
             return []

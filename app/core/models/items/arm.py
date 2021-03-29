@@ -5,6 +5,11 @@ import app.db.variables as dbvars
 class Arm(BaseItem):
     required_params = ["diameter", "arm_type"]
     collection = dbvars.arm_collection
+    MeasureCode = '006'
+    MeasureName = 'Метр'
+    MeasureInt = 'MTR'
+    MeasureText = 'метров'
+    NomenclatureType = 'Рукав'
 
     def __init__(self, out_name):
         super().__init__(out_name)

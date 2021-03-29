@@ -23,11 +23,33 @@ function init_cw() {
     render_comment();
 }
 
+var saveData = (function () {
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+    return function (fileName, blob) {
+        var url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+}());
+
 function checkout() {
     set_comment();
-    send(checkout_endpoint).then(() => {
-        window.location.href = '/'
+    fetch(checkout_endpoint, {
+        method: 'POST',
+        body: JSON.stringify({'sid': sid})
     })
+        .then(resp => resp.blob()).then(blob => {
+        saveData('orders.xml', blob)
+    })
+
+    // send(checkout_endpoint).then(resp => {
+    //     console.log(resp)
+    //     window.location.href = '/'
+    // })
 
 }
 

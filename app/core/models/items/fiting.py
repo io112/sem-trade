@@ -5,6 +5,7 @@ import app.db.variables as dbvars
 class Fiting(BaseItem):
     required_params = ["name"]
     collection = dbvars.fiting_collection
+    NomenclatureType = 'Фитинг'
 
     def __init__(self, out_name):
         super().__init__(out_name)

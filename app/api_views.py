@@ -1,7 +1,7 @@
 import json
 import sys
 
-from flask import request, jsonify, make_response, abort
+from flask import request, jsonify, make_response, abort, Response
 from flask_login import login_required
 
 from app import app
@@ -152,7 +152,7 @@ def get_cart():
     sid = request.cookies.get('current_order')
     session = get_session(sid)
     cart = Cart.create_from_session(session)
-    return jsonify(cart.__get__())
+    return jsonify(cart.dict)
 
 
 @app.route('/api/make_order/del_cart_item', methods=['POST'])
@@ -165,7 +165,7 @@ def del_cart_item():
     data = json.loads(request.form.get('data', []))
     del cart[data['id']]
     cart.save(session)
-    return jsonify(cart.__get__())
+    return jsonify(cart.dict)
 
 
 @app.route('/api/make_order/get_carts', methods=['POST'])
@@ -187,12 +187,14 @@ def checkout_order_view():
         order = Order.create_from_session(session)
     except NotImplementedError:
         abort(400, 'error was found')  # TODO: catch error message
-    order.checkout_order()
-    order.save()
+    result = order.checkout_order()
     remove_session(session.get_id())
     resp = make_response()
     resp.delete_cookie('current_order')
-    return resp  # TODO: reload page on answer
+    return Response(result,
+                    mimetype="application/xml",
+                    headers={"Content-Disposition": "attachment;filename=orders.xml"})
+    # return resp  # TODO: reload page on answer
 
 
 @app.route('/api/make_order/set_comment', methods=['POST'])

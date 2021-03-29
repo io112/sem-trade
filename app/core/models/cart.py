@@ -33,7 +33,8 @@ class Cart:
         self.items.append(item)
         return 'success'
 
-    def __get__(self, instance=None, owner=None) -> dict:
+    @property
+    def dict(self) -> dict:
         items = []
         for i in self.items:
             i: BaseItem
@@ -75,5 +76,5 @@ class Cart:
             i.unreserve_item()
 
     def save(self, session: Session):
-        session.add_data(self.__get__())
+        session.add_data(self.dict)
         update_session(session)
