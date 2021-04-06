@@ -200,10 +200,10 @@ class BaseItem(ABC):
         ET.SubElement(res, 'Количество').text = str(amount)
         ET.SubElement(res, 'Сумма').text = str(self.get_price_for_amount(amount))
         recs = ET.Element('ЗначенияРеквизитов')
-        rec1 = ET.Element('ЗначенияРеквизита')
+        rec1 = ET.Element('ЗначениеРеквизита')
         ET.SubElement(rec1, 'Наименование').text = 'ВидНоменклатуры'
         ET.SubElement(rec1, 'Значение').text = self.NomenclatureType
-        rec2 = ET.Element('ЗначенияРеквизита')
+        rec2 = ET.Element('ЗначениеРеквизита')
         ET.SubElement(rec2, 'Наименование').text = 'ТипНоменклатуры'
         ET.SubElement(rec2, 'Значение').text = 'Товар'
         recs.append(rec1)

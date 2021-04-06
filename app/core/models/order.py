@@ -117,17 +117,17 @@ class Order:
         res.append(items)
 
         recs = ET.Element('ЗначенияРеквизитов')
-        rec1 = ET.Element('ЗначенияРеквизита')
+        rec1 = ET.Element('ЗначениеРеквизита')
         ET.SubElement(rec1, 'Наименование').text = 'Номер по 1С'
         ET.SubElement(rec1, 'Значение').text = str(self._id)
-        rec2 = ET.Element('ЗначенияРеквизита')
+        rec2 = ET.Element('ЗначениеРеквизита')
         ET.SubElement(rec2, 'Наименование').text = 'Дата по 1С'
         ET.SubElement(rec2, 'Значение').text = datetime.now(tz=pytz.timezone('Europe/Moscow')).strftime(
             "%Y-%m-%dT%H:%M:%S")
-        rec3 = ET.Element('ЗначенияРеквизита')
+        rec3 = ET.Element('ЗначениеРеквизита')
         ET.SubElement(rec3, 'Наименование').text = 'ПометкаУдаления'
         ET.SubElement(rec3, 'Значение').text = 'false'
-        rec4 = ET.Element('ЗначенияРеквизита')
+        rec4 = ET.Element('ЗначениеРеквизита')
         ET.SubElement(rec4, 'Наименование').text = 'Проведен'
         ET.SubElement(rec4, 'Значение').text = 'true'
         recs.append(rec1)
