@@ -82,7 +82,8 @@ class BaseItem(ABC):
                 except Exception:
                     pass
                 self.__dict__[i] = val
-        self.find_candidate()
+        if self.candidate == {}:
+            self.find_candidate()
 
     @staticmethod
     def get_component_price(collection, component):

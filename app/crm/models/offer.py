@@ -9,8 +9,8 @@ class Offer:
 
     def convert_to_dict(self):
         data = {'_id': self.id,
-                'amount': self.amount,
-                'price': self.price}
+                'amount': float(self.amount),
+                'price': float(self.price)}
         return data
 
     def convert_for_update(self):

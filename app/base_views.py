@@ -1,7 +1,7 @@
 import functools
 import sys
 
-from flask import request, render_template, redirect, url_for, jsonify, make_response, abort
+from flask import request, render_template, redirect, url_for, jsonify, make_response, abort, Response
 from flask_httpauth import HTTPBasicAuth
 from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.urls import url_parse
@@ -122,9 +122,10 @@ def login_route():
             return redirect(next_page)
     return render_template('login.html')
 
+
 # -----------------[1C ROUTES]-----------------
 
 @app.route('/bitrix/admin/1c_exchange.php', methods=['GET', 'POST'])
 @auth.login_required
 def exchange():
-    return base.router(request.args, request.data)
+    return Response(base.router(request.args, request.data), mimetype='text/xml')

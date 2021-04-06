@@ -74,7 +74,7 @@ class Order:
         order._id = data['_id']
         order.cart = Cart.create_from_dict(cart)
         order.contragent = Contragent.create_from_dict(contragent)
-        order.user_id = data['user_id']
+        order.user_id = data['user']
         return order
 
     def get_db_dict(self):
@@ -91,7 +91,7 @@ class Order:
         else:
             db.update(order_collection, {'_id': self._id}, self.get_db_dict())
 
-    def create_xml_doc(self):
+    def create_xml_doc(self) -> ET:
         date = datetime.now(tz=pytz.timezone('Europe/Moscow')).strftime("%d.%m.%Y %H:%M:%S")
         res = ET.Element('Документ')
         ET.SubElement(res, 'Ид').text = str(self._id)
@@ -135,4 +135,4 @@ class Order:
         recs.append(rec3)
         recs.append(rec4)
         res.append(recs)
-        return ET.tostring(res, encoding='UTF-8').decode('UTF-8')
+        return res
