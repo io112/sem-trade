@@ -34,7 +34,7 @@ def make_cookie_resp(url, sid=None):
         resp = make_response(redirect(url_for(url)))
         resp.set_cookie('current_order', sid)
     else:
-        session = start_session()
+        session = start_session(current_user.username)
         resp = make_response(redirect(url_for(url)))
         resp.set_cookie('current_order', session.get_id())
     return resp
@@ -83,8 +83,8 @@ testoffer = {'arms': [{'diameter': 5}, {'diameter': 10}]}
 
 
 @app.route('/', methods=['GET'])
-@sid_required
 @login_required
+@sid_required
 def home():
     sid = request.cookies.get('current_order')
     session = get_session(sid)
@@ -128,4 +128,4 @@ def login_route():
 @app.route('/bitrix/admin/1c_exchange.php', methods=['GET', 'POST'])
 @auth.login_required
 def exchange():
-    return Response(base.router(request.args, request.data), mimetype='text/xml')
+    return base.router(request.args, request.data)

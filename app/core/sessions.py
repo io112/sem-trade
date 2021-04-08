@@ -14,6 +14,7 @@ def start_session(user=''):
         sid = misc.get_random_string(15)
     session = create_session(sid)
     session.user = user
+    update_session(session)
     return session
 
 

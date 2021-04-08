@@ -20,7 +20,7 @@ class Offer:
     def create_from_cml(obj):
         res = Offer()
         res.id = obj[0].text
-        res.price = obj.find("{urn:1C.ru:commerceml_2}Цены")[0][2].text
-        res.amount = obj.find("{urn:1C.ru:commerceml_2}Количество").text
+        res.price = float(obj.find("{urn:1C.ru:commerceml_2}Цены")[0][2].text)
+        res.amount = float(obj.find("{urn:1C.ru:commerceml_2}Количество").text)
 
         return res

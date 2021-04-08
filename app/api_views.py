@@ -2,7 +2,7 @@ import json
 import sys
 
 from flask import request, jsonify, make_response, abort, Response
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 from app import app
 from app.base_views import sid_required, check_sid, remove_session_by_session
@@ -25,7 +25,7 @@ def route_remove_session():
     if not check_sid(sid):
         abort(404, 'session not found')
     remove_session_by_session(get_session(sid))
-    sessions = get_user_sessions(fields=['_id', 'user', 'last_modified'])
+    sessions = get_user_sessions(current_user.username, fields=['_id', 'user', 'last_modified'])
     resp = make_response(jsonify(sessions))
     current_order = request.cookies.get('current_order')
     if current_order is not None and current_order == sid:
@@ -39,7 +39,7 @@ def route_remove_session():
 @app.route('/api/sessions/get_sessions', methods=['POST'])
 @login_required
 def get_sessions():
-    sessions = get_user_sessions(fields=['_id', 'user', 'last_modified'])
+    sessions = get_user_sessions(current_user.username, fields=['_id', 'user', 'last_modified'])
     print(sessions)
     return jsonify(sessions)
 
@@ -48,8 +48,8 @@ def get_sessions():
 
 
 @app.route('/api/make_order/update_session', methods=['POST'])
-@sid_required
 @login_required
+@sid_required
 def update_session_view():
     sid = request.cookies.get('current_order')
     data = json.loads(request.form.get('data', []))
@@ -60,13 +60,13 @@ def update_session_view():
 
 
 @app.route('/api/make_order/cancel', methods=['POST'])
-@sid_required
 @login_required
+@sid_required
 def remove_order():
     session = get_session(request.cookies.get('current_order'))
     remove_session_by_session(session)
-    if len(get_session_ids()) > 0:
-        return get_session_ids()[-1]['_id']
+    if len(get_session_ids(current_user.username)) > 0:
+        return get_session_ids(current_user.username)[-1]['_id']
     else:
         resp = make_response('')
         resp.delete_cookie('current_order')
@@ -74,8 +74,8 @@ def remove_order():
 
 
 @app.route('/api/make_order/remove_contragent', methods=['POST'])
-@sid_required
 @login_required
+@sid_required
 def remove_contragent():
     sid = request.cookies.get('current_order')
     session = get_session(sid)
@@ -86,8 +86,8 @@ def remove_contragent():
 
 
 @app.route('/api/make_order/set_contragent', methods=['POST'])
-@sid_required
 @login_required
+@sid_required
 def set_contragent():
     sid = request.cookies.get('current_order')
     session = get_session(sid)
@@ -172,7 +172,7 @@ def del_cart_item():
 @sid_required
 @login_required
 def get_carts():
-    carts = get_session_ids()
+    carts = get_session_ids(current_user.username)
     print(carts)
     return jsonify(carts)
 

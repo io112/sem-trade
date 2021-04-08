@@ -16,6 +16,9 @@ class Session:
         self.data.update(data)
         self.last_modified = msk_timezone.localize(datetime.now())
 
+    def set_user(self, user):
+        self.user = user
+
     def set_data(self, key, val):
         self.data[key] = val
         self.last_modified = msk_timezone.localize(datetime.now())

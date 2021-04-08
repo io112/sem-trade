@@ -25,4 +25,4 @@ def export_orders() -> str:
     f = BytesIO()
     et.write(f, encoding='utf-8', xml_declaration=True)
     print(f.getvalue().decode('UTF-8'))
-    return ET.tostring(res, encoding='UTF-8').decode('UTF-8')
+    return f.getvalue().decode('UTF-8')

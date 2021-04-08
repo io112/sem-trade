@@ -22,7 +22,6 @@ class SiteObj:
     def create_from_cml(obj):
         res = SiteObj()
         res.id = obj[0].text
-        res.id = res.id
         res.name = obj[2].text
         res.measure = obj[3].attrib['НаименованиеПолное']
         return res

@@ -34,7 +34,7 @@ class Clutch(SiteObj):
 
         for i in req:
             if i[1].text == Clutch.diameter_name:
-                res.diameter = i[2].text
+                res.diameter = float(i[2].text)
             elif i[1].text == Clutch.arm_type_name:
                 res.arm_type = i[2].text
         return res

@@ -42,5 +42,5 @@ class Fiting(SiteObj):
             elif i[1].text == Fiting.fiting_type_name:
                 res.fiting_type = i[2].text
             elif i[1].text == Fiting.diameter_name:
-                res.diameter = i[2].text
+                res.diameter = float(i[2].text)
         return res
