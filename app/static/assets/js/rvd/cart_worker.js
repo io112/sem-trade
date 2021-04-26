@@ -38,18 +38,18 @@ var saveData = (function () {
 
 function checkout() {
     set_comment();
-    fetch(checkout_endpoint, {
-        method: 'POST',
-        body: JSON.stringify({'sid': sid})
-    })
-        .then(resp => resp.blob()).then(blob => {
-        saveData('orders.xml', blob)
-    })
-
-    // send(checkout_endpoint).then(resp => {
-    //     console.log(resp)
-    //     window.location.href = '/'
+    // fetch(checkout_endpoint, {
+    //     method: 'POST',
+    //     body: JSON.stringify({'sid': sid})
     // })
+    //     .then(resp => resp.blob()).then(blob => {
+    //     saveData('orders.xml', blob)
+    // })
+
+    send(checkout_endpoint).then(resp => {
+        console.log(resp)
+        window.location.href = '/'
+    })
 
 }
 

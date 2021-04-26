@@ -13,8 +13,9 @@ from app.core.models.user import User
 from app.core.models.сontragent import Contragent
 from app.core.sessions import *
 
-
 # ----------------SESSION ENDPOINTS---------------
+from app.utilities import orders_controller
+
 
 @app.route('/api/sessions/remove_session', methods=['POST'])
 @login_required
@@ -42,6 +43,22 @@ def get_sessions():
     sessions = get_user_sessions(current_user.username, fields=['_id', 'user', 'last_modified'])
     print(sessions)
     return jsonify(sessions)
+
+
+@app.route('/api/orders/get_orders', methods=['POST'])
+@login_required
+def get_orders():
+    orders = orders_controller.get_all_orders()
+    print(orders)
+    return jsonify(orders)
+
+
+@app.route('/api/orders/get_order', methods=['POST'])
+@login_required
+def get_order():
+    order_id = json.loads(request.form.get('data'))
+    order = orders_controller.get_order(order_id)
+    return jsonify(order)
 
 
 # ----------------CREATE ORDER ENDPOINTS------------
@@ -111,7 +128,6 @@ def get_contragent():
         contragent = Contragent.create_from_session(session)
         return contragent.get()
     except Exception:
-        print(sys.exc_info()[0])
         return jsonify({})
 
 
@@ -173,7 +189,6 @@ def del_cart_item():
 @login_required
 def get_carts():
     carts = get_session_ids(current_user.username)
-    print(carts)
     return jsonify(carts)
 
 
@@ -187,14 +202,15 @@ def checkout_order_view():
         order = Order.create_from_session(session)
     except NotImplementedError:
         abort(400, 'error was found')  # TODO: catch error message
-    result = order.checkout_order()
+    order.checkout_order()
     remove_session(session.get_id())
-    resp = make_response()
+    resp = make_response(order.order_num)
     resp.delete_cookie('current_order')
-    return Response(result,
-                    mimetype="application/xml",
-                    headers={"Content-Disposition": "attachment;filename=orders.xml"})
-    # return resp  # TODO: reload page on answer
+
+    # return Response(result,
+    #                 mimetype="application/xml",
+    #                 headers={"Content-Disposition": "attachment;filename=orders.xml"})
+    return resp
 
 
 @app.route('/api/make_order/set_comment', methods=['POST'])

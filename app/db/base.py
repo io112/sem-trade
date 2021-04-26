@@ -1,3 +1,5 @@
+from typing import Dict
+
 from app.db import db
 from pymongo import ReplaceOne, UpdateOne
 
@@ -27,14 +29,18 @@ def update(collection, query, update_data: dict, upsert=False):
     db[collection].bulk_write(requests)
 
 
-def find_one(collection, query):
-    return db[collection].find_one(query)
+def find_one(collection, query,fields=None, sorting=None):
+    if sorting is None:
+        sorting = []
+    return db[collection].find_one(query, fields, sort=sorting)
 
 
-def find(collection, query, fields=None):
+def find(collection, query, fields=None, sorting=None):
+    if sorting is None:
+        sorting = []
     if query is None:
         query = {}
-    resp = db[collection].find(query, fields)
+    resp = db[collection].find(query, fields, sort=sorting)
     result = []
     for i in resp:
         result.append(i)

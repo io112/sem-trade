@@ -13,7 +13,7 @@ def export_orders() -> str:
     res.attrib['xmlns'] = "urn:1C.ru:commerceml_2"
     res.attrib['xmlns:xs'] = "http://www.w3.org/2001/XMLSchema"
     res.attrib['xmlns:xsi'] = "http://www.w3.org/2001/XMLSchema-instance"
-    res.attrib['ВерсияСхемы'] = '2.07'
+    res.attrib['ВерсияСхемы'] = '2.04'
     res.attrib['ДатаФормирования'] = datetime.now(tz=pytz.timezone('Europe/Moscow')).strftime(
             "%Y-%m-%dT%H:%M:%S")
 

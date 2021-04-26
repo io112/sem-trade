@@ -105,6 +105,18 @@ def my_sessions():
     return render_template('incompleted_orders.html', user=current_user)
 
 
+@app.route('/orders', methods=['GET'])
+@login_required
+def orders():
+    return render_template('orders.html', user=current_user)
+
+
+@app.route('/orders/<string:order_id>', methods=['GET'])
+@login_required
+def order(order_id):
+    return render_template('order.html', user=current_user)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login_route():
     if request.method == 'POST':

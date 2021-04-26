@@ -1,5 +1,7 @@
 import copy
+from dataclasses import dataclass
 
+import pymongo
 import pytz
 from pytz import tzinfo
 from datetime import timedelta
@@ -15,8 +17,17 @@ import xml.etree.ElementTree as ET
 
 
 class Order:
+    @dataclass
+    class Status:
+        STATUS_CREATED = 'Создан'
+        STATUS_CHECKED_OUT = 'Проведен'
+        STATUS_EXPORTED = 'Экспортирован'
+        STATUS_CLOSED = 'Закрыт'
+
     def __init__(self):
         self._id = None
+        self.order_num = None
+        self.status = self.Status.STATUS_CREATED
         self.contragent = None
         self.user = None
         self.comment = ""
@@ -31,12 +42,13 @@ class Order:
         return self._price * (1 - self.sale)
 
     @staticmethod
-    def create(cart: Cart, contragent: Contragent, comment: str):
+    def create(cart: Cart, contragent: Contragent, comment: str, user: str):
         order = Order()
         order.cart = cart
         order.contragent = contragent
         order.comment = comment
         order.time_created = datetime.now(pytz.timezone('Europe/Moscow'))
+        order.user = user
         return order
 
     @staticmethod
@@ -48,17 +60,18 @@ class Order:
             comment = session.data['comment']
         cart = Cart.create_from_session(session)
         contragent = Contragent.create_from_session(session)
-        return Order.create(cart, contragent, comment)
+        user = session.user
+        return Order.create(cart, contragent, comment, user)
 
-    def checkout_order(self) -> ET.Element:
+    def checkout_order(self) -> None:
         if self.is_checked_out:
             raise OverflowError('Order is already checked out')
         for i in self.cart.items:
             i: BaseItem
             i.checkout_item()
         self.is_checked_out = True
+        self.status = self.Status.STATUS_CHECKED_OUT
         self._save()
-        return self.create_xml_doc()
 
     def count_price(self) -> None:
         self._price = 0
@@ -78,7 +91,9 @@ class Order:
         order._id = data['_id']
         order.cart = Cart.create_from_dict(cart)
         order.contragent = Contragent.create_from_dict(contragent)
-        order.user_id = data['user']
+        order.user = data['user']
+        order.order_num = data['order_num']
+        order.status = data['status'] if data.get('status') else Order.Status.STATUS_CREATED
         return order
 
     def get_db_dict(self):
@@ -89,18 +104,32 @@ class Order:
             del res['_id']
         return res
 
+    def get_dict(self):
+        res = self.get_db_dict()
+        res['_id'] = str(res['_id'])
+        res['contragent'] = self.contragent.get()
+        return res
+
     def _save(self):
+        if self.order_num is None:
+            num = int(self.find_last_order_num()[3:])
+            self.order_num = 'РВ-' + str(num + 1)
         if self._id is None:
             self._id = db.insert(order_collection, self.get_db_dict())
         else:
             db.update(order_collection, {'_id': self._id}, self.get_db_dict())
 
+    @staticmethod
+    def find_last_order_num():
+        last_num = db.find_one(order_collection, {}, fields=['order_num'], sorting=[('order_num', pymongo.DESCENDING)])
+        return last_num['order_num']
+
     def create_xml_doc(self) -> ET:
         dt = pytz.timezone('Europe/Moscow').localize(self.time_created) + timedelta(hours=3)
         dt: datetime
         res = ET.Element('Документ')
-        ET.SubElement(res, 'Ид').text = 'РВ-29'
-        ET.SubElement(res, 'Номер').text = 'РВ-29'
+        ET.SubElement(res, 'Ид').text = self.order_num
+        ET.SubElement(res, 'Номер').text = self.order_num
         ET.SubElement(res, 'Дата').text = dt.strftime("%Y-%m-%d")
         ET.SubElement(res, 'ХозОперация').text = 'Заказ товара'
         ET.SubElement(res, 'Роль').text = 'Продавец'
@@ -125,20 +154,29 @@ class Order:
 
         recs = ET.Element('ЗначенияРеквизитов')
         rec1 = ET.Element('ЗначениеРеквизита')
-        ET.SubElement(rec1, 'Наименование').text = 'Номер по 1С'
-        ET.SubElement(rec1, 'Значение').text = 'РВ-23'
+        ET.SubElement(rec1, 'Наименование').text = 'Метод оплаты'
+        ET.SubElement(rec1, 'Значение').text = 'Cash on delivery (COD)'
         rec2 = ET.Element('ЗначениеРеквизита')
-        ET.SubElement(rec2, 'Наименование').text = 'Дата по 1С'
-        ET.SubElement(rec2, 'Значение').text = dt.strftime("%Y-%m-%dT%H:%M:%S")
+        ET.SubElement(rec2, 'Наименование').text = 'Метод доставки'
+        ET.SubElement(rec2, 'Значение').text = 'Самовывоз'
         rec3 = ET.Element('ЗначениеРеквизита')
-        ET.SubElement(rec3, 'Наименование').text = 'ПометкаУдаления'
-        ET.SubElement(rec3, 'Значение').text = 'false'
+        ET.SubElement(rec3, 'Наименование').text = 'Адрес'
+        ET.SubElement(rec3, 'Значение').text = 'Самовывоз'
         rec4 = ET.Element('ЗначениеРеквизита')
-        ET.SubElement(rec4, 'Наименование').text = 'Статус заказа'
-        ET.SubElement(rec4, 'Значение').text = 'Создан'
+        ET.SubElement(rec4, 'Наименование').text = 'Адрес доставки'
+        ET.SubElement(rec4, 'Значение').text = 'Самовывоз'
+        rec5 = ET.Element('ЗначениеРеквизита')
+        ET.SubElement(rec5, 'Наименование').text = 'Покупатель, контакты'
+        ET.SubElement(rec5, 'Значение').text = 'Тест'
+        rec6 = ET.Element('ЗначениеРеквизита')
+        ET.SubElement(rec6, 'Наименование').text = 'Статус заказа'
+        ET.SubElement(rec6, 'Значение').text = 'Заказ принят, ожидается закупка'
+
         recs.append(rec1)
         recs.append(rec2)
         recs.append(rec3)
         recs.append(rec4)
+        recs.append(rec5)
+        recs.append(rec6)
         res.append(recs)
         return res

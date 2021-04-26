@@ -1,0 +1,52 @@
+{% extends 'base/base.html' %}
+
+{% block pagename %}Заказы{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <div>
+              <table class="table align-items-center">
+                <thead class="thead-light">
+                <tr>
+                  <th scope="col" class="sort" data-sort="id">id</th>
+                  <th scope="col" class="sort" data-sort="time">Время создания</th>
+                  <th scope="col" class="sort" data-sort="user">Пользователь</th>
+                  <th scope="col" class="sort" data-sort="user">Статус</th>
+                  <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody id="orders_table" class="list">
+                <tr>
+                  <th scope="row">
+                    <span class="name mb-0 text-sm">Argon Design System</span>
+                  </th>
+                  <td>12:20</td>
+                  <td>User</td>
+                  <td class="text-right">
+                    <div class="row">
+                      <a class="nav-link" onclick="">
+                        <i class="fa fa-trash-alt text-red"></i>
+                      </a>
+                      <a class="nav-link" onclick="">
+                        <i class="fa fa-edit text-blue"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block additional_scripts %}
+  <script src="../static/assets/js/rvd/orders.js"></script>
+{% endblock %}
