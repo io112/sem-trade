@@ -61,6 +61,21 @@ def get_order():
     return jsonify(order)
 
 
+@app.route('/api/orders/<string:order_id>/set_upd', methods=['POST'])
+@login_required
+def set_upd(order_id):
+    upd = json.loads(request.form.get('data'))
+    order = orders_controller.set_upd(order_id, upd)
+    return jsonify(order)
+
+
+@app.route('/api/orders/<string:order_id>/close', methods=['POST'])
+@login_required
+def close_order(order_id):
+    order = orders_controller.close_order(order_id)
+    return jsonify(order)
+
+
 # ----------------CREATE ORDER ENDPOINTS------------
 
 

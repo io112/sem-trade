@@ -33,9 +33,21 @@ async function send(endpoint, data = {}) {
 
 function get_orders_list() {
     send('/api/orders/get_order', order_id).then(data => {
-        $('#order_num').html(data['order_num']);
-        render_item_list(data)
+        render_page(data);
     })
+}
+
+function render_page(data) {
+    $('#order_num').html(data['order_num']);
+    $('#status').html(data['status']);
+    if (data['upd_num'])
+        $('#upd_num').val(data['upd_num']);
+    let contragent = data['contragent']['name'];
+    if (!data['contragent']['is_org'])
+        contragent += ' ' + data['contragent']['surname']
+    $('#clientname').val(contragent);
+    $('#comment').val(data['comment']);
+    render_item_list(data);
 }
 
 function render_item_list(list) {
@@ -47,6 +59,21 @@ function render_item_list(list) {
         tb.append(get_item_row(item['name'], item['amount'], item['price'], item['final_price']))
     })
 
+}
+
+function save_upd_num() {
+    let upd_num = $('#upd_num').val();
+    send(`/api/orders/${order_id}/set_upd`, upd_num).then(data => {
+        console.log('УПД сохранен');
+        render_page(data);
+    })
+}
+
+function close_order() {
+    let upd_num = $('#upd_num').val();
+    send(`/api/orders/${order_id}/close`, upd_num).then(data => {
+        render_page(data);
+    })
 }
 
 

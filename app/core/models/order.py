@@ -29,6 +29,7 @@ class Order:
         self.order_num = None
         self.status = self.Status.STATUS_CREATED
         self.contragent = None
+        self.upd_num = None
         self.user = None
         self.comment = ""
         self._price = 0.0
@@ -93,6 +94,7 @@ class Order:
         order.contragent = Contragent.create_from_dict(contragent)
         order.user = data['user']
         order.order_num = data['order_num']
+        order.upd_num = data.get('upd_num')
         order.status = data['status'] if data.get('status') else Order.Status.STATUS_CREATED
         return order
 
@@ -117,7 +119,7 @@ class Order:
         if self._id is None:
             self._id = db.insert(order_collection, self.get_db_dict())
         else:
-            db.update(order_collection, {'_id': self._id}, self.get_db_dict())
+            db.update(order_collection, {'_id': self._id}, {'$set': self.get_db_dict()})
 
     @staticmethod
     def find_last_order_num():
