@@ -50,7 +50,9 @@ class Order:
         order.comment = comment
         order.time_created = datetime.now(pytz.timezone('Europe/Moscow'))
         order.user = user
+        order.count_price()
         return order
+
 
     @staticmethod
     def create_from_session(session: Session):
@@ -90,6 +92,7 @@ class Order:
         order.sale = data['sale']
         order.time_created = data['time_created']
         order._id = data['_id']
+        order._price = data['_price']
         order.cart = Cart.create_from_dict(cart)
         order.contragent = Contragent.create_from_dict(contragent)
         order.user = data['user']
@@ -113,6 +116,7 @@ class Order:
         return res
 
     def _save(self):
+        self.count_price()
         if self.order_num is None:
             num = int(self.find_last_order_num()[3:])
             self.order_num = 'РВ-' + str(num + 1)

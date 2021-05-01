@@ -102,8 +102,14 @@ function change_contragent_type() {
     if ($('#contragent_is_org').is(':checked')) {
         $('#contragent_surname_block').hide()
         $('#contragent_surname').val('')
+        $('#contragent_kpp_block').show()
+        $('#contragent_inn_block').show()
     } else {
         $('#contragent_surname_block').show()
+        $('#contragent_inn_block').hide()
+        $('#contragent_inn').val('')
+        $('#contragent_kpp_block').hide()
+        $('#contragent_kpp').val('')
     }
 }
 
@@ -176,15 +182,18 @@ function get_contragent() {
 
 function render_contragent(resp) {
     const inp = $('#input-clientname')
+    const checkout_field = $('#client_name')
     if (Object.keys(resp).length !== 0) {
         let name = resp['name']
         if (!resp['is_org'])
             name += ' ' + resp['surname']
         inp.val(name)
         inp.prop('disabled', true)
+        checkout_field.html(name)
     } else {
         inp.val('')
         inp.prop('disabled', false)
+        checkout_field.html('')
     }
     clear_finder()
 }

@@ -1,7 +1,9 @@
 import json
+import locale
 import sys
 
-from flask import request, jsonify, make_response, abort, Response
+import pytz
+from flask import request, jsonify, make_response, abort, Response, render_template
 from flask_login import login_required, current_user
 
 from app import app
@@ -15,6 +17,8 @@ from app.core.sessions import *
 
 # ----------------SESSION ENDPOINTS---------------
 from app.utilities import orders_controller
+
+msk_timezone = pytz.timezone('Europe/Moscow')
 
 
 @app.route('/api/sessions/remove_session', methods=['POST'])
@@ -57,7 +61,7 @@ def get_orders():
 @login_required
 def get_order():
     order_id = json.loads(request.form.get('data'))
-    order = orders_controller.get_order(order_id)
+    order = orders_controller.get_order_dict(order_id)
     return jsonify(order)
 
 
@@ -67,6 +71,22 @@ def set_upd(order_id):
     upd = json.loads(request.form.get('data'))
     order = orders_controller.set_upd(order_id, upd)
     return jsonify(order)
+
+
+@app.route('/api/orders/<string:order_id>/download_upd', methods=['POST'])
+@login_required
+def download_upd(order_id):
+    order = orders_controller.get_order(order_id)
+    locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
+    time = msk_timezone.localize(order.time_created)
+    local_time = time.strftime("%d %B %Y г.")
+    upd = render_template('UPD.htm', order=order.get_dict(),
+                          items=order.cart.items,
+                          date=local_time, day=time.strftime('%d'),
+                          month=time.strftime('%B'),
+                          year=time.strftime('%Y')[2:],
+                          final_price=order._price)
+    return upd
 
 
 @app.route('/api/orders/<string:order_id>/close', methods=['POST'])

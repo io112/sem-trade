@@ -30,6 +30,28 @@ async function send(endpoint, data = {}) {
     });
 }
 
+//
+// function download_upd() {
+//     send(`/api/orders/${order_id}/download_upd`).then(data => {
+//         w = window.open(window.location.href, "_blank");
+//         //w.document.open();
+//         w.document.write(data);
+//         //w.document.close();
+//         w.window.print();
+//         w.window.close();
+//     })
+// }
+
+function print_upd() {
+    send(`/api/orders/${order_id}/download_upd`).then(data => {
+        w = window.open(window.location.href, "_blank");
+        //w.document.open();
+        w.document.write(data);
+        //w.document.close();
+        w.window.print();
+        w.window.close();
+    })
+}
 
 function get_orders_list() {
     send('/api/orders/get_order', order_id).then(data => {

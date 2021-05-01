@@ -14,6 +14,9 @@ class Contragent:
         self.name = ""
         self.surname = ""
         self.phone = ""
+        self.inn = ""
+        self.kpp = ""
+        self.address = ""
         self.is_org = False
 
     def __get__(self, instance=None, owner=None) -> dict:
@@ -27,6 +30,12 @@ class Contragent:
         res = self.__get__()
         res['_id'] = str(res['_id'])
         return res
+
+    def get_name(self):
+        name = self.name
+        if not self.is_org:
+            name += " " + self.surname
+        return name
 
     def save_to_db(self):
         db.insert(contragent_collection, self.__get__())

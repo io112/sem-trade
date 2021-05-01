@@ -19,7 +19,15 @@ def get_all_orders(user=None) -> List[dict]:
     return res
 
 
-def get_order(order_id, user=None) -> dict:
+def get_order(order_id) -> Order:
+    q = {'_id': ObjectId(order_id)}
+    q = db.find_one(order_collection, q)
+    if q is None:
+        return None
+    return Order.create_from_db(q)
+
+
+def get_order_dict(order_id, user=None) -> dict:
     q = {'_id': ObjectId(order_id)}
     q = db.find_one(order_collection, q)
     if q is None:

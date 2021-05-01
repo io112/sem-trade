@@ -1,6 +1,8 @@
 import functools
+import locale
 import sys
 
+import pytz
 from flask import request, render_template, redirect, url_for, jsonify, make_response, abort, Response
 from flask_httpauth import HTTPBasicAuth
 from flask_login import login_user, current_user, login_required, logout_user
@@ -17,8 +19,11 @@ from werkzeug.security import check_password_hash
 from app.core.sessions import *
 import json
 
+from app.utilities.orders_controller import get_order
+
 auth = HTTPBasicAuth()
 login_manager.login_view = 'login_route'
+msk_timezone = pytz.timezone('Europe/Moscow')
 
 
 def check_sid(sid):
@@ -115,6 +120,23 @@ def orders():
 @login_required
 def order(order_id):
     return render_template('order.html', user=current_user)
+
+
+@app.route('/orders/<string:order_id>/upd', methods=['GET'])
+@login_required
+def upd(order_id):
+    order = get_order(order_id)
+    locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
+    time = msk_timezone.localize(order.time_created)
+    local_time = time.strftime("%d %B %Y г.")
+    upd = render_template('UPD.htm', order=order.get_dict(),
+                           items=order.cart.items,
+                           date=local_time, day=time.strftime('%d'),
+                           month=time.strftime('%B'),
+                           year=time.strftime('%Y')[2:],
+                           final_price=order._price)
+    return upd
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
