@@ -3,7 +3,7 @@ import locale
 import sys
 
 import pytz
-from flask import request, jsonify, make_response, abort, Response, render_template
+from flask import request, jsonify, make_response, abort, render_template
 from flask_login import login_required, current_user
 
 from app import app
@@ -14,7 +14,6 @@ from app.core.models.order import Order
 from app.core.models.user import User
 from app.core.models.сontragent import Contragent
 from app.core.sessions import *
-
 # ----------------SESSION ENDPOINTS---------------
 from app.utilities import orders_controller
 

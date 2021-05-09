@@ -114,9 +114,12 @@ function updateArmSection() {
         const braid_select = $('#input-arm-braid')
         const type_select = $('#input-arm-type')
         const length_select = $('#input-arm-length')
+        const arm_select = $('#input-arm')
         diameter_select.empty().append(new Option("Выберите диаметр", ""));
         braid_select.empty().append(new Option("Выберите оплетку", ""));
         type_select.empty().append(new Option("Выберите тип рукава", ""));
+        arm_select.empty().append(new Option("Выберите рукав", ""));
+        console.log(resp)
         let offer = createUniqueArmOffer(resp)
         let selection = current_selection['arm']
         if (selection === undefined) {
@@ -136,6 +139,9 @@ function updateArmSection() {
         offer[2].forEach((type) => {
             type_select.append(new Option(type, type));
         })
+        resp['arms'].forEach((arm) => {
+            arm_select.append(new Option(arm['name'], arm['name']));
+        })
         if (selection['diameter'] !== undefined) {
             $("#input-arm-diameter option:last").attr("selected", "selected");
         }
@@ -145,10 +151,14 @@ function updateArmSection() {
         if (selection['arm_type'] !== undefined) {
             $("#input-arm-type option:last").attr("selected", "selected");
         }
+        if (selection['arm_type'] !== undefined) {
+            $("#input-arm-type option:last").attr("selected", "selected");
+        }
 
         document.getElementById('input-arm-diameter').fstdropdown.rebind()
         document.getElementById('input-arm-type').fstdropdown.rebind()
         document.getElementById('input-arm-braid').fstdropdown.rebind()
+        document.getElementById('input-arm').fstdropdown.rebind()
         updateFitSections();
     })
 
