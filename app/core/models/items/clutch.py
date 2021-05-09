@@ -9,10 +9,6 @@ class Clutch(BaseItem):
 
     def __init__(self, out_name):
         super().__init__(out_name)
-        self.amount = 1
-        self.name = ""
-        self.arm_type = ""
-        self.diameter = ""
         self.type = self.get_param_name()
 
     @staticmethod

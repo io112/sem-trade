@@ -1,30 +1,29 @@
+from mongoengine import EmbeddedDocument, DictField
+
 from app.core.models.items.base import BaseItem
 from app.core.models.items.composite_item import CompositeItem
 from app.core.models.items.empty_item import EmptyItem
-from app.core.models.session import Session
-from app.core.models.utils import create_simple_item
 
 
-class RVDSelection:
+class RVDSelection(EmbeddedDocument):
     param_name = "selection"
+    items = DictField()
+    subtotal = DictField()
 
-    def __init__(self, session: Session):
-        selection = session.data.get(self.param_name)
-        self.selection = {}
-        self.items = {}
-        self.subtotal = {}
-        if selection is not None:
-            self.selection = selection
-        for i in self.selection:
-            if i == "subtotal" and self.selection[i]["amount"] is not None:
-                self.subtotal["amount"] = self.selection[i]["amount"]
-                continue
-            item_type = ""
-            if self.selection[i] is not None:
-                item_type = self.selection[i].get("type")
-            item = create_simple_item(item_type, i)
-            item.create_from_dict(self.selection[i])
-            self.items[i] = item
+    # def __init__(self, session: Session, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     selection = session.data.get(self.param_name, {})
+    #     self.items = {}
+    #     self.subtotal = {}
+    #     for i in selection:
+    #         if i == "subtotal" and selection[i]["amount"] is not None:
+    #             self.subtotal["amount"] = selection[i]["amount"]
+    #             continue
+    #         item_type = selection[i].get("type", "")
+    #         item = create_simple_item(item_type, i)
+    #         item.create_from_dict(selection[i])
+    #         self.items[i] = item
+
 
     def __getitem__(self, item: str) -> BaseItem:
         res = self.items.get(item)

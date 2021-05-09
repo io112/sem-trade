@@ -1,3 +1,5 @@
+from mongoengine import Document
+
 from app.core.models.items.base import BaseItem
 import app.db.variables as dbvars
 
@@ -14,10 +16,6 @@ class Arm(BaseItem):
     def __init__(self, out_name):
         super().__init__(out_name)
         self.amount = 0
-        self.name = ""
-        self.braid = ""
-        self.arm_type = ""
-        self.diameter = ""
         self.type = self.get_param_name()
 
     def get_amount(self):

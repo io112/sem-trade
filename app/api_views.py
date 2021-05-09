@@ -5,9 +5,11 @@ import sys
 import pytz
 from flask import request, jsonify, make_response, abort, render_template
 from flask_login import login_required, current_user
+from mongoengine import QuerySet
 
 from app import app
 from app.base_views import sid_required, check_sid, remove_session_by_session
+from app.core.controllers import selection_controller
 from app.core.models.cart import Cart
 from app.core.models.offer import RVDOffer
 from app.core.models.order import Order
@@ -98,15 +100,16 @@ def close_order(order_id):
 # ----------------CREATE ORDER ENDPOINTS------------
 
 
-@app.route('/api/make_order/update_session', methods=['POST'])
+@app.route('/api/make_order/update_selection_items', methods=['POST'])
 @login_required
 @sid_required
 def update_session_view():
     sid = request.cookies.get('current_order')
     data = json.loads(request.form.get('data', []))
-    session = get_session(sid)
-    session.add_data(data)
-    update_session(session)
+    session: QuerySet = Session.objects(id=sid)
+    selection_controller.update_selection(session, data['selection'])
+    # session.add_data(data)
+    # update_session(session)
     return 'success'
 
 
@@ -173,9 +176,9 @@ def get_contragent():
 def update_select():
     sid = request.cookies.get('current_order')
     session = get_session(sid)
-    offer = RVDOffer(session).to_dict()
-    offer_string = json.dumps(offer).encode('utf-8')
-    return offer_string
+    # offer = RVDOffer(session).to_dict()
+    # offer_string = json.dumps(offer).encode('utf-8')
+    return '{}'
 
 
 @app.route('/api/make_order/submit_selection', methods=['POST'])
@@ -191,6 +194,20 @@ def move_selection_to_cart():
     result = offer.create_cart_item(False)
     if not result:
         return 'success'
+
+
+@app.route('/api/make_order/get_offer', methods=['POST'])
+@sid_required
+@login_required
+def get_offer():
+    sid = request.cookies.get('current_order')
+    selection_controller.get_filtered_params(sid)
+    # if errors:
+    #     return '\r\n'.join(errors)
+    # result = offer.create_cart_item(False)
+    # if not result:
+    #     return 'success'
+    return 'f'
 
 
 # ----------------CART ENDPOINTS---------------

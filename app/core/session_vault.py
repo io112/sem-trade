@@ -4,7 +4,7 @@ from app.core.models.session import Session
 session_collection = 'session'
 
 
-def get_session(sid):
+def get_session(sid) -> Session:
     query = {"_id": sid}
     res = db.find_one(session_collection, query)
     if res is None:

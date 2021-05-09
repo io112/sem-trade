@@ -1,10 +1,13 @@
 from abc import ABC, abstractmethod
 
+from mongoengine import Document
+from mongoengine.fields import DictField, FloatField, StringField
+
 import app.db.base as db
 import xml.etree.ElementTree as ET
 
 
-class BaseItem(ABC):
+class BaseItem(Document):
     required_params = [""]
     collection = ""
     not_zero_amount = {'amount': {'$not': {'$eq': 0}}}
@@ -13,18 +16,23 @@ class BaseItem(ABC):
     MeasureInt = 'PCE'
     MeasureText = 'штук'
     NomenclatureType = ''
+    candidate = DictField()
+    parameters = DictField()
+    amount = FloatField()
+    final_price = FloatField()
+    type = StringField()
+    name = StringField()
+
+    meta = {'allow_inheritance': True}
 
     def __init__(self, out_name: str):
-        self.candidate = {}
-        self.amount = 1
-        self.final_price = 0
-        self._id = ''
+        super().__init__()
         self.is_finish = False
         self.outer_name = out_name
 
     def not_zero_prop(self, prop):
         res = None
-        val = self.__dict__[prop]
+        val = self.parameters.get(prop)
         if val is not None and val != "":
             return {prop: val}
         return {}
@@ -109,7 +117,7 @@ class BaseItem(ABC):
     def check_required_params(self) -> bool:
         res = True
         for i in self.required_params:
-            if self.__dict__[i] is None or self.__dict__[i] == "":
+            if self.parameters.get(i) is None or self.parameters.get(i) == "":
                 res = False
         return res
 

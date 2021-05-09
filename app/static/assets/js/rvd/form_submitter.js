@@ -104,6 +104,7 @@ function dropClutches() {
 }
 
 function writeToSession(sid, data) {
+    console.log(data)
     let res = send("/api/make_order/update_session", data);
     return res
 }

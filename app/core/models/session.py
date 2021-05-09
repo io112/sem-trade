@@ -1,48 +1,68 @@
 from datetime import datetime
 
 import pytz
+from mongoengine import Document, StringField, DateTimeField, DictField, EmbeddedDocumentField, signals
+
+from app.core.models.selection import RVDSelection
 
 msk_timezone = pytz.timezone('Europe/Moscow')
 
 
-class Session:
-    def __init__(self):
-        self.user = ''
-        self._id = ''
-        self.last_modified = msk_timezone.localize(datetime.now())
-        self.data = {}
+def save_handler(event):
+    """Signal decorator to allow use of callback functions as class decorators."""
+
+    def decorator(fn):
+        def apply(cls):
+            event.connect(fn, sender=cls)
+            return cls
+
+        fn.apply = apply
+        return fn
+
+    return decorator
+
+
+@save_handler(signals.pre_save)
+def update_modified(sender, document):
+    document.last_modified = msk_timezone.localize(datetime.now())
+
+
+@update_modified.apply
+class Session(Document):
+    id = StringField(primary_key=True)
+    user = StringField()
+    last_modified = DateTimeField()
+    data = DictField()
+    selection = EmbeddedDocumentField(RVDSelection)
+
+    def __init__(self, *args, **values):
+        super().__init__(*args, **values)
 
     def add_data(self, data):
         self.data.update(data)
-        self.last_modified = msk_timezone.localize(datetime.now())
 
     def set_user(self, user):
         self.user = user
 
     def set_data(self, key, val):
         self.data[key] = val
-        self.last_modified = msk_timezone.localize(datetime.now())
 
     def remove_data(self, key):
         if key in self.data:
             del self.data[key]
-        self.last_modified = msk_timezone.localize(datetime.now())
 
     def to_dict(self):
-        return {"_id": self._id,
+        return {"_id": self.id,
                 "user": self.user,
                 "data": self.data,
                 "last_modified": self.last_modified,
                 }
 
     def get_id(self):
-        return self._id
+        return self.id
 
     def set_id(self, sid):
-        if self._id != '':
-            raise Exception("sid is read-only")
-        else:
-            self._id = sid
+        self.id = sid
 
     def create_from_struct(self, struct):
         self.set_id(struct["_id"])
