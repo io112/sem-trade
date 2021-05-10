@@ -24,7 +24,6 @@ class RVDSelection(EmbeddedDocument):
     #         item.create_from_dict(selection[i])
     #         self.items[i] = item
 
-
     def __getitem__(self, item: str) -> BaseItem:
         res = self.items.get(item)
         if res is not None:

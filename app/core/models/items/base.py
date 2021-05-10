@@ -1,3 +1,4 @@
+import copy
 from abc import ABC, abstractmethod
 from copy import deepcopy
 
@@ -18,7 +19,13 @@ class ItemsQuerySet(QuerySet):
         return res
 
     def filter_params(self, params_dict: dict):
-        query_filter = self.convert_dict(params_dict)
+        filter_dict = copy.deepcopy(params_dict)
+        if 'amount' in filter_dict:
+            del filter_dict['amount']
+        if 'id' in filter_dict:
+            query_filter = {'_id': filter_dict['id']}
+        else:
+            query_filter = self.convert_dict(filter_dict)
         return self.filter(__raw__=query_filter)
 
 

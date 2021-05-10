@@ -9,7 +9,7 @@ from mongoengine import QuerySet
 
 from app import app
 from app.base_views import sid_required, check_sid, remove_session_by_session
-from app.core.controllers import selection_controller
+from app.core.controllers import selection_controller, session_controller
 from app.core.models.cart import Cart
 from app.core.models.offer import RVDOffer
 from app.core.models.order import Order
@@ -106,11 +106,9 @@ def close_order(order_id):
 def update_session_view():
     sid = request.cookies.get('current_order')
     data = json.loads(request.form.get('data', []))
-    session: QuerySet = Session.objects(id=sid)
-    selection_controller.update_selection(session, data['selection'])
     # session.add_data(data)
     # update_session(session)
-    return 'success'
+    return selection_controller.update_selection(sid, data)
 
 
 @app.route('/api/make_order/cancel', methods=['POST'])
@@ -175,10 +173,7 @@ def get_contragent():
 @login_required
 def update_select():
     sid = request.cookies.get('current_order')
-    session = get_session(sid)
-    # offer = RVDOffer(session).to_dict()
-    # offer_string = json.dumps(offer).encode('utf-8')
-    return '{}'
+    return jsonify(selection_controller.get_selection(sid))
 
 
 @app.route('/api/make_order/submit_selection', methods=['POST'])
@@ -268,18 +263,18 @@ def checkout_order_view():
 @sid_required
 @login_required
 def set_comment_view():
-    session = get_session(request.cookies.get('current_order'))
-    session.add_data({'comment': json.loads(request.form.get('data', ''))})
-    update_session(session)
-    return session.data['comment']
+    sid = request.cookies.get('current_order')
+    session_controller.set_comment(sid, json.loads(request.form.get('data', '')))
+    return jsonify(session_controller.set_comment(sid, json.loads(request.form.get('data', '')))['comment'])
 
 
 @app.route('/api/make_order/get_comment', methods=['POST'])
 @sid_required
 @login_required
 def get_comment_view():
-    session = get_session(request.cookies.get('current_order'))
-    return session.data.get('comment', '')
+    sid = request.cookies.get('current_order')
+    res = session_controller.get_comment(sid)
+    return jsonify(res)
 
 
 # ----------------CONTRAGENT ENDPOINTS---------------

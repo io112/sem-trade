@@ -13,18 +13,26 @@ msk_timezone = pytz.timezone('Europe/Moscow')
 not_zero_amount = {'amount': {'$not': {'$eq': 0}}}
 
 
-def get_filtered_params(session_id, ignore_amounts=False):
+def get_selection(session_id):
     session = Session.objects(id=session_id)[0]
     selection = session.selection
+    if selection is None:
+        return 'NaN'
+    return selection.to_mongo().to_dict()
+
+
+def get_filtered_params(session_id, ignore_amounts=False):
+    session = Session.objects(id=session_id)[0]
+    if session.selection is None:
+        session.selection = utility.create_selection()
+        session.save()
+    selection = session.selection
     candidates = utility.get_candidates_by_params(selection)
-    return candidates
+    parameters = utility.get_parameters_list(candidates)
+    return {'candidates': candidates, 'parameters': parameters, 'selection': selection.to_mongo().to_dict()}
 
 
-def update_selection(session: QuerySet, selection: dict):
+def update_selection(session_id: str, selection: dict):
+    session: QuerySet = Session.objects(id=session_id)
     session: Session = session[0]
-    items = deepcopy(selection)
-    if items['subtotal']:
-        del items['subtotal']
-    selection = RVDSelection(items=items, subtotal=selection['subtotal'])
-    session.selection = selection
-    session.save()
+    return utility.save_selection(session, selection['items'], selection['subtotal'])

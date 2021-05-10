@@ -8,13 +8,36 @@ let fs2 = ''
 
 let sid = ""
 let current_selection = {
+    "items": {
+        "arm": {},
+        "fiting1": {},
+        "fiting2": {},
+        "clutch1": {},
+        "clutch2": {},
+    },
+    "subtotal": {},
+}
+let parameters = {
     "arm": {},
     "fiting1": {},
     "fiting2": {},
     "clutch1": {},
     "clutch2": {},
-    "final": {}
 }
+let candidates = {
+    "arm": {},
+    "fiting1": {},
+    "fiting2": {},
+    "clutch1": {},
+    "clutch2": {},
+}
+
+let current_offer = {
+    "selection": current_selection,
+    "candidates": candidates,
+    "parameters": parameters
+}
+
 
 function init() {
     sid = Cookies.get('current_order');
@@ -27,27 +50,42 @@ function init() {
     as.on('change', submitArm);
     fs1.on('change', submitFits);
     fs2.on('change', submitFits);
-    updateArmSection();
-    updateFitSections();
-    update_cart();
-    init_sessions();
+    getCurrentSelection().then(() => {
+        updateArmSection();
+        updateFitSections();
+        update_cart();
+        init_sessions();
+    })
+}
+
+function tryParseFloat(val) {
+    let res = val
+    let regex = /^[0-9]+$/;
+    if (regex.test(res) && res.length > 0) {
+        res = parseFloat(val)
+    }
+    return res
 }
 
 function submitArm() {
     let formRes = as.serializeArray()
     formRes.forEach(i => {
+        let val = tryParseFloat(i.value)
         if (i.value !== "")
-            current_selection["arm"][i.name] = i.value
+            current_selection["items"]["arm"][i.name] = val
+        else
+            delete current_selection["items"]["arm"][i.name]
         if (i.name === "diameter") {
-            current_selection["clutch1"] = {'diameter': i.value}
-            current_selection["clutch2"] = {'diameter': i.value}
+            current_selection["items"]["clutch1"] = {'diameter': val}
+            current_selection["items"]["clutch2"] = {'diameter': val}
         }
 
     })
-    let req = {"selection": current_selection}
-    let resp = writeToSession(sid, req).then(() => {
-        updateArmSection()
-        updateFitSections()
+    writeToSession(sid, current_selection).then(() => {
+        getCurrentSelection().then(() => {
+            updateArmSection()
+            updateFitSections()
+        })
     })
 }
 
@@ -55,115 +93,119 @@ function submitFits() {
     let fit1 = fs1.serializeArray()
     let fit2 = fs2.serializeArray()
     fit1.forEach(i => {
+        let val = tryParseFloat(i.value)
         if (i.value !== "") {
             if (i.name === "clutch_name")
-                current_selection["clutch1"]["name"] = i.value
+                current_selection["items"]["clutch1"]["id"] = val
             else
-                current_selection["fiting1"][i.name] = i.value
+                current_selection["items"]["fiting1"][i.name] = val
+        } else {
+            if (i.name === "clutch_name")
+                delete current_selection["items"]["clutch1"]["id"]
+            else
+                delete current_selection["items"]["fiting1"][i.name]
         }
     })
     fit2.forEach(i => {
+        let val = tryParseFloat(i.value)
         if (i.value !== "") {
             if (i.name === "clutch_name")
-                current_selection["clutch2"]["name"] = i.value
-            else current_selection["fiting2"][i.name] = i.value
+                current_selection["items"]["clutch2"]["id"] = val
+            else
+                current_selection["items"]["fiting2"][i.name] = val
+        } else {
+            if (i.name === "clutch_name")
+                delete current_selection["items"]["clutch2"]["id"]
+            else
+                delete current_selection["items"]["fiting2"][i.name]
         }
     })
-    let req = {"selection": current_selection}
-    let resp = writeToSession(sid, req).then(() => updateFitSections())
+    writeToSession(sid, current_selection).then(() => getCurrentSelection().then(() => updateFitSections()))
 }
 
 function dropArm() {
-    current_selection["arm"] = {}
-    current_selection["clutch1"] = {}
-    current_selection["clutch2"] = {}
+    current_selection["items"]["arm"] = {}
+    current_selection["items"]["clutch1"] = {}
+    current_selection["items"]["clutch2"] = {}
 
-    let req = {"selection": current_selection}
-    let resp = writeToSession(sid, req).then(() => updateArmSection())
+    let resp = writeToSession(sid, current_selection).then(() => getCurrentSelection().then(() => updateArmSection()))
 }
 
 function dropFits() {
-    current_selection["fiting1"] = {}
-    current_selection["fiting2"] = {}
+    current_selection["items"]["fiting1"] = {}
+    current_selection["items"]["fiting2"] = {}
 
-    let req = {"selection": current_selection}
-    let resp = writeToSession(sid, req).then(() => updateFitSections())
+    let resp = writeToSession(sid, current_selection).then(() => getCurrentSelection().then(() => updateFitSections()))
 }
 
 function dropClutches() {
-    current_selection["clutch1"] = {}
-    current_selection["clutch2"] = {}
+    current_selection["items"]["clutch1"] = {}
+    current_selection["items"]["clutch2"] = {}
 
-    let req = {"selection": current_selection}
-    let resp = writeToSession(sid, req).then(() => updateFitSections())
+    writeToSession(sid, current_selection).then(() => getCurrentSelection().then(() => updateFitSections()))
 }
 
 function writeToSession(sid, data) {
-    console.log(data)
-    let res = send("/api/make_order/update_session", data);
-    return res
+    return send("/api/make_order/update_selection_items", data)
 }
 
 function updateArmSection() {
-    getCurrentSelection().then((resp) => {
-        const diameter_select = $('#input-arm-diameter')
-        const braid_select = $('#input-arm-braid')
-        const type_select = $('#input-arm-type')
-        const length_select = $('#input-arm-length')
-        const arm_select = $('#input-arm')
-        diameter_select.empty().append(new Option("Выберите диаметр", ""));
-        braid_select.empty().append(new Option("Выберите оплетку", ""));
-        type_select.empty().append(new Option("Выберите тип рукава", ""));
-        arm_select.empty().append(new Option("Выберите рукав", ""));
-        console.log(resp)
-        let offer = createUniqueArmOffer(resp)
-        let selection = current_selection['arm']
-        if (selection === undefined) {
-            selection = {}
-        }
-        if (current_selection["arm"] !== undefined && current_selection["arm"]['amount'] !== undefined) {
-            length_select.val(parseInt(current_selection["arm"]['amount']))
-        } else {
-            length_select.val(0);
-        }
-        offer[0].forEach((diameter) => {
-            diameter_select.append(new Option(diameter + ' мм', diameter));
-        })
-        offer[1].forEach((braid) => {
-            braid_select.append(new Option(braid, braid));
-        })
-        offer[2].forEach((type) => {
-            type_select.append(new Option(type, type));
-        })
-        resp['arms'].forEach((arm) => {
-            arm_select.append(new Option(arm['name'], arm['name']));
-        })
-        if (selection['diameter'] !== undefined) {
-            $("#input-arm-diameter option:last").attr("selected", "selected");
-        }
-        if (selection['braid'] !== undefined) {
-            $("#input-arm-braid option:last").attr("selected", "selected");
-        }
-        if (selection['arm_type'] !== undefined) {
-            $("#input-arm-type option:last").attr("selected", "selected");
-        }
-        if (selection['arm_type'] !== undefined) {
-            $("#input-arm-type option:last").attr("selected", "selected");
-        }
-
-        document.getElementById('input-arm-diameter').fstdropdown.rebind()
-        document.getElementById('input-arm-type').fstdropdown.rebind()
-        document.getElementById('input-arm-braid').fstdropdown.rebind()
-        document.getElementById('input-arm').fstdropdown.rebind()
-        updateFitSections();
+    let resp = current_offer;
+    const diameter_select = $('#input-arm-diameter')
+    const braid_select = $('#input-arm-braid')
+    const type_select = $('#input-arm-type')
+    const length_select = $('#input-arm-length')
+    const arm_select = $('#input-arm')
+    diameter_select.empty().append(new Option("Выберите диаметр", ""));
+    braid_select.empty().append(new Option("Выберите оплетку", ""));
+    type_select.empty().append(new Option("Выберите тип рукава", ""));
+    arm_select.empty().append(new Option("Выберите рукав", ""));
+    console.log(resp)
+    let offer = resp['parameters']['arm']
+    let selection = current_selection["items"]['arm']
+    if (selection === undefined) {
+        selection = {}
+    }
+    if (selection['amount'] !== undefined) {
+        length_select.val(parseInt(current_selection["items"]["arm"]['amount']))
+    } else {
+        length_select.val(0);
+    }
+    offer['diameter'].forEach((diameter) => {
+        diameter_select.append(new Option(diameter + ' мм', diameter));
     })
+    offer['braid'].forEach((braid) => {
+        braid_select.append(new Option(braid, braid));
+    })
+    offer['arm_type'].forEach((type) => {
+        type_select.append(new Option(type, type));
+    })
+    resp['candidates']['arm'].forEach((arm) => {
+        arm_select.append(new Option(`${arm['name']}: ${arm['amount']}`, arm['_id']));
+    })
+    if (selection['diameter'] !== undefined) {
+        $("#input-arm-diameter option:last").attr("selected", "selected");
+    }
+    if (selection['braid'] !== undefined) {
+        $("#input-arm-braid option:last").attr("selected", "selected");
+    }
+    if (selection['arm_type'] !== undefined) {
+        $("#input-arm-type option:last").attr("selected", "selected");
+    }
+    if (selection['id'] !== undefined) {
+        $("#input-arm option:last").attr("selected", "selected");
+    }
 
+    document.getElementById('input-arm-diameter').fstdropdown.rebind()
+    document.getElementById('input-arm-type').fstdropdown.rebind()
+    document.getElementById('input-arm-braid').fstdropdown.rebind()
+    document.getElementById('input-arm').fstdropdown.rebind()
+    updateFitSections();
 }
 
 function updateFitSections() {
-    getCurrentSelection().then((resp) => {
-        ['1', '2'].forEach((num) => updateFitSection(num, resp));
-    })
+    let resp = current_offer;
+    ['1', '2'].forEach((num) => updateFitSection(num, resp));
 }
 
 function updateFitSection(num, resp) {
@@ -175,22 +217,22 @@ function updateFitSection(num, resp) {
     standart_select.empty().append(new Option("Выберите стандарт фитинга", ""));
     fit_select.empty().append(new Option("Выберите фитинг", ""));
     muf_select.empty().append(new Option("Выберите муфту", ""));
-    let offer = createUniqueFitOffer(resp, num)
-    let selection = current_selection['fiting' + num]
+    let offer = resp['parameters']['fiting' + num]
+    let selection = current_selection["items"]['fiting' + num]
     if (selection === undefined) {
         selection = {}
     }
-    offer[0].forEach((diameter) => {
+    offer['diameter'].forEach((diameter) => {
         diameter_select.append(new Option(diameter + ' мм', diameter));
     })
-    offer[1].forEach((standart) => {
+    offer['fiting_type'].forEach((standart) => {
         standart_select.append(new Option(standart, standart));
     })
-    offer[2].forEach((fit) => {
-        fit_select.append(new Option(fit, fit));
+    resp['candidates']['fiting' + num].forEach((fit) => {
+        fit_select.append(new Option(`${fit["name"]}: ${fit["amount"]}`, fit["_id"]));
     })
-    resp['clutches'].forEach((muf) => {
-        muf_select.append(new Option(muf['name'], muf['name']));
+    resp['candidates']['clutch1'].forEach((muf) => {
+        muf_select.append(new Option(`${muf["name"]}: ${muf["amount"]}`, muf["_id"]));
     })
     if (selection['fiting_type'] !== undefined) {
         $('#input-fit-std-' + num + " option:last").attr("selected", "selected");
@@ -198,10 +240,10 @@ function updateFitSection(num, resp) {
     if (selection['diameter'] !== undefined) {
         $("#input-fit-d-" + num + " option:last").attr("selected", "selected");
     }
-    if (selection['name'] !== undefined) {
+    if (selection['id'] !== undefined) {
         $("#input-fit-" + num + " option:last").attr("selected", "selected");
     }
-    if (current_selection['clutch' + num] !== undefined && current_selection['clutch' + num]['name'] !== undefined) {
+    if (current_selection["items"]['clutch' + num] !== undefined && current_selection["items"]['clutch' + num]['id'] !== undefined) {
         $("#input-muf-" + num + " option:last").attr("selected", "selected");
     }
 
@@ -211,56 +253,6 @@ function updateFitSection(num, resp) {
     document.getElementById('input-muf-' + num).fstdropdown.rebind()
 }
 
-function createUniqueDict(dict) {
-    var res = []
-    dict.forEach((elem) => {
-        if ($.inArray(elem, res) === -1) {
-            res.push(elem);
-        }
-    })
-}
-
-function createUniqueArmOffer(dict) {
-    let diameters = []
-    let braids = []
-    let types = []
-    dict['arms'].forEach((arm) => {
-        let diameter = arm['diameter']
-        let braid = arm['braid']
-        let type = arm['arm_type']
-        if ($.inArray(diameter, diameters) === -1) {
-            diameters.push(diameter);
-        }
-        if ($.inArray(braid, braids) === -1) {
-            braids.push(braid);
-        }
-        if ($.inArray(type, types) === -1) {
-            types.push(type);
-        }
-    })
-    return [diameters, braids, types]
-}
-
-function createUniqueFitOffer(dict, num) {
-    let diameters = []
-    let standarts = []
-    let fits = []
-    dict['fitings'][num].forEach((fiting) => {
-        let diameter = fiting['diameter']
-        let standart = fiting['fiting_type']
-        let fit = fiting['name']
-        if ($.inArray(diameter, diameters) === -1) {
-            diameters.push(diameter);
-        }
-        if ($.inArray(standart, standarts) === -1) {
-            standarts.push(standart);
-        }
-        if ($.inArray(fit, fits) === -1) {
-            fits.push(fit);
-        }
-    })
-    return [diameters, standarts, fits]
-}
 
 async function send(endpoint, data = {}) {
     if (data === undefined)
@@ -270,6 +262,7 @@ async function send(endpoint, data = {}) {
         type: "POST",
         url: endpoint,
         data: request,
+        dataType: 'json',
         success: function (e) {
             return e
         },
@@ -281,22 +274,31 @@ async function send(endpoint, data = {}) {
 }
 
 async function getCurrentSelection() {
-    let resp = await send('/api/make_order/update_selection');
-    resp = JSON.parse(resp);
-    if (resp['selection'] !== undefined) {
+    let resp = await send('/api/make_order/get_offer');
+    if (resp !== 'NaN') {
+        console.log(resp)
         current_selection = resp['selection']
+        parameters = resp['parameters']
+        candidates = resp['candidates']
+        current_offer = resp
+        normalize_selection()
     }
     updateSelectionSubtotal()
     return resp;
 }
 
+function normalize_selection() {
+    let names = ['arm', 'fiting1', 'fiting2', 'clutch1', 'clutch2']
+    names.forEach(name => {
+        if (current_selection['items'][name] === undefined) {
+            current_selection['items'][name] = {}
+        }
+    })
+}
+
 function changeSelectAmount() {
-    if (current_selection["subtotal"] === undefined) {
-        current_selection["subtotal"] = {}
-    }
     current_selection["subtotal"]["amount"] = parseInt($('#subtotal_amount').val());
-    let req = {"selection": current_selection}
-    let resp = writeToSession(sid, req).then(() => {
+    let resp = writeToSession(sid, current_selection).then(() => {
         getCurrentSelection()
     })
 

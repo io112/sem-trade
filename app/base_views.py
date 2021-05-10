@@ -91,10 +91,7 @@ testoffer = {'arms': [{'diameter': 5}, {'diameter': 10}]}
 @login_required
 @sid_required
 def home():
-    sid = request.cookies.get('current_order')
-    session = get_session(sid)
-    offer = RVDOffer(session).to_dict()
-    return render_template('create_order/create_order.html', items=[testitem], offer=offer, user=current_user)
+    return render_template('create_order/create_order.html', user=current_user)
 
 
 @app.route('/logout')

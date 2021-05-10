@@ -15,7 +15,6 @@ class Arm(BaseItem):
 
     def __init__(self, *args, **values):
         super().__init__('arm', *args, **values)
-        self.amount = 0
         self.type = self.get_param_name()
 
     def get_amount(self):

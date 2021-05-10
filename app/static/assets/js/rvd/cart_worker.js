@@ -59,6 +59,7 @@ function set_comment() {
 
 function render_comment() {
     send(get_comment_endpoint).then(comment => {
+        console.log(comment)
         $('#comment_text').val(comment)
     })
 }

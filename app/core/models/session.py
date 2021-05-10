@@ -34,6 +34,11 @@ class Session(Document):
     last_modified = DateTimeField()
     data = DictField()
     selection = EmbeddedDocumentField(RVDSelection)
+    comment = StringField()
+
+    @property
+    def dict(self):
+        return self.to_mongo().to_dict()
 
     def __init__(self, *args, **values):
         super().__init__(*args, **values)
