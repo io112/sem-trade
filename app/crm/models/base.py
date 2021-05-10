@@ -5,6 +5,7 @@ class SiteObj:
         self.name = ''
         self.measure = ''
         self.category_id = ''
+        self.parameters = {}
         self.type = 'base'
 
     def convert_to_dict(self):
@@ -12,7 +13,8 @@ class SiteObj:
                 'category_id': self.category_id,
                 'name': self.name,
                 'measure': self.measure,
-                'type': self.type}
+                'type': self.type,
+                'parameters': self.parameters}
         return data
 
     def convert_for_update(self):

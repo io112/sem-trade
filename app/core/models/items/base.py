@@ -1,10 +1,25 @@
 from abc import ABC, abstractmethod
+from copy import deepcopy
 
-from mongoengine import Document
+from mongoengine import Document, QuerySet
 from mongoengine.fields import DictField, FloatField, StringField
 
 import app.db.base as db
 import xml.etree.ElementTree as ET
+
+
+class ItemsQuerySet(QuerySet):
+
+    def convert_dict(self, params_dict: dict):
+        collection_name = 'parameters'
+        res = {}
+        for k in params_dict.keys():
+            res[f'{collection_name}.{k}'] = params_dict[k]
+        return res
+
+    def filter_params(self, params_dict: dict):
+        query_filter = self.convert_dict(params_dict)
+        return self.filter(__raw__=query_filter)
 
 
 class BaseItem(Document):
@@ -16,17 +31,20 @@ class BaseItem(Document):
     MeasureInt = 'PCE'
     MeasureText = 'штук'
     NomenclatureType = ''
-    candidate = DictField()
+    id = StringField(primary_key=True)
+    category_id = StringField()
     parameters = DictField()
     amount = FloatField()
     final_price = FloatField()
     type = StringField()
     name = StringField()
+    price = FloatField()
+    measure = StringField()
 
-    meta = {'allow_inheritance': True}
+    meta = {'abstract': True, 'queryset_class': ItemsQuerySet}
 
-    def __init__(self, out_name: str):
-        super().__init__()
+    def __init__(self, out_name: str, *args, **values):
+        super().__init__(*args, **values)
         self.is_finish = False
         self.outer_name = out_name
 

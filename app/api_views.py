@@ -201,13 +201,13 @@ def move_selection_to_cart():
 @login_required
 def get_offer():
     sid = request.cookies.get('current_order')
-    selection_controller.get_filtered_params(sid)
+    res = selection_controller.get_filtered_params(sid)
     # if errors:
     #     return '\r\n'.join(errors)
     # result = offer.create_cart_item(False)
     # if not result:
     #     return 'success'
-    return 'f'
+    return jsonify(res)
 
 
 # ----------------CART ENDPOINTS---------------

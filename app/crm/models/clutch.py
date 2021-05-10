@@ -14,16 +14,6 @@ class Clutch(SiteObj):
         self.type = 'clutch'
         self.category_id = clutch_cat_id
 
-        self.diameter = 'Не задан'
-        self.arm_type = 'Не задан'
-
-    def convert_to_dict(self):
-        data = super().convert_to_dict()
-        data['diameter'] = self.diameter
-        data['arm_type'] = self.arm_type
-
-        return data
-
     @staticmethod
     def create_from_cml(obj):
         res = SiteObj.create_from_cml(obj)
@@ -34,7 +24,7 @@ class Clutch(SiteObj):
 
         for i in req:
             if i[1].text == Clutch.diameter_name:
-                res.diameter = float(i[2].text)
+                res.parameters['diameter'] = float(i[2].text)
             elif i[1].text == Clutch.arm_type_name:
-                res.arm_type = i[2].text
+                res.parameters['arm_type'] = i[2].text
         return res

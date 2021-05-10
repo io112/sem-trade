@@ -13,8 +13,8 @@ class Arm(BaseItem):
     MeasureText = 'метров'
     NomenclatureType = 'Рукав'
 
-    def __init__(self, out_name):
-        super().__init__(out_name)
+    def __init__(self, *args, **values):
+        super().__init__('arm', *args, **values)
         self.amount = 0
         self.type = self.get_param_name()
 

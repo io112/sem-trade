@@ -34,14 +34,13 @@ function init() {
 }
 
 function submitArm() {
-    current_selection["arm"] = {'type': 'arm'}
     let formRes = as.serializeArray()
     formRes.forEach(i => {
         if (i.value !== "")
             current_selection["arm"][i.name] = i.value
         if (i.name === "diameter") {
-            current_selection["clutch1"] = {'type': 'clutch', 'diameter': i.value}
-            current_selection["clutch2"] = {'type': 'clutch', 'diameter': i.value}
+            current_selection["clutch1"] = {'diameter': i.value}
+            current_selection["clutch2"] = {'diameter': i.value}
         }
 
     })
@@ -55,10 +54,6 @@ function submitArm() {
 function submitFits() {
     let fit1 = fs1.serializeArray()
     let fit2 = fs2.serializeArray()
-    current_selection["clutch1"] = {'type': 'clutch'}
-    current_selection["clutch2"] = {'type': 'clutch'}
-    current_selection["fiting1"] = {'type': 'fiting'}
-    current_selection["fiting2"] = {'type': 'fiting'}
     fit1.forEach(i => {
         if (i.value !== "") {
             if (i.name === "clutch_name")

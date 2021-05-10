@@ -7,8 +7,8 @@ class Fiting(BaseItem):
     collection = dbvars.fiting_collection
     NomenclatureType = 'Фитинг'
 
-    def __init__(self, out_name):
-        super().__init__(out_name)
+    def __init__(self, *args, **values):
+        super().__init__('fiting', *args, **values)
         self.type = self.get_param_name()
 
     @staticmethod

@@ -7,8 +7,8 @@ class Clutch(BaseItem):
     collection = dbvars.clutch_collection
     NomenclatureType = 'Муфта'
 
-    def __init__(self, out_name):
-        super().__init__(out_name)
+    def __init__(self, *args, **values):
+        super().__init__('clutch', *args, **values)
         self.type = self.get_param_name()
 
     @staticmethod

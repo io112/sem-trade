@@ -17,7 +17,7 @@ def get_filtered_params(session_id, ignore_amounts=False):
     session = Session.objects(id=session_id)[0]
     selection = session.selection
     candidates = utility.get_candidates_by_params(selection)
-    print(candidates)
+    return candidates
 
 
 def update_selection(session: QuerySet, selection: dict):
