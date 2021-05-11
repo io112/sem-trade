@@ -8,6 +8,8 @@ from app.core.session_vault import *
 import app.core.utilities.selection_utility as utility
 from datetime import datetime
 
+from app.core.utilities import session_utility, contragent_utility
+
 msk_timezone = pytz.timezone('Europe/Moscow')
 
 not_zero_amount = {'amount': {'$not': {'$eq': 0}}}
@@ -36,3 +38,5 @@ def update_selection(session_id: str, selection: dict):
     session: QuerySet = Session.objects(id=session_id)
     session: Session = session[0]
     return utility.save_selection(session, selection['items'], selection['subtotal'])
+
+

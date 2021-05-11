@@ -1,9 +1,11 @@
 from datetime import datetime
 
 import pytz
-from mongoengine import Document, StringField, DateTimeField, DictField, EmbeddedDocumentField, signals
+from mongoengine import Document, StringField, DateTimeField, DictField, EmbeddedDocumentField, signals, ReferenceField
 
+from app.core.models.cart import Cart
 from app.core.models.selection import RVDSelection
+from app.core.models.сontragent import Contragent
 
 msk_timezone = pytz.timezone('Europe/Moscow')
 
@@ -27,6 +29,7 @@ def update_modified(sender, document):
     document.last_modified = msk_timezone.localize(datetime.now())
 
 
+
 @update_modified.apply
 class Session(Document):
     id = StringField(primary_key=True)
@@ -34,6 +37,8 @@ class Session(Document):
     last_modified = DateTimeField()
     data = DictField()
     selection = EmbeddedDocumentField(RVDSelection)
+    contragent = ReferenceField(Contragent)
+    cart = EmbeddedDocumentField(Cart)
     comment = StringField()
 
     @property

@@ -1,23 +1,30 @@
 from bson import ObjectId
+from mongoengine import Document, StringField, BooleanField
 
 import app.db.base as db
-from app.core.models.session import Session
-from app.core.sessions import update_session
 from app.db.variables import contragent_collection
 
 
-class Contragent:
+class Contragent(Document):
+    name = StringField()
+    surname = StringField()
+    phone = StringField()
+    inn = StringField()
+    kpp = StringField()
+    address = StringField()
+    is_org = BooleanField(default=False)
 
-    def __init__(self):
+    meta = {'indexes': [
+        {'fields': ['$name', "$phone", '$surname'],
+         'default_language': 'english',
+         'name': 'search_idx',
+         'weights': {'name': 1, 'phone': 1, 'surname': 1}
+         }
+    ]}
+
+    def __init__(self, *args, **values):
+        super().__init__(*args, **values)
         self.__session = None
-        self._id = ""
-        self.name = ""
-        self.surname = ""
-        self.phone = ""
-        self.inn = ""
-        self.kpp = ""
-        self.address = ""
-        self.is_org = False
 
     def __get__(self, instance=None, owner=None) -> dict:
         res = {}
@@ -40,22 +47,22 @@ class Contragent:
     def save_to_db(self):
         db.insert(contragent_collection, self.__get__())
 
-    def save_to_session(self, session=None):
-        if self.__session is None and session is None:
-            raise Exception('Session not defined')
-        if self.__session:
-            session = self.__session
-        session.add_data({'contragent': self.__get__()})
-        update_session(session)
+    # def save_to_session(self, session=None):
+    #     if self.__session is None and session is None:
+    #         raise Exception('Session not defined')
+    #     if self.__session:
+    #         session = self.__session
+    #     session.add_data({'contragent': self.__get__()})
+    #     update_session(session)
 
-    @staticmethod
-    def create_from_session(session: Session):
-        cont_data = session.data.get('contragent')
-        if cont_data is None:
-            raise NotImplementedError('Contragent not defined')
-        contragent = Contragent.create_from_dict(cont_data)
-        contragent.__session = session
-        return contragent
+    # @staticmethod
+    # def create_from_session(session: Session):
+    #     cont_data = session.data.get('contragent')
+    #     if cont_data is None:
+    #         raise NotImplementedError('Contragent not defined')
+    #     contragent = Contragent.create_from_dict(cont_data)
+    #     contragent.__session = session
+    #     return contragent
 
     @staticmethod
     def create_by_id(c_id):

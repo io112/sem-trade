@@ -218,6 +218,7 @@ function render_clients(data) {
 
 function del_order() {
     send(cancel_order_endpoint).then(new_sid => {
+        console.log(new_sid)
         if (new_sid !== '')
             window.location.href = `/?sid=${new_sid}`;
         else

@@ -9,7 +9,7 @@ from mongoengine import QuerySet
 
 from app import app
 from app.base_views import sid_required, check_sid, remove_session_by_session
-from app.core.controllers import selection_controller, session_controller
+from app.core.controllers import selection_controller, session_controller, contragent_controller
 from app.core.models.cart import Cart
 from app.core.models.offer import RVDOffer
 from app.core.models.order import Order
@@ -30,8 +30,8 @@ def route_remove_session():
         abort(404, 'sid not found')
     if not check_sid(sid):
         abort(404, 'session not found')
-    remove_session_by_session(get_session(sid))
-    sessions = get_user_sessions(current_user.username, fields=['_id', 'user', 'last_modified'])
+    session_controller.remove_session(sid)
+    sessions = session_controller.get_user_sessions(current_user.username)
     resp = make_response(jsonify(sessions))
     current_order = request.cookies.get('current_order')
     if current_order is not None and current_order == sid:
@@ -45,7 +45,7 @@ def route_remove_session():
 @app.route('/api/sessions/get_sessions', methods=['POST'])
 @login_required
 def get_sessions():
-    sessions = get_user_sessions(current_user.username, fields=['_id', 'user', 'last_modified'])
+    sessions = session_controller.get_user_sessions(current_user.username)
     print(sessions)
     return jsonify(sessions)
 
@@ -106,8 +106,6 @@ def close_order(order_id):
 def update_session_view():
     sid = request.cookies.get('current_order')
     data = json.loads(request.form.get('data', []))
-    # session.add_data(data)
-    # update_session(session)
     return selection_controller.update_selection(sid, data)
 
 
@@ -115,12 +113,13 @@ def update_session_view():
 @login_required
 @sid_required
 def remove_order():
-    session = get_session(request.cookies.get('current_order'))
-    remove_session_by_session(session)
-    if len(get_session_ids(current_user.username)) > 0:
-        return get_session_ids(current_user.username)[-1]['_id']
+    sid = request.cookies.get('current_order')
+    session_controller.remove_session(sid)
+    sessions = session_controller.get_user_sessions(current_user.username)
+    if len(sessions) > 0:
+        return jsonify(sessions[-1]['_id'])
     else:
-        resp = make_response('')
+        resp = make_response(jsonify(''))
         resp.delete_cookie('current_order')
         return resp
 
@@ -130,10 +129,10 @@ def remove_order():
 @sid_required
 def remove_contragent():
     sid = request.cookies.get('current_order')
-    session = get_session(sid)
+    session = session_controller.get_session(sid)
     if 'contragent' in session.data:
         session.remove_data('contragent')
-        update_session(session)
+        session.save()
     return jsonify({})
 
 
@@ -142,12 +141,10 @@ def remove_contragent():
 @sid_required
 def set_contragent():
     sid = request.cookies.get('current_order')
-    session = get_session(sid)
     contragent_id = json.loads(request.form.get('data', []))
     try:
-        contragent = Contragent.create_by_id(contragent_id)
-        contragent.save_to_session(session)
-        return contragent.get()
+        session_controller.set_contragent(sid, contragent_id)
+        return contragent_controller.get_contragent(contragent_id)
     except Exception:
         print(sys.exc_info()[0])
         return str(sys.exc_info()[0]), 404
@@ -158,10 +155,9 @@ def set_contragent():
 @login_required
 def get_contragent():
     sid = request.cookies.get('current_order')
-    session = get_session(sid)
     try:
-        contragent = Contragent.create_from_session(session)
-        return contragent.get()
+        contragent = session_controller.get_contragent(sid)
+        return contragent
     except Exception:
         return jsonify({})
 
@@ -181,7 +177,7 @@ def update_select():
 @login_required
 def move_selection_to_cart():
     sid = request.cookies.get('current_order')
-    session = get_session(sid)
+    session = session_controller.get_session(sid)
     offer = RVDOffer(session)
     errors = offer.get_errors()
     if errors:
@@ -212,9 +208,7 @@ def get_offer():
 @login_required
 def get_cart():
     sid = request.cookies.get('current_order')
-    session = get_session(sid)
-    cart = Cart.create_from_session(session)
-    return jsonify(cart.dict)
+    return jsonify(session_controller.get_cart(sid))
 
 
 @app.route('/api/make_order/del_cart_item', methods=['POST'])
@@ -222,19 +216,15 @@ def get_cart():
 @login_required
 def del_cart_item():
     sid = request.cookies.get('current_order')
-    session = get_session(sid)
-    cart = Cart.create_from_session(session)
     data = json.loads(request.form.get('data', []))
-    del cart[data['id']]
-    cart.save(session)
-    return jsonify(cart.dict)
+    return jsonify(session_controller.del_cart_item(sid, data['id']))
 
 
 @app.route('/api/make_order/get_carts', methods=['POST'])
 @sid_required
 @login_required
 def get_carts():
-    carts = get_session_ids(current_user.username)
+    carts = session_controller.get_user_sessions(current_user.username)
     return jsonify(carts)
 
 
@@ -242,14 +232,14 @@ def get_carts():
 @sid_required
 @login_required
 def checkout_order_view():
-    session = get_session(request.cookies.get('current_order'))
+    session = session_controller.get_session(request.cookies.get('current_order'))
     order = Order()
     try:
         order = Order.create_from_session(session)
     except NotImplementedError:
         abort(400, 'error was found')  # TODO: catch error message
     order.checkout_order()
-    remove_session(session.get_id())
+    session_controller.remove_session(session.id)
     resp = make_response(order.order_num)
     resp.delete_cookie('current_order')
 
@@ -284,17 +274,15 @@ def get_comment_view():
 @login_required
 def create_contragent():
     data = json.loads(request.form.get('data', []))
-    contragent = Contragent.create_from_form(data)
-    print(contragent.__get__())
-    contragent.save_to_db()
-    return 'success'
+    contragent_controller.create_contragent_from_form(data)
+    return jsonify('success')
 
 
 @app.route('/api/contragent/find_contragents', methods=['POST'])
 @login_required
 def find_contragents():
     data = json.loads(request.form.get('data', []))
-    return jsonify(Contragent.find_contragents(data))
+    return jsonify(contragent_controller.find_contragents(data))
 
 
 # ----------------USER ROUTES------------------

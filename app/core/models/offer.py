@@ -6,7 +6,6 @@ from app.core.models.items.base import BaseItem
 from app.core.models.items.composite_item import CompositeItem
 from app.core.models.selection import RVDSelection
 from app.core.models.session import Session
-from app.core.sessions import update_session
 
 
 class RVDOffer:
@@ -81,7 +80,7 @@ class RVDOffer:
                 del self.selection
             self.session.add_data(cart.dict)
             self.session.remove_data('selection')
-            update_session(self.session)
+            Session.save()
             return []
 
     def get_errors(self):
@@ -92,7 +91,7 @@ class RVDOffer:
         selection = self.selection
         self.selection.set_subtotal(self.make_subtotal())
         session.add_data({'selection': self.selection.__get__()})
-        update_session(session)
+        Session.save()
         fiting1 = selection["fiting1"]
         fiting2 = selection["fiting2"]
         arm = selection["arm"]

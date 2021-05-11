@@ -3,13 +3,9 @@ from app.core.models.items.clutch import Clutch
 from app.core.models.items.fiting import Fiting
 from app.core.models.selection import RVDSelection
 from app.core.models.session import Session
-from mongoengine import QuerySet
+from app.core.utilities.common import queryset_to_list
 
 not_zero_amount = {'amount': {'$not': {'$eq': 0}}}
-
-
-def queryset_to_list(qs: QuerySet):
-    return [each.to_mongo().to_dict() for each in qs]
 
 
 def create_selection() -> RVDSelection:

@@ -1,14 +1,16 @@
+from mongoengine import ListField, FloatField, EmbeddedDocument
+
 from app.core.models.items.base import BaseItem
-from app.core.models.session import Session
 from app.core.models.utils import create_item
-from app.core.sessions import update_session
 
 
-class Cart:
+class Cart(EmbeddedDocument):
 
-    def __init__(self):
-        self.items = []
-        self.subtotal = 0.0
+    items = ListField()
+    subtotal = FloatField()
+
+    def __init__(self, document_type, **kwargs):
+        super().__init__(document_type, **kwargs)
 
     def __getitem__(self, item: int) -> BaseItem:
         return self.items[item]
@@ -62,19 +64,19 @@ class Cart:
         res.get_subtotal()
         return res
 
-    @staticmethod
-    def create_from_session(session: Session):
-        res = Cart()
-        current_cart = session.data.get('cart')
-        if current_cart is not None:
-            res = Cart.create_from_dict(current_cart)
-        return res
+    # @staticmethod
+    # def create_from_session(session: Session):
+    #     res = Cart()
+    #     current_cart = session.data.get('cart')
+    #     if current_cart is not None:
+    #         res = Cart.create_from_dict(current_cart)
+    #     return res
 
     def remove_cart(self):
         for i in self.items:
             i: BaseItem
             i.unreserve_item()
 
-    def save(self, session: Session):
-        session.add_data(self.dict)
-        update_session(session)
+    # def save(self, session: Session):
+    #     session.add_data(self.dict)
+    #     update_session(session)
