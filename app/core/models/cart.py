@@ -1,16 +1,16 @@
-from mongoengine import ListField, FloatField, EmbeddedDocument
+from mongoengine import ListField, FloatField, EmbeddedDocument, GenericReferenceField, GenericEmbeddedDocumentField, \
+    signals
 
 from app.core.models.items.base import BaseItem
 from app.core.models.utils import create_item
 
 
 class Cart(EmbeddedDocument):
-
-    items = ListField()
+    items = ListField(GenericEmbeddedDocumentField())
     subtotal = FloatField()
 
-    def __init__(self, document_type, **kwargs):
-        super().__init__(document_type, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def __getitem__(self, item: int) -> BaseItem:
         return self.items[item]
@@ -20,9 +20,6 @@ class Cart(EmbeddedDocument):
 
     def __delitem__(self, key: int):
         if key < len(self.items):
-            item = self.items[key]
-            item: BaseItem
-            item.unreserve_item()
             del self.items[key]
 
     def add(self, item: BaseItem) -> str:

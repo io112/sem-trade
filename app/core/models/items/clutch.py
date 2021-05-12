@@ -8,7 +8,7 @@ class Clutch(BaseItem):
     NomenclatureType = 'Муфта'
 
     def __init__(self, *args, **values):
-        super().__init__('clutch', *args, **values)
+        super().__init__(*args, **values)
         self.type = self.get_param_name()
 
     @staticmethod

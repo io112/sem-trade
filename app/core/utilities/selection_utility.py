@@ -1,4 +1,7 @@
+from typing import Dict
+
 from app.core.models.items.arm import Arm
+from app.core.models.items.base import BaseItem
 from app.core.models.items.clutch import Clutch
 from app.core.models.items.fiting import Fiting
 from app.core.models.selection import RVDSelection
@@ -6,6 +9,8 @@ from app.core.models.session import Session
 from app.core.utilities.common import queryset_to_list
 
 not_zero_amount = {'amount': {'$not': {'$eq': 0}}}
+item_objects = {'arm': Arm, 'clutch1': Clutch, 'clutch2': Clutch,
+                'fiting1': Fiting, 'fiting2': Fiting}
 
 
 def create_selection() -> RVDSelection:
@@ -64,8 +69,6 @@ def save_selection(session: Session, items: dict, subtotal: dict) -> dict:
 def calc_subtotal(selection: RVDSelection) -> RVDSelection:
     price = 0
     total_amount = selection.subtotal.get('amount', 1)
-    item_objects = {'arm': Arm, 'clutch1': Clutch, 'clutch2': Clutch,
-                    'fiting1': Fiting, 'fiting2': Fiting}
     items = selection.items
     for i, obj in item_objects.items():
         amount = 1
@@ -79,6 +82,16 @@ def calc_subtotal(selection: RVDSelection) -> RVDSelection:
     selection.subtotal['total_price'] = price * total_amount
     selection.subtotal['name'] = create_selection_name(items)
     return selection
+
+
+def get_selected_items(selection: RVDSelection) -> Dict[str, BaseItem]:
+    res = {}
+    items = selection.items
+    for i, obj in item_objects.items():
+        if i in items and 'id' in items[i]:
+            id = items[i]['id']
+            res[i] = obj.objects(id=id)[0]
+    return res
 
 
 def create_selection_name(items: dict):

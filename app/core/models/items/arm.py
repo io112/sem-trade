@@ -14,7 +14,7 @@ class Arm(BaseItem):
     NomenclatureType = 'Рукав'
 
     def __init__(self, *args, **values):
-        super().__init__('arm', *args, **values)
+        super().__init__(*args, **values)
         self.type = self.get_param_name()
 
     def get_amount(self):

@@ -327,9 +327,11 @@ function updateSelectionSubtotal() {
 }
 
 function updateAllSections() {
-    updateFitSections()
-    updateArmSection()
-    updateSelectionSubtotal()
+    getCurrentSelection().then(() => {
+        updateFitSections()
+        updateArmSection()
+        updateSelectionSubtotal()
+    })
 }
 
 function addToCart() {

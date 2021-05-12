@@ -6,7 +6,7 @@ from app.core.utilities.common import *
 
 def get_contragent(cid: str):
     contragent = Contragent.objects(id=ObjectId(cid))[0]
-    return document_to_dict(contragent)
+    return contragent
 
 
 def find_contragents(query: str):

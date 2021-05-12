@@ -27,7 +27,12 @@ def save_handler(event):
 @save_handler(signals.pre_save)
 def update_modified(sender, document):
     document.last_modified = msk_timezone.localize(datetime.now())
-
+    if document.cart:
+        cart = document.cart
+        price = 0
+        for i in cart.items:
+            price += i.final_price
+        cart.subtotal = price
 
 
 @update_modified.apply

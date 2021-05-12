@@ -1,11 +1,19 @@
 from bson import ObjectId
 
 import app.core.utilities.contragent_utility as utility
+from app.core.utilities.common import *
 from app.core.models.сontragent import Contragent
 
 
-def get_contragent(cid: str):
-    return utility.get_contragent(cid)
+def get_contragent_safe_dict(contragent: Contragent) -> dict:
+    contragent = document_to_dict(contragent)
+    contragent['_id'] = str(contragent['_id'])
+    return contragent
+
+
+def get_contragent(cid: str) -> dict:
+    contragent = utility.get_contragent(cid)
+    return get_contragent_safe_dict(contragent)
 
 
 def find_contragents(query: str):

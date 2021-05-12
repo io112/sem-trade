@@ -50,10 +50,9 @@ class BaseItem(Document):
 
     meta = {'abstract': True, 'queryset_class': ItemsQuerySet}
 
-    def __init__(self, out_name: str, *args, **values):
+    def __init__(self, *args, **values):
         super().__init__(*args, **values)
         self.is_finish = False
-        self.outer_name = out_name
 
     def not_zero_prop(self, prop):
         res = None

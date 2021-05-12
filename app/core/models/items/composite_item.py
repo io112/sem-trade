@@ -1,17 +1,27 @@
+from mongoengine import ListField, GenericReferenceField, FloatField, StringField, EmbeddedDocument, IntField
+
 from app.core.models.items.base import BaseItem
 from app.core.models.utils import create_simple_item
-import xml.etree.ElementTree as ET
 
 
 # noinspection SpellCheckingInspection
-class CompositeItem(BaseItem):
+class CompositeItem(EmbeddedDocument):
 
-    def __init__(self, out_name: str):
-        super().__init__(out_name)
-        self.name = ""
-        self.amount = 0
-        self.type = self.get_param_name()
-        self.items = []
+    MeasureCode = '796'
+    MeasureName = 'Штука'
+    MeasureInt = 'PCE'
+    MeasureText = 'штук'
+    NomenclatureType = 'composite_item'
+    items = ListField(GenericReferenceField())
+    final_price = FloatField()
+    name = StringField()
+    price = FloatField()
+    amount = IntField()
+
+
+    def __init__(self, *args, **values):
+
+        super().__init__(*args, **values)
 
     @staticmethod
     def get_param_name() -> str:

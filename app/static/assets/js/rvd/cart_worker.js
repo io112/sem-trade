@@ -123,7 +123,6 @@ function update_cart() {
 }
 
 function render_cart(cart) {
-    cart = cart['cart']
     const cart_table = $('#items_list tbody')
 
     cart_table.empty()
@@ -132,7 +131,7 @@ function render_cart(cart) {
 
     let i = 0
     items.forEach(item => {
-        item = item[Object.keys(item)[0]]
+        // item = item[Object.keys(item)[0]]
         cart_table.append(get_items_table_row(i, item['name'], item['amount'],
             item['price'], item['final_price']));
         i++;

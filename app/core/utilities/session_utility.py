@@ -1,9 +1,10 @@
+from app.core.models.cart import Cart
 from app.core.models.session import Session
 from app.core.utilities.common import *
 
 
 def get_session(sid: str) -> Session:
-    return Session.objects(id=sid)[0]
+    return Session.objects(id=sid)[0] if len(Session.objects(id=sid)) > 0 else None
 
 
 def delete_session(sid: str):
@@ -11,17 +12,14 @@ def delete_session(sid: str):
     Session.delete(session)
 
 
-def get_user_sessions(username: str):
-    sessions = Session.objects(user=username)
-    return queryset_to_list(sessions)
+def get_user_sessions(username: str) -> QuerySet:
+    sessions = Session.objects(user=username).only('id')
+    return sessions
 
 
-def get_cart(sid: str):
+def get_cart(sid: str) -> Cart:
     session = get_session(sid)
     cart = session.cart
-    if cart is None:
-        return '{}'
-    cart = document_to_dict(cart)
     return cart
 
 

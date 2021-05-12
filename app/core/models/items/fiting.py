@@ -8,7 +8,7 @@ class Fiting(BaseItem):
     NomenclatureType = 'Фитинг'
 
     def __init__(self, *args, **values):
-        super().__init__('fiting', *args, **values)
+        super().__init__(*args, **values)
         self.type = self.get_param_name()
 
     @staticmethod

@@ -5,17 +5,12 @@ import sys
 import pytz
 from flask import request, jsonify, make_response, abort, render_template
 from flask_login import login_required, current_user
-from mongoengine import QuerySet
 
 from app import app
-from app.base_views import sid_required, check_sid, remove_session_by_session
+from app.base_views import sid_required, check_sid
 from app.core.controllers import selection_controller, session_controller, contragent_controller
-from app.core.models.cart import Cart
-from app.core.models.offer import RVDOffer
 from app.core.models.order import Order
 from app.core.models.user import User
-from app.core.models.сontragent import Contragent
-from app.core.sessions import *
 # ----------------SESSION ENDPOINTS---------------
 from app.utilities import orders_controller
 
@@ -129,10 +124,7 @@ def remove_order():
 @sid_required
 def remove_contragent():
     sid = request.cookies.get('current_order')
-    session = session_controller.get_session(sid)
-    if 'contragent' in session.data:
-        session.remove_data('contragent')
-        session.save()
+    session_controller.del_contragent(sid)
     return jsonify({})
 
 
@@ -177,14 +169,15 @@ def update_select():
 @login_required
 def move_selection_to_cart():
     sid = request.cookies.get('current_order')
-    session = session_controller.get_session(sid)
-    offer = RVDOffer(session)
-    errors = offer.get_errors()
-    if errors:
-        return '\r\n'.join(errors)
-    result = offer.create_cart_item(False)
-    if not result:
-        return 'success'
+    session_controller.add_selection_to_cart(sid)
+    # offer = RVDOffer(session)
+    # errors = offer.get_errors()
+    # if errors:
+    #     return '\r\n'.join(errors)
+    # result = offer.create_cart_item(False)
+    # if not result:
+    #     return 'success'
+    return jsonify('success')
 
 
 @app.route('/api/make_order/get_offer', methods=['POST'])
@@ -208,7 +201,8 @@ def get_offer():
 @login_required
 def get_cart():
     sid = request.cookies.get('current_order')
-    return jsonify(session_controller.get_cart(sid))
+    cart = session_controller.get_cart(sid)
+    return jsonify(cart)
 
 
 @app.route('/api/make_order/del_cart_item', methods=['POST'])

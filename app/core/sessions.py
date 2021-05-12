@@ -13,9 +13,9 @@ def start_session(user=''):
     sid = misc.get_random_string(15)
     while check_session(sid):
         sid = misc.get_random_string(15)
-    session = Session()
+    session = Session(id=sid)
     session.user = user
-    Session.save()
+    session.save()
     return session
 
 
