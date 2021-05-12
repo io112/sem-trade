@@ -2,6 +2,7 @@ from bson import ObjectId
 from mongoengine import Document, StringField, BooleanField
 
 import app.db.base as db
+from app.core.utilities.common import document_to_dict
 from app.db.variables import contragent_collection
 
 
@@ -32,6 +33,11 @@ class Contragent(Document):
             if k[:11] != '_Contragent' and v is not None and v != '':
                 res[k] = v
         return res
+
+    def get_safe(self) -> dict:
+        contragent = document_to_dict(self)
+        contragent['_id'] = str(contragent['_id'])
+        return contragent
 
     def get(self):
         res = self.__get__()

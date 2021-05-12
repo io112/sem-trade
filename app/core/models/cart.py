@@ -3,6 +3,7 @@ from mongoengine import ListField, FloatField, EmbeddedDocument, GenericReferenc
 
 from app.core.models.items.base import BaseItem
 from app.core.models.utils import create_item
+from app.core.utilities.common import document_to_dict
 
 
 class Cart(EmbeddedDocument):
@@ -31,6 +32,15 @@ class Cart(EmbeddedDocument):
             return error
         self.items.append(item)
         return 'success'
+
+    def get_safe(self) -> dict:
+        res = document_to_dict(self)
+        for i in range(len(self.items)):
+            item = self.items[i]
+            if item.items:
+                for j in range(len(item.items)):
+                    res['items'][i]['items'][j] = document_to_dict(item.items[j])
+        return res
 
     @property
     def dict(self) -> dict:

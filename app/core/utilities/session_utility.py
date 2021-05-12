@@ -13,7 +13,7 @@ def delete_session(sid: str):
 
 
 def get_user_sessions(username: str) -> QuerySet:
-    sessions = Session.objects(user=username).only('id')
+    sessions = Session.objects(user=username).only('id', 'last_modified', 'user')
     return sessions
 
 

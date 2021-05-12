@@ -3,16 +3,16 @@ import locale
 import sys
 
 import pytz
-from flask import request, jsonify, make_response, abort, render_template
+from flask import request, jsonify, make_response, abort, render_template, Response
 from flask_login import login_required, current_user
 
 from app import app
-from app.base_views import sid_required, check_sid
-from app.core.controllers import selection_controller, session_controller, contragent_controller
+from app.misc import sid_required, check_sid
+from app.core.controllers import order_controller, selection_controller, session_controller, contragent_controller
 from app.core.models.order import Order
 from app.core.models.user import User
+
 # ----------------SESSION ENDPOINTS---------------
-from app.utilities import orders_controller
 
 msk_timezone = pytz.timezone('Europe/Moscow')
 
@@ -41,15 +41,13 @@ def route_remove_session():
 @login_required
 def get_sessions():
     sessions = session_controller.get_user_sessions(current_user.username)
-    print(sessions)
     return jsonify(sessions)
 
 
 @app.route('/api/orders/get_orders', methods=['POST'])
 @login_required
 def get_orders():
-    orders = orders_controller.get_all_orders()
-    print(orders)
+    orders = order_controller.get_all_orders()
     return jsonify(orders)
 
 
@@ -57,7 +55,7 @@ def get_orders():
 @login_required
 def get_order():
     order_id = json.loads(request.form.get('data'))
-    order = orders_controller.get_order_dict(order_id)
+    order = order_controller.get_order(order_id)
     return jsonify(order)
 
 
@@ -65,30 +63,20 @@ def get_order():
 @login_required
 def set_upd(order_id):
     upd = json.loads(request.form.get('data'))
-    order = orders_controller.set_upd(order_id, upd)
+    order = order_controller.set_upd(order_id, upd)
     return jsonify(order)
 
 
 @app.route('/api/orders/<string:order_id>/download_upd', methods=['POST'])
 @login_required
 def download_upd(order_id):
-    order = orders_controller.get_order(order_id)
-    locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
-    time = msk_timezone.localize(order.time_created)
-    local_time = time.strftime("%d %B %Y г.")
-    upd = render_template('UPD.htm', order=order.get_dict(),
-                          items=order.cart.items,
-                          date=local_time, day=time.strftime('%d'),
-                          month=time.strftime('%B'),
-                          year=time.strftime('%Y')[2:],
-                          final_price=order._price)
-    return upd
+    return order_controller.get_upd(order_id)
 
 
 @app.route('/api/orders/<string:order_id>/close', methods=['POST'])
 @login_required
 def close_order(order_id):
-    order = orders_controller.close_order(order_id)
+    order = order_controller.close_order(order_id)
     return jsonify(order)
 
 
@@ -226,15 +214,11 @@ def get_carts():
 @sid_required
 @login_required
 def checkout_order_view():
-    session = session_controller.get_session(request.cookies.get('current_order'))
-    order = Order()
-    try:
-        order = Order.create_from_session(session)
-    except NotImplementedError:
-        abort(400, 'error was found')  # TODO: catch error message
-    order.checkout_order()
-    session_controller.remove_session(session.id)
-    resp = make_response(order.order_num)
+    sid = request.cookies.get('current_order')
+    order = order_controller.create_order(sid)
+
+    session_controller.remove_session(sid)
+    resp = make_response(jsonify(order.order_num))
     resp.delete_cookie('current_order')
 
     # return Response(result,

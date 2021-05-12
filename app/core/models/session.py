@@ -1,11 +1,13 @@
 from datetime import datetime
 
 import pytz
-from mongoengine import Document, StringField, DateTimeField, DictField, EmbeddedDocumentField, signals, ReferenceField
+from mongoengine import Document, StringField, DateTimeField, DictField, EmbeddedDocumentField, signals, ReferenceField, \
+    IntField
 
 from app.core.models.cart import Cart
 from app.core.models.selection import RVDSelection
 from app.core.models.сontragent import Contragent
+from app.core.utilities.common import document_to_dict
 
 msk_timezone = pytz.timezone('Europe/Moscow')
 
@@ -44,7 +46,14 @@ class Session(Document):
     selection = EmbeddedDocumentField(RVDSelection)
     contragent = ReferenceField(Contragent)
     cart = EmbeddedDocumentField(Cart)
+    sale = IntField()
     comment = StringField()
+
+    def get_safe(self) -> dict:
+        session = document_to_dict(self)
+        if session.get('contragent'):
+            session['contragent'] = str(session['contragent'])
+        return session
 
     @property
     def dict(self):

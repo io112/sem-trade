@@ -1,28 +1,11 @@
 import app.core.utilities.session_utility as utility
-from app.core.controllers.contragent_controller import get_contragent_safe_dict
 from app.core.models.cart import Cart
 from app.core.models.items.composite_item import CompositeItem
 from app.core.models.selection import RVDSelection
 from app.core.models.session import Session
+from app.core.models.user import User
 from app.core.utilities import contragent_utility, selection_utility
 from app.core.utilities.common import *
-
-
-def get_session_safe_dict(session: Session) -> dict:
-    session = document_to_dict(session)
-    if session.get('contragent'):
-        session['contragent'] = str(session['contragent'])
-    return session
-
-
-def get_cart_safe_dict(cart: Cart) -> dict:
-    res = document_to_dict(cart)
-    for i in range(len(cart.items)):
-        item = cart.items[i]
-        if item.items:
-            for j in range(len(item.items)):
-                res['items'][i]['items'][j] = document_to_dict(item.items[j])
-    return res
 
 
 def get_session(sid: str):
@@ -48,7 +31,7 @@ def get_user_sessions(username: str) -> list:
     sessions = utility.get_user_sessions(username)
     res = []
     for i in sessions:
-        res.append(get_session_safe_dict(i))
+        res.append(i.get_safe())
     return res
 
 
@@ -76,13 +59,13 @@ def get_cart(sid: str):
     cart = utility.get_cart(sid)
     if cart is None:
         return document_to_dict(Cart())
-    cart = get_cart_safe_dict(cart)
+    cart = cart.get_safe()
     return cart
 
 
 def del_cart_item(sid: str, item_id: int):
     utility.del_cart_item(sid, item_id)
-    return get_cart_safe_dict(utility.get_cart(sid))
+    return utility.get_cart(sid).get_safe()
 
 
 def add_selection_to_cart(sid: str):

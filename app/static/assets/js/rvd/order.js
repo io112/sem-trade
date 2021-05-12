@@ -76,8 +76,6 @@ function render_item_list(list) {
     const tb = $('#items_list')
     tb.empty()
     list['cart']['items'].forEach(item => {
-        console.log(Object.keys(item)[0])
-        item = item[Object.keys(item)[0]];
         tb.append(get_item_row(item['name'], item['amount'], item['price'], item['final_price']))
     })
 

@@ -1,55 +1,24 @@
 import functools
-import locale
-import sys
 
 import pytz
-from flask import request, render_template, redirect, url_for, jsonify, make_response, abort, Response
+from flask import request, render_template, redirect, url_for, make_response
 from flask_httpauth import HTTPBasicAuth
 from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.urls import url_parse
 
-from app.constants import *
-from app.core.models.сontragent import Contragent
-from app.core.models.cart import Cart
-from app.core.models.offer import RVDOffer
-from app.core.models.user import User
-from app.crm import base
 from app import app, login_manager
-from werkzeug.security import check_password_hash
+from app.constants import *
+from app.core.controllers import order_controller
+from app.core.models.user import User
 from app.core.sessions import *
-import json
-
-from app.utilities.orders_controller import get_order
+from app.crm import base
+from app.misc import sid_required
 
 auth = HTTPBasicAuth()
 login_manager.login_view = 'login_route'
 msk_timezone = pytz.timezone('Europe/Moscow')
 
 
-def check_sid(sid):
-    if sid is None:
-        return False
-    elif not check_session(sid):
-        return False
-    return True
-
-
-def make_cookie_resp(url, sid=None):
-    if sid:
-        resp = make_response(redirect(url_for(url)))
-        resp.set_cookie('current_order', sid)
-    else:
-        session = start_session(current_user.username)
-        resp = make_response(redirect(url_for(url)))
-        resp.set_cookie('current_order', session.get_id())
-    return resp
-
-
-def remove_session_by_session(session):
-    cart = Cart.create_from_session(session)
-    cart.remove_cart()
-    session.remove_data('cart')
-    remove_session(session.get_id())
 
 
 @auth.verify_password
@@ -62,25 +31,6 @@ def verify_password(username, password):
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
-
-
-def sid_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        sid = request.args.get('sid', None)
-        if sid is not None:
-            cs = check_sid(sid)
-            if cs:
-                resp = make_cookie_resp('home', sid)
-            else:
-                resp = make_cookie_resp('home')
-            return resp
-        sid = request.cookies.get('current_order')
-        if not check_sid(sid):
-            return make_cookie_resp('home')
-        return view(**kwargs)
-
-    return wrapped_view
 
 
 testitem = {'name': 'testitem', 'amount': 5, 'price': 500}
@@ -122,18 +72,7 @@ def order(order_id):
 @app.route('/orders/<string:order_id>/upd', methods=['GET'])
 @login_required
 def upd(order_id):
-    order = get_order(order_id)
-    locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
-    time = msk_timezone.localize(order.time_created)
-    local_time = time.strftime("%d %B %Y г.")
-    upd = render_template('UPD.htm', order=order.get_dict(),
-                           items=order.cart.items,
-                           date=local_time, day=time.strftime('%d'),
-                           month=time.strftime('%B'),
-                           year=time.strftime('%Y')[2:],
-                           final_price=order._price)
-    return upd
-
+    return order_controller.get_upd(order_id)
 
 
 @app.route('/login', methods=['GET', 'POST'])

@@ -3,20 +3,24 @@ from dataclasses import dataclass
 
 import pymongo
 import pytz
+from mongoengine import Document, StringField, ReferenceField, FloatField, BooleanField, EmbeddedDocumentField, \
+    DateTimeField, IntField
 from pytz import tzinfo
 from datetime import timedelta
 
 from app.core.models.cart import Cart
 from app.core.models.items.base import BaseItem
 from app.core.models.session import Session
+from app.core.models.user import User
 from app.core.models.сontragent import Contragent
+from app.core.utilities.common import document_to_dict
 from app.db import base as db
 from app.db.variables import *
 from datetime import datetime
 import xml.etree.ElementTree as ET
 
 
-class Order:
+class Order(Document):
     @dataclass
     class Status:
         STATUS_CREATED = 'Создан'
@@ -24,19 +28,21 @@ class Order:
         STATUS_EXPORTED = 'Экспортирован'
         STATUS_CLOSED = 'Закрыт'
 
-    def __init__(self):
-        self._id = None
-        self.order_num = None
-        self.status = self.Status.STATUS_CREATED
-        self.contragent = None
-        self.upd_num = None
-        self.user = None
-        self.comment = ""
-        self._price = 0.0
-        self.is_checked_out = False
-        self.cart = None
-        self.time_created = None
-        self.sale = 0  # decimal num, percents of sale
+    order_num = StringField()
+    status = StringField(default=Status.STATUS_CREATED)
+    contragent = ReferenceField(Contragent)
+    upd_num = StringField()
+    user = ReferenceField(User)
+    comment = StringField()
+    _price = FloatField()
+    is_checked_out = BooleanField()
+    cart = EmbeddedDocumentField(Cart)
+    time_created = DateTimeField()
+    sale = IntField()  # decimal num, percents of sale
+
+    def __init__(self, *args, **values):
+
+        super().__init__(*args, **values)
 
     @property
     def price(self) -> float:
@@ -53,6 +59,13 @@ class Order:
         order.count_price()
         return order
 
+    def get_safe(self):
+        res = document_to_dict(self)
+        res['cart'] = self.cart.get_safe()
+        res['contragent'] = self.contragent.get_safe()
+        res['_id'] = str(res['_id'])
+        res['user'] = self.user.get_safe()
+        return res
 
     @staticmethod
     def create_from_session(session: Session):

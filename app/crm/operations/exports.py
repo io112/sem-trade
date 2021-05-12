@@ -4,11 +4,11 @@ from io import BytesIO
 
 import pytz
 
-from app.utilities.orders_controller import get_all_orders
+from app.core.utilities.order_utility import get_orders
 
 
 def export_orders() -> str:
-    orders = get_all_orders()
+    orders = get_orders()
     res = ET.Element('КоммерческаяИнформация')
     res.attrib['xmlns'] = "urn:1C.ru:commerceml_2"
     res.attrib['xmlns:xs'] = "http://www.w3.org/2001/XMLSchema"
