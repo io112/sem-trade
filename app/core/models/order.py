@@ -89,113 +89,95 @@ class Order(Document):
         self.status = self.Status.STATUS_CHECKED_OUT
         self._save()
 
-    def count_price(self) -> None:
-        self._price = 0
-        for i in self.cart.items:
-            i: BaseItem
-            self._price += i.get_price()
 
-    @staticmethod
-    def create_from_db(data):
-        order = Order()
-        cart = data['cart']
-        contragent = data['contragent']
-        order.comment = data['comment']
-        order.is_checked_out = data['is_checked_out']
-        order.sale = data['sale']
-        order.time_created = data['time_created']
-        order._id = data['_id']
-        order._price = data['_price']
-        order.cart = Cart.create_from_dict(cart)
-        order.contragent = Contragent.create_from_dict(contragent)
-        order.user = data['user']
-        order.order_num = data['order_num']
-        order.upd_num = data.get('upd_num')
-        order.status = data['status'] if data.get('status') else Order.Status.STATUS_CREATED
-        return order
+def get_db_dict(self):
+    res = copy.deepcopy(self.__dict__)
+    res.update(self.cart.dict)
+    res['contragent'] = self.contragent.__get__()
+    if self._id is None:
+        del res['_id']
+    return res
 
-    def get_db_dict(self):
-        res = copy.deepcopy(self.__dict__)
-        res.update(self.cart.dict)
-        res['contragent'] = self.contragent.__get__()
-        if self._id is None:
-            del res['_id']
-        return res
 
-    def get_dict(self):
-        res = self.get_db_dict()
-        res['_id'] = str(res['_id'])
-        res['contragent'] = self.contragent.get()
-        return res
+def get_dict(self):
+    res = self.get_db_dict()
+    res['_id'] = str(res['_id'])
+    res['contragent'] = self.contragent.get()
+    return res
 
-    def _save(self):
-        self.count_price()
-        if self.order_num is None:
-            num = int(self.find_last_order_num()[3:])
-            self.order_num = 'РВ-' + str(num + 1)
-        if self._id is None:
-            self._id = db.insert(order_collection, self.get_db_dict())
-        else:
-            db.update(order_collection, {'_id': self._id}, {'$set': self.get_db_dict()})
 
-    @staticmethod
-    def find_last_order_num():
-        last_num = db.find_one(order_collection, {}, fields=['order_num'], sorting=[('order_num', pymongo.DESCENDING)])
-        return last_num['order_num']
+def _save(self):
+    self.count_price()
+    if self.order_num is None:
+        num = int(self.find_last_order_num()[3:])
+        self.order_num = 'РВ-' + str(num + 1)
+    if self._id is None:
+        self._id = db.insert(order_collection, self.get_db_dict())
+    else:
+        db.update(order_collection, {'_id': self._id}, {'$set': self.get_db_dict()})
 
-    def create_xml_doc(self) -> ET:
-        dt = pytz.timezone('Europe/Moscow').localize(self.time_created) + timedelta(hours=3)
-        dt: datetime
-        res = ET.Element('Документ')
-        ET.SubElement(res, 'Ид').text = self.order_num
-        ET.SubElement(res, 'Номер').text = self.order_num
-        ET.SubElement(res, 'Дата').text = dt.strftime("%Y-%m-%d")
-        ET.SubElement(res, 'ХозОперация').text = 'Заказ товара'
-        ET.SubElement(res, 'Роль').text = 'Продавец'
-        ET.SubElement(res, 'Валюта').text = 'RUB'
-        ET.SubElement(res, 'Курс').text = str(1.0000)
-        ET.SubElement(res, 'Сумма').text = str(self.cart.subtotal)
-        ET.SubElement(res, 'Время').text = dt.strftime('%H:%M:%S')
-        contragents = ET.Element('Контрагенты')
-        contragent = ET.Element('Контрагент')
-        ET.SubElement(contragent, 'Ид').text = str(self.contragent._id)
-        ET.SubElement(contragent, 'Наименование').text = str(self.contragent.name + ' ' + self.contragent.surname)
-        ET.SubElement(contragent, 'Роль').text = 'Покупатель'
-        ET.SubElement(contragent, 'ПолноеНаименование').text = str(self.contragent.name + ' ' + self.contragent.surname)
-        contragents.append(contragent)
-        res.append(contragents)
-        items = ET.Element('Товары')
-        for i in self.cart.items:
-            i: BaseItem
-            for j in i.create_xml():
-                items.append(j)
-        res.append(items)
 
-        recs = ET.Element('ЗначенияРеквизитов')
-        rec1 = ET.Element('ЗначениеРеквизита')
-        ET.SubElement(rec1, 'Наименование').text = 'Метод оплаты'
-        ET.SubElement(rec1, 'Значение').text = 'Cash on delivery (COD)'
-        rec2 = ET.Element('ЗначениеРеквизита')
-        ET.SubElement(rec2, 'Наименование').text = 'Метод доставки'
-        ET.SubElement(rec2, 'Значение').text = 'Самовывоз'
-        rec3 = ET.Element('ЗначениеРеквизита')
-        ET.SubElement(rec3, 'Наименование').text = 'Адрес'
-        ET.SubElement(rec3, 'Значение').text = 'Самовывоз'
-        rec4 = ET.Element('ЗначениеРеквизита')
-        ET.SubElement(rec4, 'Наименование').text = 'Адрес доставки'
-        ET.SubElement(rec4, 'Значение').text = 'Самовывоз'
-        rec5 = ET.Element('ЗначениеРеквизита')
-        ET.SubElement(rec5, 'Наименование').text = 'Покупатель, контакты'
-        ET.SubElement(rec5, 'Значение').text = 'Тест'
-        rec6 = ET.Element('ЗначениеРеквизита')
-        ET.SubElement(rec6, 'Наименование').text = 'Статус заказа'
-        ET.SubElement(rec6, 'Значение').text = 'Заказ принят, ожидается закупка'
+@staticmethod
 
-        recs.append(rec1)
-        recs.append(rec2)
-        recs.append(rec3)
-        recs.append(rec4)
-        recs.append(rec5)
-        recs.append(rec6)
-        res.append(recs)
-        return res
+
+def find_last_order_num():
+    last_num = db.find_one(order_collection, {}, fields=['order_num'], sorting=[('order_num', pymongo.DESCENDING)])
+    return last_num['order_num']
+
+
+def create_xml_doc(self) -> ET:
+    dt = pytz.timezone('Europe/Moscow').localize(self.time_created) + timedelta(hours=3)
+    dt: datetime
+    res = ET.Element('Документ')
+    ET.SubElement(res, 'Ид').text = self.order_num
+    ET.SubElement(res, 'Номер').text = self.order_num
+    ET.SubElement(res, 'Дата').text = dt.strftime("%Y-%m-%d")
+    ET.SubElement(res, 'ХозОперация').text = 'Заказ товара'
+    ET.SubElement(res, 'Роль').text = 'Продавец'
+    ET.SubElement(res, 'Валюта').text = 'RUB'
+    ET.SubElement(res, 'Курс').text = str(1.0000)
+    ET.SubElement(res, 'Сумма').text = str(self.cart.subtotal)
+    ET.SubElement(res, 'Время').text = dt.strftime('%H:%M:%S')
+    contragents = ET.Element('Контрагенты')
+    contragent = ET.Element('Контрагент')
+    ET.SubElement(contragent, 'Ид').text = str(self.contragent._id)
+    ET.SubElement(contragent, 'Наименование').text = str(self.contragent.name + ' ' + self.contragent.surname)
+    ET.SubElement(contragent, 'Роль').text = 'Покупатель'
+    ET.SubElement(contragent, 'ПолноеНаименование').text = str(self.contragent.name + ' ' + self.contragent.surname)
+    contragents.append(contragent)
+    res.append(contragents)
+    items = ET.Element('Товары')
+    for i in self.cart.items:
+        i: BaseItem
+        for j in i.create_xml():
+            items.append(j)
+    res.append(items)
+
+    recs = ET.Element('ЗначенияРеквизитов')
+    rec1 = ET.Element('ЗначениеРеквизита')
+    ET.SubElement(rec1, 'Наименование').text = 'Метод оплаты'
+    ET.SubElement(rec1, 'Значение').text = 'Cash on delivery (COD)'
+    rec2 = ET.Element('ЗначениеРеквизита')
+    ET.SubElement(rec2, 'Наименование').text = 'Метод доставки'
+    ET.SubElement(rec2, 'Значение').text = 'Самовывоз'
+    rec3 = ET.Element('ЗначениеРеквизита')
+    ET.SubElement(rec3, 'Наименование').text = 'Адрес'
+    ET.SubElement(rec3, 'Значение').text = 'Самовывоз'
+    rec4 = ET.Element('ЗначениеРеквизита')
+    ET.SubElement(rec4, 'Наименование').text = 'Адрес доставки'
+    ET.SubElement(rec4, 'Значение').text = 'Самовывоз'
+    rec5 = ET.Element('ЗначениеРеквизита')
+    ET.SubElement(rec5, 'Наименование').text = 'Покупатель, контакты'
+    ET.SubElement(rec5, 'Значение').text = 'Тест'
+    rec6 = ET.Element('ЗначениеРеквизита')
+    ET.SubElement(rec6, 'Наименование').text = 'Статус заказа'
+    ET.SubElement(rec6, 'Значение').text = 'Заказ принят, ожидается закупка'
+
+    recs.append(rec1)
+    recs.append(rec2)
+    recs.append(rec3)
+    recs.append(rec4)
+    recs.append(rec5)
+    recs.append(rec6)
+    res.append(recs)
+    return res

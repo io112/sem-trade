@@ -35,7 +35,7 @@ function render_order_list(list) {
     tb.empty()
     list.forEach(order => {
         console.log(order)
-        tb.append(get_order_row(order['_id'], order['order_num'], order['user'], order['time_created'], order['status']))
+        tb.append(get_order_row(order['_id'], order['order_num'], order['user']['username'], order['time_created'], order['status']))
     })
 
 }

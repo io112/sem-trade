@@ -36,10 +36,7 @@ class Cart(EmbeddedDocument):
     def get_safe(self) -> dict:
         res = document_to_dict(self)
         for i in range(len(self.items)):
-            item = self.items[i]
-            if item.items:
-                for j in range(len(item.items)):
-                    res['items'][i]['items'][j] = document_to_dict(item.items[j])
+            res['items'][i] = self.items[i].get_safe()
         return res
 
     @property

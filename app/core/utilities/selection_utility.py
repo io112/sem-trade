@@ -2,6 +2,7 @@ from typing import Dict
 
 from app.core.models.items.arm import Arm
 from app.core.models.items.base import BaseItem
+from app.core.models.items.cart_item import CartItem
 from app.core.models.items.clutch import Clutch
 from app.core.models.items.fiting import Fiting
 from app.core.models.selection import RVDSelection
@@ -84,13 +85,17 @@ def calc_subtotal(selection: RVDSelection) -> RVDSelection:
     return selection
 
 
-def get_selected_items(selection: RVDSelection) -> Dict[str, BaseItem]:
+def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
     res = {}
     items = selection.items
     for i, obj in item_objects.items():
         if i in items and 'id' in items[i]:
+            amount = items[i]['amount'] if items[i].get('amount') else 1
             id = items[i]['id']
-            res[i] = obj.objects(id=id)[0]
+            item = obj.objects(id=id)[0]
+            cart_item = CartItem(item=item, amount=amount,
+                                 price=item.price, total_price=item.price * amount)
+            res[i] = cart_item
     return res
 
 

@@ -8,6 +8,8 @@ from mongoengine.fields import DictField, FloatField, StringField
 import app.db.base as db
 import xml.etree.ElementTree as ET
 
+from app.core.utilities.common import document_to_dict
+
 
 class ItemsQuerySet(QuerySet):
 
@@ -42,7 +44,6 @@ class BaseItem(Document):
     category_id = StringField()
     parameters = DictField()
     amount = FloatField()
-    final_price = FloatField()
     type = StringField()
     name = StringField()
     price = FloatField()
@@ -73,6 +74,10 @@ class BaseItem(Document):
     @abstractmethod
     def get_item_params(self) -> list:
         pass
+
+    def get_safe(self) -> dict:
+        res = document_to_dict(self)
+        return res
 
     def __get__(self, instance=None, owner=None) -> dict:
         res = {}

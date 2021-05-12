@@ -1,10 +1,15 @@
-from mongoengine import ListField, GenericReferenceField, FloatField, StringField, EmbeddedDocument, IntField
+from mongoengine import ListField, GenericReferenceField, FloatField, StringField, EmbeddedDocument, IntField, \
+    EmbeddedDocumentField
 
 from app.core.models.items.base import BaseItem
+from app.core.models.items.cart_item import CartItem
 from app.core.models.utils import create_simple_item
 
 
 # noinspection SpellCheckingInspection
+from app.core.utilities.common import document_to_dict
+
+
 class CompositeItem(EmbeddedDocument):
 
     MeasureCode = '796'
@@ -12,7 +17,7 @@ class CompositeItem(EmbeddedDocument):
     MeasureInt = 'PCE'
     MeasureText = 'штук'
     NomenclatureType = 'composite_item'
-    items = ListField(GenericReferenceField())
+    items = ListField(EmbeddedDocumentField(CartItem))
     final_price = FloatField()
     name = StringField()
     price = FloatField()
@@ -22,6 +27,12 @@ class CompositeItem(EmbeddedDocument):
     def __init__(self, *args, **values):
 
         super().__init__(*args, **values)
+
+    def get_safe(self) -> dict:
+        res = document_to_dict(self)
+        for i in range(len(self.items)):
+            res['items'][i] = self.items[i].get_safe()
+        return res
 
     @staticmethod
     def get_param_name() -> str:

@@ -95,6 +95,16 @@ function close_order() {
         render_page(data);
     })
 }
+function checkout_order() {
+    let upd_num = $('#upd_num').val();
+    send(`/api/orders/${order_id}/checkout`).then(data => {
+        if (data.length > 0) {
+            alert(data)
+        } else {
+            get_orders_list()
+        }
+    })
+}
 
 
 function get_item_row(name, num, price, fullprice) {

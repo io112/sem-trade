@@ -80,6 +80,13 @@ def close_order(order_id):
     return jsonify(order)
 
 
+@app.route('/api/orders/<string:order_id>/checkout', methods=['POST'])
+@login_required
+def checkout_order(order_id):
+    report = order_controller.checkout_order(order_id)
+    return jsonify(report)
+
+
 # ----------------CREATE ORDER ENDPOINTS------------
 
 

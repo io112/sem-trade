@@ -45,8 +45,7 @@ def set_contragent(sid: str, cid: str):
 def get_contragent(sid: str):
     session = utility.get_session(sid)
     contragent = session.contragent
-
-    return get_contragent_safe_dict(contragent)
+    return contragent.get_safe()
 
 
 def del_contragent(sid: str):

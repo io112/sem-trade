@@ -124,7 +124,7 @@ function update_cart() {
 
 function render_cart(cart) {
     const cart_table = $('#items_list tbody')
-
+    console.log(cart)
     cart_table.empty()
     let items = cart['items']
     let subtotal = cart['subtotal']
