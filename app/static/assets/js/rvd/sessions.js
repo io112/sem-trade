@@ -35,20 +35,25 @@ function render_session_list(list) {
     tb.empty()
     list.forEach(session => {
         console.log(session)
-        tb.append(get_session_row(session['_id'], session['last_modified'], session['user']))
+        let cart = session['cart'] ? session['cart']['subtotal'] : 0
+        let contragent = session['contragent'] ? session['contragent']['name'] : ''
+        tb.append(get_session_row(session['_id'], session['last_modified'], session['user'], cart,
+            contragent))
     })
 
 }
 
 
-function get_session_row(session_id, time, user) {
+function get_session_row(session_id, time, user, total_price, contragent) {
     time = moment(time).tz('Europe/Moscow').format('YYYY-MM-DD HH:mm z')
     return '<tr>\n' +
         '                  <th scope="row">\n' +
         `                    <span class="name mb-0 text-sm">${session_id}</span>\n` +
         '                  </th>\n' +
         `                  <td>${time}</td>\n` +
+        `                  <td>${contragent}</td>\n` +
         `                  <td>${user}</td>\n` +
+        `                  <td>${total_price} ₽</td>\n` +
         '                  <td class="text-right">\n' +
         '                    <div class="row">\n' +
         `                      <a class="nav-link" href="#!" onclick="del_session('${session_id}')">\n` +

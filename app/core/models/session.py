@@ -52,7 +52,9 @@ class Session(Document):
     def get_safe(self) -> dict:
         session = document_to_dict(self)
         if session.get('contragent'):
-            session['contragent'] = str(session['contragent'])
+            session['contragent'] = self.contragent.get_safe()
+        if session.get('cart'):
+            session['cart'] = self.cart.get_safe()
         return session
 
     @property

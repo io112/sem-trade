@@ -35,20 +35,24 @@ function render_order_list(list) {
     tb.empty()
     list.forEach(order => {
         console.log(order)
-        tb.append(get_order_row(order['_id'], order['order_num'], order['user']['username'], order['time_created'], order['status']))
+        tb.append(get_order_row(order['_id'], order['order_num'],
+            order['contragent']['name'], order['user']['username'],
+            order['time_created'], order['status'], order['_price']))
     })
 
 }
 
 
-function get_order_row(order_id, order_num, user, time, status) {
+function get_order_row(order_id, order_num, contragent, user, time, status, total_price) {
     time = moment(time).tz('Europe/Moscow').format('YYYY-MM-DD HH:mm z')
     return '<tr>\n' +
         '                  <th scope="row">\n' +
         `                    <span class="name mb-0 text-sm">${order_num}</span>\n` +
         '                  </th>\n' +
         `                  <td>${time}</td>\n` +
+        `                  <td>${contragent}</td>\n` +
         `                  <td>${user}</td>\n` +
+        `                  <td>${total_price} ₽</td>\n` +
         `                  <td>${status}</td>\n` +
         '                  <td class="text-right">\n' +
         '                    <div class="row">\n' +
