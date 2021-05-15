@@ -8,6 +8,7 @@ from app.core.models.cart import Cart
 from app.core.models.selection import RVDSelection
 from app.core.models.сontragent import Contragent
 from app.core.utilities.common import document_to_dict
+from app.core.utilities.selection_utility import get_selected_items
 
 msk_timezone = pytz.timezone('Europe/Moscow')
 
@@ -35,6 +36,10 @@ def update_modified(sender, document):
         for i in cart.items:
             price += i.final_price
         cart.subtotal = price
+    selected_items = get_selected_items(document.selection)
+    for key, item in selected_items.values():
+        for k, v in item.item.parameters:
+            document.selection[key][k] = v
 
 
 @update_modified.apply
