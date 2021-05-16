@@ -60,9 +60,10 @@ function init() {
 
 function tryParseFloat(val) {
     let res = val
-    let regex = /^[0-9]+$/;
+    let regex = /^[+-]?([0-9]*([.]|[,]))?[0-9]+$/;
     if (regex.test(res) && res.length > 0) {
         res = parseFloat(val)
+        console.log(res)
     }
     return res
 }
@@ -167,7 +168,7 @@ function updateArmSection() {
         selection = {}
     }
     if (selection['amount'] !== undefined) {
-        length_select.val(parseInt(current_selection["items"]["arm"]['amount']))
+        length_select.val(current_selection["items"]["arm"]['amount'])
     } else {
         length_select.val(0);
     }

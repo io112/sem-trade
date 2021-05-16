@@ -70,6 +70,8 @@ def save_selection(session: Session, items: dict, subtotal: dict) -> dict:
 def calc_subtotal(selection: RVDSelection) -> RVDSelection:
     price = 0
     total_amount = selection.subtotal.get('amount', 1)
+    if total_amount is None:
+        total_amount = 1
     items = selection.items
     for i, obj in item_objects.items():
         amount = 1
@@ -82,11 +84,14 @@ def calc_subtotal(selection: RVDSelection) -> RVDSelection:
     selection.subtotal['price'] = price
     selection.subtotal['total_price'] = price * total_amount
     selection.subtotal['name'] = create_selection_name(items)
+    selection.subtotal['amount'] = total_amount
     return selection
 
 
 def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
     res = {}
+    if not (selection and selection.items):
+        return {}
     items = selection.items
     for i, obj in item_objects.items():
         if i in items and 'id' in items[i]:

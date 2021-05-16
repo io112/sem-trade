@@ -221,30 +221,3 @@ class BaseItem(Document):
                 self.__dict__[i] = self.candidate[i]
         self.final_price = self.get_price()
         return 'success'
-
-    def create_xml(self, amount=-1) -> list:
-        amount = self.amount if amount == -1 else amount
-        res = ET.Element('Товар')
-        ET.SubElement(res, 'Ид').text = str(self._id)
-        ET.SubElement(res, 'Наименование').text = self.NomenclatureType
-        measure = ET.Element('БазоваяЕдиница')
-        measure.text = self.MeasureText
-        measure.attrib['Код'] = self.MeasureCode
-        measure.attrib['НаименованиеПолное'] = self.MeasureName
-        measure.attrib['МеждународноеСокращение'] = self.MeasureInt
-        res.append(measure)
-        ET.SubElement(res, 'ЦенаЗаЕдиницу').text = str(self.get_price_for_amount(1))
-        ET.SubElement(res, 'Количество').text = str(amount)
-        ET.SubElement(res, 'Сумма').text = str(self.get_price_for_amount(amount))
-        recs = ET.Element('ЗначенияРеквизитов')
-        rec1 = ET.Element('ЗначениеРеквизита')
-        ET.SubElement(rec1, 'Наименование').text = 'ВидНоменклатуры'
-        ET.SubElement(rec1, 'Значение').text = self.NomenclatureType
-        rec2 = ET.Element('ЗначениеРеквизита')
-        ET.SubElement(rec2, 'Наименование').text = 'ТипНоменклатуры'
-        ET.SubElement(rec2, 'Значение').text = 'Товар'
-        recs.append(rec1)
-        recs.append(rec2)
-        res.append(recs)
-
-        return [res]
