@@ -99,6 +99,16 @@ def update_session_view():
     return selection_controller.update_selection(sid, data)
 
 
+@app.route('/api/make_order/find_part', methods=['POST'])
+@login_required
+@sid_required
+def find_part():
+    data = json.loads(request.form.get('data', []))
+
+    res = selection_controller.find_part(data[0]['value'], data[1]['value'])
+    return jsonify(res)
+
+
 @app.route('/api/make_order/cancel', methods=['POST'])
 @login_required
 @sid_required

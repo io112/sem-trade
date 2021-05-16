@@ -12,10 +12,15 @@ from app.core.utilities.common import queryset_to_list
 not_zero_amount = {'amount': {'$not': {'$eq': 0}}}
 item_objects = {'arm': Arm, 'clutch1': Clutch, 'clutch2': Clutch,
                 'fiting1': Fiting, 'fiting2': Fiting}
+collections = {'arm': Arm, 'clutch': Clutch, 'fiting': Fiting}
 
 
 def create_selection() -> RVDSelection:
     return calc_subtotal(RVDSelection())
+
+
+def find_part(collection: BaseItem, query: str):
+    return collection.objects.search_text(query)
 
 
 def get_candidates_by_params(selection: RVDSelection):

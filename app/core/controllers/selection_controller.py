@@ -8,7 +8,7 @@ from app.core.session_vault import *
 import app.core.utilities.selection_utility as utility
 from datetime import datetime
 
-from app.core.utilities import session_utility, contragent_utility
+from app.core.utilities.selection_utility import collections
 
 msk_timezone = pytz.timezone('Europe/Moscow')
 
@@ -21,6 +21,21 @@ def get_selection(session_id):
     if selection is None:
         return 'NaN'
     return selection.to_mongo().to_dict()
+
+
+def find_part(collection, query):
+    res = []
+    collection_object = None
+    for i in collections:
+        if i == collection:
+            collection_object = collections[i]
+    if collection_object is not None:
+        search = utility.find_part(collection_object, query)
+        for i in search:
+            res.append(i.get_safe())
+        return res
+    else:
+        return []
 
 
 def get_filtered_params(session_id, ignore_amounts=False):
@@ -38,5 +53,3 @@ def update_selection(session_id: str, selection: dict):
     session: QuerySet = Session.objects(id=session_id)
     session: Session = session[0]
     return utility.save_selection(session, selection['items'], selection['subtotal'])
-
-

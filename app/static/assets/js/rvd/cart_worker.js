@@ -36,6 +36,13 @@ var saveData = (function () {
     };
 }());
 
+function find_part() {
+    let form_data = $('#part_form').serializeArray()
+    console.log(form_data)
+    send('/api/make_order/find_part', form_data).then(resp => console.log(resp))
+
+}
+
 function checkout() {
     set_comment();
     // fetch(checkout_endpoint, {

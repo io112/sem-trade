@@ -49,7 +49,15 @@ class BaseItem(Document):
     price = FloatField()
     measure = StringField()
 
-    meta = {'abstract': True, 'queryset_class': ItemsQuerySet}
+    meta = {'abstract': True, 'queryset_class': ItemsQuerySet,
+            'indexes': [
+                {'fields': ['$name', "$price"],
+                 'default_language': 'english',
+                 'name': 'search_idx',
+                 'weights': {'name': 1}
+                 }
+            ]
+            }
 
     def __init__(self, *args, **values):
         super().__init__(*args, **values)
