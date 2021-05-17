@@ -14,6 +14,8 @@ const set_comment_endpoint = 'api/make_order/set_comment'
 const get_comment_endpoint = 'api/make_order/get_comment'
 const checkout_endpoint = 'api/make_order/checkout'
 
+let current_part = undefined
+
 function init_cw() {
     is_org_slider = $('#contragent_is_org');
     $('#comment_text').on('blur', set_comment);
@@ -38,9 +40,54 @@ var saveData = (function () {
 
 function find_part() {
     let form_data = $('#part_form').serializeArray()
-    console.log(form_data)
-    send('/api/make_order/find_part', form_data).then(resp => console.log(resp))
+    send('/api/make_order/find_part', form_data).then(resp => render_parts(resp))
 
+}
+
+function render_parts(list) {
+    console.log(list)
+    const parts_list = $('#parts_list')
+    parts_list.empty();
+    if (list['current_part']) {
+        $('#part_search').hide()
+        let part = list['current_part']
+        let item = part['item']
+        console.log(part)
+        parts_list.append(get_part(item['name'], item['amount'], item['_id'], true, item['type']))
+        $('#part_price').html(part['price'])
+        $('#part_total').html(part['total_price'])
+        return
+    }
+    if (list['items'] === undefined)
+        return
+    list['items'].forEach(part => {
+        parts_list.append(get_part(part['name'], part['amount'], part['_id'], false, part['type']))
+    })
+}
+
+function get_part(name, amount, id, is_selected, type) {
+    name = `${name} : ${amount}`
+    return `<a href="#!" onclick="set_part('${id}', '${type}')" class="list-group-item list-group-item-action ${is_selected ? 'active' : ''}" aria-current="true">
+              ${name}
+            </a>`
+}
+
+function clear_part() {
+    current_part = undefined
+    // TODO: clear part
+}
+
+function update_part() {
+    if (current_part !== undefined)
+        set_part(current_part['item']['_id'], current_part['item']['type'])
+}
+
+function set_part(id, collection) {
+    let req = {
+        'collection': collection, 'part_id': id,
+        'amount': tryParseFloat($('#part-input-amount').val())
+    }
+    send('/api/make_order/set_part', req).then(resp => render_parts(resp))
 }
 
 function checkout() {

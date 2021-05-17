@@ -1,16 +1,14 @@
 import json
-import locale
 import sys
 
 import pytz
-from flask import request, jsonify, make_response, abort, render_template, Response
+from flask import request, jsonify, make_response, abort
 from flask_login import login_required, current_user
 
 from app import app
-from app.misc import sid_required, check_sid
 from app.core.controllers import order_controller, selection_controller, session_controller, contragent_controller
-from app.core.models.order import Order
 from app.core.models.user import User
+from app.misc import sid_required, check_sid
 
 # ----------------SESSION ENDPOINTS---------------
 
@@ -167,6 +165,18 @@ def get_contragent():
 def update_select():
     sid = request.cookies.get('current_order')
     return jsonify(selection_controller.get_selection(sid))
+
+
+@app.route('/api/make_order/set_part', methods=['POST'])
+@sid_required
+@login_required
+def set_part():
+    sid = request.cookies.get('current_order')
+    data = json.loads(request.form.get('data'))
+    collection = data['collection']
+    part_id = data['part_id']
+    amount = data['amount']
+    return selection_controller.set_part(sid, collection, part_id, amount)
 
 
 @app.route('/api/make_order/submit_selection', methods=['POST'])

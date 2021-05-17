@@ -1,14 +1,17 @@
-from mongoengine import EmbeddedDocument, DictField
+from mongoengine import EmbeddedDocument, DictField, EmbeddedDocumentField
 
 from app.core.models.items.base import BaseItem
+from app.core.models.items.cart_item import CartItem
 from app.core.models.items.composite_item import CompositeItem
 from app.core.models.items.empty_item import EmptyItem
+from app.core.utilities.common import document_to_dict
 
 
 class RVDSelection(EmbeddedDocument):
     param_name = "selection"
     items = DictField()
     subtotal = DictField()
+    part = EmbeddedDocumentField(CartItem)
 
     # def __init__(self, session: Session, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
@@ -23,6 +26,12 @@ class RVDSelection(EmbeddedDocument):
     #         item = create_simple_item(item_type, i)
     #         item.create_from_dict(selection[i])
     #         self.items[i] = item
+
+    def get_safe(self):
+        res = document_to_dict(self)
+        if self.part:
+            res['part'] = self.part.get_safe()
+        return res
 
     def __getitem__(self, item: str) -> BaseItem:
         res = self.items.get(item)

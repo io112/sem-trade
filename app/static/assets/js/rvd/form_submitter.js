@@ -55,6 +55,9 @@ function init() {
         updateFitSections();
         update_cart();
         init_sessions();
+        if (current_part !== undefined) {
+            render_parts({'current_part': current_part})
+        }
     })
 }
 
@@ -282,6 +285,7 @@ async function getCurrentSelection() {
         parameters = resp['parameters']
         candidates = resp['candidates']
         current_offer = resp
+        current_part = current_selection['part']
         normalize_selection()
     }
     updateSelectionSubtotal()

@@ -1,14 +1,10 @@
-from copy import deepcopy
-
 import pytz
 from mongoengine import QuerySet
 
-from app.core.models.selection import RVDSelection
-from app.core.session_vault import *
 import app.core.utilities.selection_utility as utility
-from datetime import datetime
-
+from app.core.models.items.cart_item import CartItem
 from app.core.utilities.selection_utility import collections
+from app.core.models.session import Session
 
 msk_timezone = pytz.timezone('Europe/Moscow')
 
@@ -24,7 +20,7 @@ def get_selection(session_id):
 
 
 def find_part(collection, query):
-    res = []
+    res = {'items': []}
     collection_object = None
     for i in collections:
         if i == collection:
@@ -32,10 +28,10 @@ def find_part(collection, query):
     if collection_object is not None:
         search = utility.find_part(collection_object, query)
         for i in search:
-            res.append(i.get_safe())
+            res['items'].append(i.get_safe())
         return res
     else:
-        return []
+        return {}
 
 
 def get_filtered_params(session_id, ignore_amounts=False):
@@ -46,7 +42,20 @@ def get_filtered_params(session_id, ignore_amounts=False):
     selection = session.selection
     candidates = utility.get_candidates_by_params(selection)
     parameters = utility.get_parameters_list(candidates)
-    return {'candidates': candidates, 'parameters': parameters, 'selection': selection.to_mongo().to_dict()}
+    return {'candidates': candidates, 'parameters': parameters, 'selection': selection.get_safe()}
+
+
+def set_part(session_id: str, collection: str, part_id: str, amount: float):
+    if amount == '':
+        amount = 0
+    session = Session.objects(id=session_id)[0]
+    collection = collections[collection]
+    part = collection.objects(id=part_id)[0]
+    item = CartItem(item=part, amount=amount, price=part.price, total_price=(part.price * amount))
+    selection = utility.save_selection(session, {}, {}, item)
+    res_part = selection['part']
+    res = {'current_part': res_part}
+    return res
 
 
 def update_selection(session_id: str, selection: dict):

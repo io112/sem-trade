@@ -61,6 +61,8 @@ class Session(Document):
             session['contragent'] = self.contragent.get_safe()
         if session.get('cart'):
             session['cart'] = self.cart.get_safe()
+        if self.selection:
+            session['selection'] = self.selection.get_safe()
         return session
 
     @property

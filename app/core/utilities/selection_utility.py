@@ -64,12 +64,12 @@ def get_available_parameters(candidates: list) -> dict:
     return res
 
 
-def save_selection(session: Session, items: dict, subtotal: dict) -> dict:
-    selection = RVDSelection(items=items, subtotal=subtotal)
+def save_selection(session: Session, items: dict, subtotal: dict, part: CartItem = None) -> dict:
+    selection = RVDSelection(items=items, subtotal=subtotal, part=part)
     selection = calc_subtotal(selection)
     session.selection = selection
     session.save()
-    return selection.to_mongo().to_dict()
+    return selection.get_safe()
 
 
 def calc_subtotal(selection: RVDSelection) -> RVDSelection:
