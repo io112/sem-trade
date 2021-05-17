@@ -1,3 +1,5 @@
+from typing import List
+
 from mongoengine import ListField, GenericReferenceField, FloatField, StringField, EmbeddedDocument, IntField, \
     EmbeddedDocumentField
 
@@ -60,16 +62,22 @@ class CompositeItem(EmbeddedDocument):
             res.create_from_dict(items[item])
             self.items.append(res)
 
-    def create_xml(self) -> list:
+    def aggregate_items(self) -> List[CartItem]:
         res = {}
-        result = []
         for i in self.items:
             i: CartItem
             item_id = i.item.id
             if item_id not in res:
-                res[item_id] = [0, i]
-            res[item_id][0] += i.amount * self.amount
-        for i in res.values():
-            i: list
-            result.extend(i[1].create_xml(i[0]))
+                res[item_id] = i
+                res[item_id].amount = i.amount * self.amount
+            else:
+                res[item_id].amount += i.amount * self.amount
+        items_list = list(res.values())
+        return items_list
+
+    def create_xml(self) -> list:
+        items_list = self.aggregate_items()
+        result = []
+        for i in items_list:
+            result.extend(i.create_xml(i.amount))
         return result

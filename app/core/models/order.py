@@ -11,6 +11,7 @@ from datetime import timedelta
 from app.core.models.cart import Cart
 from app.core.models.items.base import BaseItem
 from app.core.models.items.cart_item import CartItem
+from app.core.models.items.composite_item import CompositeItem
 from app.core.models.session import Session
 from app.core.models.user import User
 from app.core.models.сontragent import Contragent
@@ -90,7 +91,6 @@ class Order(Document):
         self.status = self.Status.STATUS_CHECKED_OUT
         self._save()
 
-
     def get_db_dict(self):
         res = copy.deepcopy(self.__dict__)
         res.update(self.cart.dict)
@@ -99,13 +99,11 @@ class Order(Document):
             del res['_id']
         return res
 
-
     def get_dict(self):
         res = self.get_db_dict()
         res['_id'] = str(res['_id'])
         res['contragent'] = self.contragent.get()
         return res
-
 
     def _save(self):
         self.count_price()
@@ -117,14 +115,28 @@ class Order(Document):
         else:
             db.update(order_collection, {'_id': self._id}, {'$set': self.get_db_dict()})
 
-
     @staticmethod
-
-
     def find_last_order_num():
         last_num = db.find_one(order_collection, {}, fields=['order_num'], sorting=[('order_num', pymongo.DESCENDING)])
         return last_num['order_num']
 
+    def aggregate_items(self):
+        res = {}
+        cart = self.cart
+        items_list = []
+        for i in cart.items:
+            if type(i) is CompositeItem:
+                items_list.extend(i.aggregate_items())
+            else:
+                items_list.append(i)
+        for i in items_list:
+            item_id = i.item.id
+            if item_id not in res:
+                res[item_id] = i
+            else:
+                res[item_id].amount += i.amount
+        items_list = list(res.values())
+        return items_list
 
     def create_xml_doc(self) -> ET:
         dt = pytz.timezone('Europe/Moscow').localize(self.time_created) + timedelta(hours=3)
@@ -149,7 +161,7 @@ class Order(Document):
         contragents.append(contragent)
         res.append(contragents)
         items = ET.Element('Товары')
-        for i in self.cart.items:
+        for i in self.aggregate_items():
             i: CartItem
             for j in i.create_xml():
                 items.append(j)

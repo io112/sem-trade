@@ -11,3 +11,5 @@ db_password = str(os.getenv('MONGO_PASS'))
 db_name = str(os.getenv('MONGO_DB'))
 db_host = str(os.getenv('MONGO_HOST'))
 secret_key = str(os.getenv('SECRET_KEY'))
+
+commit_hash = str(os.getenv('SECRET_KEY', 'development'))

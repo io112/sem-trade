@@ -41,7 +41,7 @@ testoffer = {'arms': [{'diameter': 5}, {'diameter': 10}]}
 @login_required
 @sid_required
 def home():
-    return render_template('create_order/create_order.html', user=current_user)
+    return render_template('create_order/create_order.html', user=current_user, commit_hash=commit_hash)
 
 
 @app.route('/logout')
@@ -54,19 +54,19 @@ def logout():
 @app.route('/my_sessions', methods=['GET'])
 @login_required
 def my_sessions():
-    return render_template('incompleted_orders.html', user=current_user)
+    return render_template('incompleted_orders.html', user=current_user, commit_hash=commit_hash)
 
 
 @app.route('/orders', methods=['GET'])
 @login_required
 def orders():
-    return render_template('orders.html', user=current_user)
+    return render_template('orders.html', user=current_user, commit_hash=commit_hash)
 
 
 @app.route('/orders/<string:order_id>', methods=['GET'])
 @login_required
 def order(order_id):
-    return render_template('order.html', user=current_user)
+    return render_template('order.html', user=current_user, commit_hash=commit_hash)
 
 
 @app.route('/orders/<string:order_id>/upd', methods=['GET'])
@@ -90,7 +90,7 @@ def login_route():
             if not next_page or url_parse(next_page).netloc != '':
                 next_page = url_for('home')
             return redirect(next_page)
-    return render_template('login.html')
+    return render_template('login.html', commit_hash=commit_hash)
 
 
 # -----------------[1C ROUTES]-----------------
