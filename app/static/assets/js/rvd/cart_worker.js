@@ -44,9 +44,28 @@ function find_part() {
 
 }
 
+function submit_part() {
+    update_part()
+    send('/api/make_order/submit_part').then((resp) => {
+        current_part = undefined
+        render_parts(current_part)
+        $('#addPartModal').modal('hide');
+        update_cart();
+    })
+
+}
+
 function render_parts(list) {
-    console.log(list)
     const parts_list = $('#parts_list')
+    if (list === undefined) {
+        parts_list.empty()
+        $('#part_price').html(0)
+        $('#part_total').html(0)
+        $('#part-input-amount').val(0)
+        $('#part_search').show()
+        return;
+    }
+    console.log(list)
     parts_list.empty();
     if (list['current_part']) {
         $('#part_search').hide()
@@ -56,6 +75,7 @@ function render_parts(list) {
         parts_list.append(get_part(item['name'], item['amount'], item['_id'], true, item['type']))
         $('#part_price').html(part['price'])
         $('#part_total').html(part['total_price'])
+        $('#part-input-amount').val(part['amount'])
         return
     }
     if (list['items'] === undefined)
@@ -74,7 +94,12 @@ function get_part(name, amount, id, is_selected, type) {
 
 function clear_part() {
     current_part = undefined
-    // TODO: clear part
+    send('/api/make_order/clear_part').then(res => {
+        console.log(res)
+        if (res === 'success') {
+            render_parts(current_part)
+        }
+    })
 }
 
 function update_part() {
@@ -87,7 +112,11 @@ function set_part(id, collection) {
         'collection': collection, 'part_id': id,
         'amount': tryParseFloat($('#part-input-amount').val())
     }
-    send('/api/make_order/set_part', req).then(resp => render_parts(resp))
+    send('/api/make_order/set_part', req).then(resp => {
+        console.log(resp)
+        current_part = resp['current_part']
+        render_parts(resp)
+    })
 }
 
 function checkout() {
@@ -187,7 +216,7 @@ function render_cart(cart) {
     items.forEach(item => {
         // item = item[Object.keys(item)[0]]
         cart_table.append(get_items_table_row(i, item['name'], item['amount'],
-            item['price'], item['final_price']));
+            item['price'], item['total_price']));
         i++;
     })
     $('#cart_total').text(subtotal)

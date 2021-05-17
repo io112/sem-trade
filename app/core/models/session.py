@@ -33,7 +33,7 @@ def update_modified(sender, document):
         cart = document.cart
         price = 0
         for i in cart.items:
-            price += i.final_price
+            price += i.total_price
         cart.subtotal = price
     from app.core.utilities.selection_utility import get_selected_items
     selected_items = get_selected_items(document.selection)

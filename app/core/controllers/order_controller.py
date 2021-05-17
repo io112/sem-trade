@@ -65,7 +65,7 @@ def get_upd(order_id):
                           date=local_time, day=time.strftime('%d'),
                           month=time.strftime('%B'),
                           year=time.strftime('%Y')[2:],
-                          final_price=order._price)
+                          total_price=order._price)
     return upd
 
 
@@ -77,9 +77,14 @@ def set_upd(order_id, upd) -> dict:
     return order.get_safe()
 
 
-def close_order(order_id) -> dict:
+def close_order(order_id) -> List[str]:
     order_id = ObjectId(order_id)
     order = utility.get_order(order_id)
+    if order.status == order.Status.STATUS_CREATED:
+        return ['Заказ еще не проведен']
+    if (order.status == order.Status.STATUS_CLOSED or
+            order.status == order.Status.STATUS_EXPORTED):
+        return ['Заказ уже закрыт']
     order.status = Order.Status.STATUS_CLOSED
     order.save()
     return order.get_safe()

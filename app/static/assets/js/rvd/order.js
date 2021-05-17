@@ -76,7 +76,7 @@ function render_item_list(list) {
     const tb = $('#items_list')
     tb.empty()
     list['cart']['items'].forEach(item => {
-        tb.append(get_item_row(item['name'], item['amount'], item['price'], item['final_price']))
+        tb.append(get_item_row(item['name'], item['amount'], item['price'], item['total_price']))
     })
 
 }
@@ -92,7 +92,11 @@ function save_upd_num() {
 function close_order() {
     let upd_num = $('#upd_num').val();
     send(`/api/orders/${order_id}/close`, upd_num).then(data => {
-        render_page(data);
+        if (data.length > 0) {
+            alert(data)
+        } else {
+            render_page(data);
+        }
     })
 }
 function checkout_order() {

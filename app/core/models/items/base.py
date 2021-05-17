@@ -227,5 +227,5 @@ class BaseItem(Document):
         for i in self.get_item_params():
             if self.candidate.get(i) is not None:
                 self.__dict__[i] = self.candidate[i]
-        self.final_price = self.get_price()
+        self.total_price = self.get_price()
         return 'success'

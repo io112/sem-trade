@@ -3,7 +3,7 @@
       xmlns="http://www.w3.org/TR/REC-html40">
 
 <head>
-{#  <meta name="pdfkit-page-size" content="A4"/>#}
+  {#  <meta name="pdfkit-page-size" content="A4"/>#}
   <meta name="pdfkit-orientation" content="Landscape"/>
   <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
   <meta name=ProgId content=Excel.Sheet>
@@ -2134,23 +2134,37 @@
         <td colspan=2 height=16 class=xl9525777 width=24
             style='border-right:.5pt solid black; height:12.0pt;width:18pt'>{{ loop.index }}
         </td>
-        <td colspan=6 class=xl9525777 width=72 style='border-left:none;width:54pt'>{{ item.number }}</td>
+        <td colspan=6 class=xl9525777 width=72 style='border-left:none;width:54pt'>{% if item.item %}
+          {{ item.item.number }}
+        {% else %}
+          {{ item.number }}
+        {% endif %}</td>
         <td colspan=12 class=xl8125777 width=144 style='width:108pt'>{{ item.name }}</td>
         <td colspan=3 class=xl9525777 width=36 style='border-right:.5pt solid black; width:27pt'>--</td>
         <td colspan=2 class=xl10625777
-            style='border-right:.5pt solid black; border-left:none'>{{ item.MeasureCode }}</td>
+            style='border-right:.5pt solid black; border-left:none'>
+          {% if item.item %}
+            {{ item.item.MeasureCode }}
+          {% else %}
+            {{ item.MeasureCode }}
+          {% endif %}</td>
         <td colspan=6 class=xl10625777
-            style='border-right:.5pt solid black;border-left:none'>{{ item.MeasureName }}</td>
+            style='border-right:.5pt solid black;border-left:none'>
+        {% if item.item %}
+            {{ item.item.MeasureName }}
+          {% else %}
+            {{ item.MeasureName }}
+          {% endif %}</td>
         <td colspan=4 class=xl11025777 style='border-left:none'>{{ item.amount }}</td>
         <td colspan=5 class=xl9025777
-            style='border-left:none'>{{ '%0.2f' %  (item.final_price/ 120 * 100 / item.amount) | float }}</td>
+            style='border-left:none'>{{ '%0.2f' %  (item.total_price/ 120 * 100 / item.amount) | float }}</td>
         <td colspan=7 class=xl9025777
-            style='border-left:none'>{{ '%0.2f' %  (item.final_price / 120 * 100) | float }}</td>
+            style='border-left:none'>{{ '%0.2f' %  (item.total_price / 120 * 100) | float }}</td>
         <td colspan=4 class=xl9025777 style='border-left:none'>без акциза</td>
         <td colspan=4 class=xl9025777 style='border-left:none'>20%</td>
         <td colspan=6 class=xl9025777
-            style='border-left:none'>{{ '%0.2f' %  (item.final_price / 120 * 20) | float }}</td>
-        <td colspan=7 class=xl9025777 style='border-left:none'>{{ item.final_price }}</td>
+            style='border-left:none'>{{ '%0.2f' %  (item.total_price / 120 * 20) | float }}</td>
+        <td colspan=7 class=xl9025777 style='border-left:none'>{{ item.total_price }}</td>
         <td colspan=4 class=xl10225777 style='border-left:none'>--</td>
         <td colspan=7 class=xl10225777 style='border-left:none'>--</td>
         <td colspan=6 class=xl10225777 style='border-left:none'>--</td>
@@ -2164,12 +2178,12 @@
       <td colspan=32 class=xl9625777 width=384 style='border-right:.5pt solid black;
   width:288pt'>Всего к оплате
       </td>
-      <td colspan=7 class=xl9025777 style='border-left:none'>{{ '%0.2f' % (final_price / 120 * 100) | float }}</td>
+      <td colspan=7 class=xl9025777 style='border-left:none'>{{ '%0.2f' % (total_price / 120 * 100) | float }}</td>
       <td colspan=8 class=xl10325777 style='border-right:.5pt solid black;
   border-left:none'>Х
       </td>
-      <td colspan=6 class=xl9025777 style='border-left:none'>{{ '%0.2f' % (final_price / 120 * 20) | float }}</td>
-      <td colspan=7 class=xl9025777 style='border-left:none'>{{ final_price }}</td>
+      <td colspan=6 class=xl9025777 style='border-left:none'>{{ '%0.2f' % (total_price / 120 * 20) | float }}</td>
+      <td colspan=7 class=xl9025777 style='border-left:none'>{{ total_price }}</td>
       <td colspan=4 class=xl10225777 style='border-left:none'>&nbsp;</td>
       <td colspan=7 class=xl10225777 style='border-left:none'>&nbsp;</td>
       <td colspan=6 class=xl10225777 style='border-left:none'>&nbsp;</td>

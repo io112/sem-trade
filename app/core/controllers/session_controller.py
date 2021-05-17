@@ -67,6 +67,16 @@ def del_cart_item(sid: str, item_id: int):
     return utility.get_cart(sid).get_safe()
 
 
+def add_part_to_cart(sid: str):
+    session = utility.get_session(sid)
+    selection: RVDSelection = session.selection
+    if session.cart is None:
+        session.cart = Cart()
+    session.cart.items.append(selection.part)
+    del session.selection
+    session.save()
+
+
 def add_selection_to_cart(sid: str):
     session = utility.get_session(sid)
     selection: RVDSelection = session.selection
@@ -77,7 +87,7 @@ def add_selection_to_cart(sid: str):
     item = CompositeItem()
     item.items = items
     item.price = selection.subtotal['price']
-    item.final_price = selection.subtotal['total_price']
+    item.total_price = selection.subtotal['total_price']
     item.amount = selection.subtotal['amount']
     item.name = selection.subtotal['name']
     if session.cart is None:

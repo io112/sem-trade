@@ -5,24 +5,21 @@ from app.core.models.items.base import BaseItem
 from app.core.models.items.cart_item import CartItem
 from app.core.models.utils import create_simple_item
 
-
 # noinspection SpellCheckingInspection
 from app.core.utilities.common import document_to_dict
 
 
 class CompositeItem(EmbeddedDocument):
-
     MeasureCode = '796'
     MeasureName = 'Штука'
     MeasureInt = 'PCE'
     MeasureText = 'штук'
     NomenclatureType = 'composite_item'
     items = ListField(EmbeddedDocumentField(CartItem))
-    final_price = FloatField()
+    total_price = FloatField()
     name = StringField()
     price = FloatField()
     amount = IntField()
-
 
     def __init__(self, *args, **values):
 
@@ -63,64 +60,6 @@ class CompositeItem(EmbeddedDocument):
             res.create_from_dict(items[item])
             self.items.append(res)
 
-    def __get__(self, instance=None, owner=None) -> dict:
-        res = {'name': self.name, 'type': self.type, 'outer_name': self.outer_name,
-               'amount': self.amount, 'final_price': self.final_price, 'price': self.get_price_for_amount(1)}
-        items = {}
-        for i in self.items:
-            i: BaseItem
-            items.update(i.__get__())
-        res['items'] = items
-        return {self.outer_name: res}
-
-    def get_price_for_amount(self, amount) -> float:
-        price = 0
-        for i in self.items:
-            i: BaseItem
-            price += i.final_price
-        return price
-
-    def reserve_item(self) -> str:
-        errors = "success"
-        completed_items = []
-        for i in self.items:
-            i: BaseItem
-            err = i._reserve_item_amount(self.amount * i.amount)
-            if err != 'success':
-                errors += err
-            else:
-                completed_items.append(i)
-        if errors != "success":
-            for i in completed_items:
-                i.unreserve_item()
-        return errors
-
-    def finish_item(self) -> str:
-        self.final_price = 0
-        for i in self.items:
-            i: BaseItem
-            err = i.finish_item()
-            if err != 'success':
-                return err
-            self.final_price += i.final_price
-        self.final_price *= self.amount
-        return 'success'
-
-    def unreserve_item(self):
-        for i in self.items:
-            i: BaseItem
-            i._unreserve_item_amount(self.amount * i.amount)
-
-    def cancel_item(self):
-        for i in self.items:
-            i: BaseItem
-            i._cancel_item_amount(self.amount * i.amount)
-
-    def checkout_item(self):
-        for i in self.items:
-            i: BaseItem
-            i._checkout_item_amount(self.amount * i.amount)
-
     def create_xml(self) -> list:
         res = {}
         result = []
@@ -134,19 +73,3 @@ class CompositeItem(EmbeddedDocument):
             i: list
             result.extend(i[1].create_xml(i[0]))
         return result
-
-    def find_candidate(self):
-        for i in self.items:
-            i: BaseItem
-            i.find_candidate()
-        return 'success'
-
-    def check_validity(self) -> bool:
-        res = True
-        for i in self.items:
-            i: BaseItem
-            res = res and i.check_validity()
-        return res
-
-    def get_item_params(self) -> list:
-        pass

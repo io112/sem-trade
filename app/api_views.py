@@ -107,6 +107,15 @@ def find_part():
     return jsonify(res)
 
 
+@app.route('/api/make_order/clear_part', methods=['POST'])
+@login_required
+@sid_required
+def clear_part():
+    sid = request.cookies.get('current_order')
+    selection_controller.clear_part(sid)
+    return jsonify('success')
+
+
 @app.route('/api/make_order/cancel', methods=['POST'])
 @login_required
 @sid_required
@@ -179,19 +188,21 @@ def set_part():
     return selection_controller.set_part(sid, collection, part_id, amount)
 
 
+@app.route('/api/make_order/submit_part', methods=['POST'])
+@sid_required
+@login_required
+def move_part_to_cart():
+    sid = request.cookies.get('current_order')
+    session_controller.add_part_to_cart(sid)
+    return jsonify('success')
+
+
 @app.route('/api/make_order/submit_selection', methods=['POST'])
 @sid_required
 @login_required
 def move_selection_to_cart():
     sid = request.cookies.get('current_order')
     session_controller.add_selection_to_cart(sid)
-    # offer = RVDOffer(session)
-    # errors = offer.get_errors()
-    # if errors:
-    #     return '\r\n'.join(errors)
-    # result = offer.create_cart_item(False)
-    # if not result:
-    #     return 'success'
     return jsonify('success')
 
 
