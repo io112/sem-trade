@@ -1,0 +1,48 @@
+name: Production pipeline
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        env:
+          COMMIT: ${{ github.SHA }}
+        with:
+          name: io112/sem-trade/sem-trade
+          username: ${{ github.ACTOR }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+          registry: docker.pkg.github.com
+          tags: "latest,${{ github.SHA }}"
+          buildargs: COMMIT
+
+  deploy:
+    runs-on: sem_de
+    needs: build
+    steps:
+      - uses: actions/checkout@master
+      - name: Login to packages
+        run: |
+          echo  ${{ secrets.REGISTRY_TOKEN }} |  docker login docker.pkg.github.com -u ${{ github.ACTOR }} --password-stdin
+      - name: deploy
+        env:
+          CRM_LOGIN: ${{ secrets.CRM_LOGIN }}
+          CRM_PASSWORD: ${{ secrets.CRM_PASSWORD }}
+          MONGO_USER: ${{ secrets.MONGO_USER }}
+          MONGO_PASS: ${{ secrets.MONGO_PASS }}
+          MONGO_DB: ${{ secrets.MONGO_DB }}
+          MONGO_HOST: ${{ secrets.MONGO_HOST }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          INTERNAL_PORT: ${{ secrets.INTERNAL_PORT }}
+          BRANCH: master
+          COMMIT: ${{ github.SHA }}
+        run: |
+          docker-compose up -d

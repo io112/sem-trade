@@ -1,6 +1,24 @@
 version: '3'
 
 services:
+  sem_trade:
+    image: docker.pkg.github.com/io112/sem-trade/sem-trade:${GITHUB_SHA}
+    container_name: sem_trade
+    restart: always
+    environment:
+      1C_LOGIN: ${CRM_LOGIN}
+      1C_PASSWORD: ${CRM_PASSWORD}
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASS: ${MONGO_PASS}
+      MONGO_DB: ${MONGO_DB}
+      MONGO_HOST: ${MONGO_HOST}
+      SECRET_KEY: ${SECRET_KEY}
+      INTERNAL_PORT: ${INTERNAL_PORT}
+      COMMIT_HASH: ${COMMIT}
+      LISTEN_PORT: ${INTERNAL_PORT}
+    ports:
+      - "${INTERNAL_PORT}:${INTERNAL_PORT}"
+
   mongodb:
     image: docker.io/bitnami/mongodb
     ports:
@@ -12,7 +30,7 @@ services:
       MONGODB_PASSWORD: ${MONGO_PASS}
       MONGODB_DATABASE: ${MONGO_DB}
 
-      
+
 volumes:
   mongodb_data:
     driver: local

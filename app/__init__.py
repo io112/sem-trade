@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 
-from app.db import init
+from app import db
 from app import constants
 
 app = Flask(__name__)
@@ -11,6 +11,7 @@ login_manager.init_app(app)
 
 from app import base_views, api_views
 
-init()
+db.init()
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=constants.internal_port)
