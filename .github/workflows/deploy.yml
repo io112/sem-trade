@@ -25,6 +25,7 @@ jobs:
   deploy:
     runs-on: sem_de
     needs: build
+    environment: master
     steps:
       - uses: actions/checkout@master
       - name: Login to packages
