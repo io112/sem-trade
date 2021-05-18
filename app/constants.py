@@ -1,8 +1,8 @@
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 
-site_login = os.getenv('1C_LOGIN')
-site_password = generate_password_hash(os.getenv('1C_PASSWORD'))
+site_login = os.getenv('CRM_LOGIN')
+site_password = generate_password_hash(os.getenv('CRM_PASSWORD'))
 tmp_catalog = 'crm/tmp/'
 max_filesize = 10 * (10 ** 6)
 
