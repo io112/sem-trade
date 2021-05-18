@@ -1,6 +1,6 @@
 from bson import ObjectId
 from flask_login import UserMixin
-from mongoengine import Document, StringField
+from mongoengine import Document, StringField, BooleanField
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.core.utilities.common import document_to_dict
@@ -13,6 +13,7 @@ class User(UserMixin, Document):
     username = StringField()
     name = StringField()
     surname = StringField()
+    change_password = BooleanField(default=True)
     role = StringField()
 
     def __init__(self, *args, **kwargs):
@@ -25,7 +26,7 @@ class User(UserMixin, Document):
 
     @staticmethod
     def get(uid):
-        return User.objects(id=ObjectId(uid))[0]
+        return User.objects(id=ObjectId(uid)).first()
 
     @staticmethod
     def get_by_username(username):

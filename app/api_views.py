@@ -2,11 +2,12 @@ import json
 import sys
 
 import pytz
-from flask import request, jsonify, make_response, abort
+from flask import request, jsonify, make_response, abort, Response
 from flask_login import login_required, current_user
 
 from app import app
-from app.core.controllers import order_controller, selection_controller, session_controller, contragent_controller
+from app.core.controllers import order_controller, selection_controller, session_controller, contragent_controller, \
+    users_controller
 from app.core.models.user import User
 from app.misc import sid_required, check_sid
 
@@ -301,19 +302,16 @@ def find_contragents():
     return jsonify(contragent_controller.find_contragents(data))
 
 
-# ----------------USER ROUTES------------------
+# ----------------ADMIN ROUTES------------------
 
 
 @app.route('/api/create_user', methods=['POST'])
 @login_required
 def create_user():
-    username = request.form.get('username')
-    password = request.form.get('password')
-    name = request.form.get('name')
-    surname = request.form.get('surname', '')
-    role = request.form.get('role', '')
     try:
-        user = User.create_user(username, password, name, surname, role)
-        return user.get_id()
-    except ValueError:
-        abort(409, 'user already exists')
+        user_token = users_controller.create_user(**request.form)
+        return jsonify(user_token.token)
+    except ValueError as e:
+        resp = Response(str(e))
+        resp.status = 409
+        return resp

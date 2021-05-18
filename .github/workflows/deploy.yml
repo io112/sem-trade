@@ -3,8 +3,6 @@ name: Production pipeline
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 
 jobs:
@@ -42,6 +40,8 @@ jobs:
           MONGO_HOST: ${{ secrets.MONGO_HOST }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           INTERNAL_PORT: ${{ secrets.INTERNAL_PORT }}
+          ROOT_USERNAME: ${{ secrets.ROOT_USERNAME }}
+          ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
           BRANCH: master
           COMMIT: ${{ github.SHA }}
         run: |
