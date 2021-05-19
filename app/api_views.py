@@ -310,7 +310,7 @@ def find_contragents():
 def create_user():
     try:
         user_token = users_controller.create_user(**request.form)
-        return jsonify(user_token.token)
+        return jsonify('success')
     except ValueError as e:
         resp = Response(str(e))
         resp.status = 409

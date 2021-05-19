@@ -42,7 +42,12 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           INTERNAL_PORT: ${{ secrets.INTERNAL_PORT }}
           ROOT_USERNAME: ${{ secrets.ROOT_USERNAME }}
-          ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
+          MAIL_SERVER: ${{ secrets.MAIL_SERVER }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          CURRENT_HOST: ${{ secrets.CURRENT_HOST }}
+          INSTANCE: master
           BRANCH: master
           COMMIT: ${{ github.SHA }}
         run: |

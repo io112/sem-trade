@@ -6,7 +6,7 @@ function create_user() {
             res[item.name] = item.value
     })
     console.log(res)
-    send('/api/create_user', res).then(resp => console.log(resp))
+    send('/api/create_user', res).then(resp => alert('Пользователь успешно создан!'))
 }
 
 async function send(endpoint, data = {}) {

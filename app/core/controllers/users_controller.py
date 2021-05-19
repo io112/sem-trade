@@ -1,5 +1,6 @@
 from typing import Optional
 
+from app.core.controllers import mail_controller
 from app.core.models.user import User
 from app.constants import root_password, root_username
 from app.core.models.user_token import UserToken
@@ -29,7 +30,9 @@ def login_using_token(token: str) -> Optional[User]:
 def create_user(**kwargs):
     if User.objects(username=kwargs['username']).count() > 0:
         raise ValueError('Пользователь уже существует')
-    return utility.create_user_without_password(**kwargs)
+    token = utility.create_user_without_password(**kwargs)
+    mail_controller.send_user_created_email(token)
+    return token
 
 
 def change_password(**kwargs):

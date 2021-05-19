@@ -5,6 +5,7 @@ import string
 from flask import make_response, redirect, url_for, request
 from flask_login import current_user
 
+from app.core.controllers import session_controller
 from app.core.sessions import check_session, start_session
 
 
@@ -18,6 +19,8 @@ def check_sid(sid):
     if sid is None:
         return False
     elif not check_session(sid):
+        return False
+    elif session_controller.get_session(sid).user != current_user.username:
         return False
     return True
 
@@ -43,6 +46,7 @@ def sid_required(view):
                 resp = make_cookie_resp('home', sid)
             else:
                 resp = make_cookie_resp('home')
+                resp.delete_cookie('current_order')
             return resp
         sid = request.cookies.get('current_order')
         if not check_sid(sid):
