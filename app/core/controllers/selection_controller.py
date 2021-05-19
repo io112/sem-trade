@@ -58,7 +58,8 @@ def set_part(session_id: str, collection: str, part_id: str, amount: float):
     session = Session.objects(id=session_id)[0]
     collection = collections[collection]
     part = collection.objects(id=part_id)[0]
-    item = CartItem(name=part.name, item=part, amount=amount, price=part.price, total_price=(part.price * amount))
+    price = part.price * utility.price_coefficient
+    item = CartItem(name=part.name, item=part, amount=amount, price=price, total_price=(price * amount))
     selection = utility.save_selection(session, {}, {}, item)
     res_part = selection['part']
     res = {'current_part': res_part}

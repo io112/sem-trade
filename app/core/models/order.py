@@ -64,7 +64,8 @@ class Order(Document):
     def get_safe(self):
         res = document_to_dict(self)
         res['cart'] = self.cart.get_safe()
-        res['contragent'] = self.contragent.get_safe()
+        if self.contragent:
+            res['contragent'] = self.contragent.get_safe()
         res['_id'] = str(res['_id'])
         res['user'] = self.user.get_safe()
         return res

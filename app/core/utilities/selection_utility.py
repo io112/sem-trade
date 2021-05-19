@@ -13,6 +13,7 @@ not_zero_amount = {'amount': {'$not': {'$eq': 0}}}
 item_objects = {'arm': Arm, 'clutch1': Clutch, 'clutch2': Clutch,
                 'fiting1': Fiting, 'fiting2': Fiting}
 collections = {'arm': Arm, 'clutch': Clutch, 'fiting': Fiting}
+price_coefficient = 2.2
 
 
 def create_selection() -> RVDSelection:
@@ -20,7 +21,10 @@ def create_selection() -> RVDSelection:
 
 
 def find_part(collection: BaseItem, query: str):
-    return collection.objects.search_text(query)
+    res = collection.objects.search_text(query)
+    for i in res:
+        i.price *= price_coefficient
+    return res
 
 
 def get_candidates_by_params(selection: RVDSelection):
@@ -78,14 +82,8 @@ def calc_subtotal(selection: RVDSelection) -> RVDSelection:
     if total_amount is None:
         total_amount = 1
     items = selection.items
-    for i, obj in item_objects.items():
-        amount = 1
-        if i in items and 'id' in items[i]:
-            id = items[i]['id']
-            o_price = obj.objects(id=id)[0].price
-            if 'amount' in items[i]:
-                amount = items[i]['amount']
-            price += o_price * amount
+    for _, obj in get_selected_items(selection).items():
+        price += obj.total_price
     selection.subtotal['price'] = price
     selection.subtotal['total_price'] = price * total_amount
     selection.subtotal['name'] = create_selection_name(items)
@@ -103,8 +101,9 @@ def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
             amount = items[i]['amount'] if items[i].get('amount') else 1
             id = items[i]['id']
             item = obj.objects(id=id)[0]
+            price = item.price * price_coefficient
             cart_item = CartItem(item=item, amount=amount,
-                                 price=item.price, total_price=item.price * amount)
+                                 price=price, total_price=price * amount)
             res[i] = cart_item
     return res
 
