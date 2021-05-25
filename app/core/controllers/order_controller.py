@@ -81,24 +81,28 @@ def close_order(order_id) -> List[str]:
     order_id = ObjectId(order_id)
     order = utility.get_order(order_id)
     if order.status == order.Status.STATUS_CREATED:
-        return ['Заказ еще не проведен']
+        raise ValueError('Заказ еще не проведен')
     if (order.status == order.Status.STATUS_CLOSED or
             order.status == order.Status.STATUS_EXPORTED):
-        return ['Заказ уже закрыт']
+        raise ValueError('Заказ уже закрыт')
+    if order.upd_num is None:
+        raise ValueError('Заполните номер УПД')
     order.status = Order.Status.STATUS_CLOSED
     order.save()
     return order.get_safe()
 
 
-def checkout_order(order_id) -> List[str]:
+def checkout_order(order_id) -> Order:
     order = utility.get_order(ObjectId(order_id))
     if (order.status == order.Status.STATUS_CHECKED_OUT or
             order.status == order.Status.STATUS_CLOSED or
             order.status == order.Status.STATUS_EXPORTED):
-        return ['Заказ уже проведен']
+        raise ValueError('Заказ уже проведен')
+    if order.upd_num is None:
+        raise ValueError('Заполните номер УПД')
     missing_report = check_presence(order_id)
     if len(missing_report) > 0:
-        return missing_report
+        raise ValueError('\r\n'.join(missing_report))
     for i in order.cart.items:
         if type(i) == CompositeItem:
             total_amount = i.amount
@@ -112,7 +116,7 @@ def checkout_order(order_id) -> List[str]:
             i.item.save()
     order.status = Order.Status.STATUS_CHECKED_OUT
     order.save()
-    return []
+    return order.get_safe()
 
 
 def create_order(sid: str) -> Order:

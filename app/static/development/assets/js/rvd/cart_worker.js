@@ -344,10 +344,19 @@ function get_items_table_row(id, name, amount, price, fullprice) {
     return res
 }
 
+function clean_form(mas) {
+    let res = []
+    mas.forEach(i => {
+        if (i.value !== '') {
+            res.push(i)
+        }
+    })
+    return res
+}
 
 function create_contragent() {
     let mas = $('#contragent_form').serializeArray()
-    send(create_contragent_endpoint, mas).then(resp => {
+    send(create_contragent_endpoint, clean_form(mas)).then(resp => {
         if (resp === 'success') {
             const modal = $('#addContragentModal')
             modal.modal('hide');

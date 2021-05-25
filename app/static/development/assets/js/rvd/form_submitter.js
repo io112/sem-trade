@@ -273,7 +273,6 @@ async function send(endpoint, data = {}) {
         },
         error: function (e) {
             alert(e.responseText)
-            return e
         }
     });
 }

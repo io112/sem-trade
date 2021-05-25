@@ -75,15 +75,21 @@ def download_upd(order_id):
 @app.route('/api/orders/<string:order_id>/close', methods=['POST'])
 @login_required
 def close_order(order_id):
-    order = order_controller.close_order(order_id)
+    try:
+        order = order_controller.close_order(order_id)
+    except Exception as e:
+        return Response(str(e), status=409)
     return jsonify(order)
 
 
 @app.route('/api/orders/<string:order_id>/checkout', methods=['POST'])
 @login_required
 def checkout_order(order_id):
-    report = order_controller.checkout_order(order_id)
-    return jsonify(report)
+    try:
+        order = order_controller.checkout_order(order_id)
+    except Exception as e:
+        return Response(str(e), status=409)
+    return jsonify(order)
 
 
 # ----------------CREATE ORDER ENDPOINTS------------

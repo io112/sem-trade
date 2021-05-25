@@ -23,8 +23,8 @@ async function send(endpoint, data = {}) {
         success: function (e) {
             return e
         },
-        fail: function (e) {
-            alert(e)
+        error: function (e) {
+            alert(e.responseText)
             return e
         }
     });
@@ -99,9 +99,7 @@ function save_upd_num() {
 function close_order() {
     let upd_num = $('#upd_num').val();
     send(`/api/orders/${order_id}/close`, upd_num).then(data => {
-        if (data.length > 0) {
-            alert(data)
-        } else {
+        if (data.responseText === undefined) {
             render_page(data);
         }
     })
@@ -110,10 +108,8 @@ function close_order() {
 function checkout_order() {
     let upd_num = $('#upd_num').val();
     send(`/api/orders/${order_id}/checkout`).then(data => {
-        if (data.length > 0) {
-            alert(data)
-        } else {
-            get_orders_list()
+        if (data.responseText === undefined) {
+            render_page(data)
         }
     })
 }

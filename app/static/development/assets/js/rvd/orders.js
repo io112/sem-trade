@@ -45,7 +45,7 @@ function render_order_list(list) {
 
 function get_order_row(order_id, order_num, contragent, user, time, status, total_price) {
     time = moment(time).tz('Europe/Moscow').format('YYYY-MM-DD HH:mm z')
-    return '<tr>\n' +
+    return '<tr style="color:black;">\n' +
         '                  <th scope="row">\n' +
         `                    <span class="name mb-0 text-sm">${order_num}</span>\n` +
         '                  </th>\n' +
