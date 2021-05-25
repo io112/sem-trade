@@ -77,6 +77,13 @@ function render_item_list(list) {
     tb.empty()
     list['cart']['items'].forEach(item => {
         tb.append(get_item_row(item['name'], item['amount'], item['price'], item['total_price']))
+        if (item['items']) {
+            let num = 1;
+            item['items'].forEach(i => {
+                tb.append(get_included_item_row(num, i['item']['name'], i['amount']))
+                num += 1;
+            })
+        }
     })
 
 }
@@ -99,6 +106,7 @@ function close_order() {
         }
     })
 }
+
 function checkout_order() {
     let upd_num = $('#upd_num').val();
     send(`/api/orders/${order_id}/checkout`).then(data => {
@@ -112,12 +120,20 @@ function checkout_order() {
 
 
 function get_item_row(name, num, price, fullprice) {
-    return '<tr id="0">\n' +
+    return '<tr  id="0">\n' +
         `        <td><span class="item-table-name mb-0 text-sm">${name}</span>\n` +
         '        </td>\n' +
         `        <td class="text-center" width="10%"><span class="mb-0 text-sm">${num}</span></td>\n` +
         `        <td class="text-center" width="10%"><span class="align-center mb-0 text-sm">${price} ₽</span></td>\n` +
         `        <td class="text-center" width="10%"><span class="mb-0 text-sm">${fullprice} ₽</span></td>\n` +
+        '      </tr>'
+}
+
+function get_included_item_row(num, name, amount) {
+    return '<tr style="background-color: #cfd8dc" id="0">\n' +
+        `        <td><span class="item-table-name mb-0 text-sm">${num}. ${name}</span>\n` +
+        '        </td>\n' +
+        `        <td class="text-center" width="10%"><span class="mb-0 text-sm">${amount}</span></td>\n` +
         '      </tr>'
 }
 

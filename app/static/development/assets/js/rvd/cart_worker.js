@@ -47,10 +47,12 @@ function find_part() {
 function submit_part() {
     update_part()
     send('/api/make_order/submit_part').then((resp) => {
-        current_part = undefined
-        render_parts(current_part)
-        $('#addPartModal').modal('hide');
-        update_cart();
+        if (resp === 'success') {
+            current_part = undefined
+            render_parts(current_part)
+            $('#addPartModal').modal('hide');
+            update_cart();
+        }
     })
 
 }
@@ -130,8 +132,10 @@ function checkout() {
     // })
 
     send(checkout_endpoint).then(resp => {
-        console.log(resp)
-        window.location.href = '/'
+        console.log(resp.status)
+        if (!resp.status || resp.status === 200) {
+            window.location.href = '/'
+        }
     })
 
 }
@@ -344,7 +348,10 @@ function get_items_table_row(id, name, amount, price, fullprice) {
 function create_contragent() {
     let mas = $('#contragent_form').serializeArray()
     send(create_contragent_endpoint, mas).then(resp => {
-        $('#addContragentModal').modal('hide');
+        if (resp === 'success') {
+            const modal = $('#addContragentModal')
+            modal.modal('hide');
+        }
     })
 }
 

@@ -1,5 +1,5 @@
 from bson import ObjectId
-from mongoengine import Document, StringField, BooleanField
+from mongoengine import Document, StringField, BooleanField, ValidationError
 
 import app.db.base as db
 from app.core.utilities.common import document_to_dict
@@ -7,13 +7,13 @@ from app.db.variables import contragent_collection
 
 
 class Contragent(Document):
-    name = StringField()
+    name = StringField(required=True)
     surname = StringField()
     phone = StringField()
     inn = StringField()
     kpp = StringField()
-    address = StringField()
-    email = StringField()
+    address = StringField(required=True)
+    email = StringField(required=True)
     is_org = BooleanField(default=False)
 
     meta = {'indexes': [
@@ -23,6 +23,26 @@ class Contragent(Document):
          'weights': {'name': 1, 'phone': 1, 'surname': 1}
          }
     ]}
+
+    def clean(self):
+        if self.is_org:
+            self.validate_org_part()
+        else:
+            self.validate_user_part()
+
+    def validate_org_part(self):
+        if not self.inn:
+            raise ValidationError('ИНН не заполнен')
+        if not self.kpp:
+            raise ValidationError('КПП не заполнен')
+        if len(self.inn) != 12:
+            raise ValidationError('ИНН должен быть из 12 символов')
+        if len(self.kpp) != 9:
+            raise ValidationError('КПП должен быть из 9 символов')
+
+    def validate_user_part(self):
+        if not self.surname:
+            raise ValidationError('Фамилия должна быть заполнена')
 
     def __init__(self, *args, **values):
         super().__init__(*args, **values)

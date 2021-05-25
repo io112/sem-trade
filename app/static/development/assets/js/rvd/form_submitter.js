@@ -261,17 +261,18 @@ function updateFitSection(num, resp) {
 async function send(endpoint, data = {}) {
     if (data === undefined)
         data = []
-    var request = {"data": JSON.stringify(data), "sid": sid}
+    var request = {"data": JSON.stringify(data)}
     return await $.ajax({
         type: "POST",
         url: endpoint,
         data: request,
         dataType: 'json',
-        success: function (e) {
+        success: function (e, textStatus, xhr) {
+            console.log(e)
             return e
         },
-        fail: function (e) {
-            alert(e)
+        error: function (e) {
+            alert(e.responseText)
             return e
         }
     });
@@ -345,8 +346,6 @@ function addToCart() {
             if (ans === 'success') {
                 updateAllSections()
                 $('#addModal').modal('hide');
-            } else {
-                alert(ans)
             }
             update_cart();
         }

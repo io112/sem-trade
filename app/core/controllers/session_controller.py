@@ -70,6 +70,10 @@ def del_cart_item(sid: str, item_id: int):
 def add_part_to_cart(sid: str):
     session = utility.get_session(sid)
     selection: RVDSelection = session.selection
+    if selection.part is None:
+        raise ValueError('Запчасть не выделена')
+    if selection.part.amount <= 0:
+        raise ValueError('Выбрано 0 или меньше предметов')
     if session.cart is None:
         session.cart = Cart()
     session.cart.items.append(selection.part)
@@ -83,13 +87,19 @@ def add_selection_to_cart(sid: str):
     selection_items = selection_utility.get_selected_items(selection)
     items = []
     for i in selection_items.values():
+        if i.amount <= 0:
+            raise ValueError(f'Выбрано 0 или меньше предметов: {i.name}')
         items.append(i)
+    if len(items) == 0:
+        raise ValueError('Не выделен ни один компонент')
     item = CompositeItem()
     item.items = items
     item.price = selection.subtotal['price']
     item.total_price = selection.subtotal['total_price']
     item.amount = selection.subtotal['amount']
     item.name = selection.subtotal['name']
+    if not item.amount:
+        raise ValueError(f'Выбрано 0 или меньше РВД')
     if session.cart is None:
         session.cart = Cart()
     session.cart.items.append(item)

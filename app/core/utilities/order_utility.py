@@ -5,8 +5,8 @@ from app.core.models.user import User
 def get_orders(user=None):
     if user is not None:
         user = User.get_by_username(user)
-        return Order.objects(user=user)
-    return Order.objects
+        return Order.objects(user=user).order_by('-order_num')
+    return Order.objects.order_by('-order_num')
 
 
 def get_order(order_id):

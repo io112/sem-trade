@@ -194,7 +194,10 @@ def set_part():
 @login_required
 def move_part_to_cart():
     sid = request.cookies.get('current_order')
-    session_controller.add_part_to_cart(sid)
+    try:
+        session_controller.add_part_to_cart(sid)
+    except Exception as e:
+        return Response(str(e), status=409)
     return jsonify('success')
 
 
@@ -203,7 +206,10 @@ def move_part_to_cart():
 @login_required
 def move_selection_to_cart():
     sid = request.cookies.get('current_order')
-    session_controller.add_selection_to_cart(sid)
+    try:
+        session_controller.add_selection_to_cart(sid)
+    except Exception as e:
+        return Response(str(e), status=409)
     return jsonify('success')
 
 
@@ -254,8 +260,10 @@ def get_carts():
 @login_required
 def checkout_order_view():
     sid = request.cookies.get('current_order')
-    order = order_controller.create_order(sid)
-
+    try:
+        order = order_controller.create_order(sid)
+    except Exception as e:
+        return Response(str(e), status=409)
     session_controller.remove_session(sid)
     resp = make_response(jsonify(order.order_num))
     resp.delete_cookie('current_order')
@@ -291,7 +299,10 @@ def get_comment_view():
 @login_required
 def create_contragent():
     data = json.loads(request.form.get('data', []))
-    contragent_controller.create_contragent_from_form(data)
+    try:
+        contragent_controller.create_contragent_from_form(data)
+    except Exception as e:
+        return Response(str(e), status=409)
     return jsonify('success')
 
 

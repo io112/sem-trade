@@ -32,13 +32,13 @@ class Order(Document):
 
     order_num = StringField()
     status = StringField(default=Status.STATUS_CREATED)
-    contragent = ReferenceField(Contragent)
+    contragent = ReferenceField(Contragent, required=True)
     upd_num = StringField()
-    user = ReferenceField(User)
+    user = ReferenceField(User, required=True)
     comment = StringField()
     _price = FloatField()
     is_checked_out = BooleanField()
-    cart = EmbeddedDocumentField(Cart)
+    cart = EmbeddedDocumentField(Cart, required=True)
     time_created = DateTimeField()
     sale = IntField()  # decimal num, percents of sale
 

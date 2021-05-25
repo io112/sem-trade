@@ -118,6 +118,8 @@ def checkout_order(order_id) -> List[str]:
 def create_order(sid: str) -> Order:
     session = session_utility.get_session(sid)
     order = Order()
+    if session.cart is None:
+        raise ValueError('В корзине нет товаров')
     order.cart = session.cart
     order.user = User.get_by_username(session.user)
     order.contragent = session.contragent

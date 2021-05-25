@@ -23,7 +23,7 @@ def create_selection() -> RVDSelection:
 def find_part(collection: BaseItem, query: str):
     res = collection.objects.search_text(query)
     for i in res:
-        i.price *= price_coefficient
+        i.price = round(i.price * price_coefficient, 2)
     return res
 
 
@@ -98,12 +98,12 @@ def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
     items = selection.items
     for i, obj in item_objects.items():
         if i in items and 'id' in items[i]:
-            amount = items[i]['amount'] if items[i].get('amount') else 1
+            amount = items[i]['amount'] if items[i].get('amount') is not None else 1
             id = items[i]['id']
             item = obj.objects(id=id)[0]
-            price = item.price * price_coefficient
-            cart_item = CartItem(item=item, amount=amount,
-                                 price=price, total_price=price * amount)
+            price = round(item.price * price_coefficient, 2)
+            cart_item = CartItem(name=item.name, item=item, amount=amount,
+                                 price=price, total_price=round(price * amount, 2))
             res[i] = cart_item
     return res
 
