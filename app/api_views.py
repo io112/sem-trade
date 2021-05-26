@@ -46,7 +46,9 @@ def get_sessions():
 @app.route('/api/orders/get_orders', methods=['POST'])
 @login_required
 def get_orders():
-    orders = order_controller.get_all_orders()
+    limit = int(request.form.get('limit', 0))
+    offset = int(request.form.get('offset', 0))
+    orders = order_controller.get_all_orders(limit=limit, offset=offset)
     return jsonify(orders)
 
 

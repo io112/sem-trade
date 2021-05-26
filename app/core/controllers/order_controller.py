@@ -19,14 +19,17 @@ import app.core.utilities.order_utility as utility
 from app.core.utilities.common import *
 
 
-def get_all_orders(user=None) -> list:
+def get_all_orders(user=None, limit=None, offset=None) -> dict:
     res = []
-    orders = utility.get_orders(user)
+    orders = utility.get_orders(user, limit, offset)
     if orders is None:
-        return res
+        return {}
     for i in orders:
         res.append(i.get_safe())
-    return res
+    count = utility.count_orders(user)
+    from_elem = offset+1
+    to_elem = offset + (len(res) if limit else count)
+    return {"from": from_elem, 'to': to_elem, 'count': count, 'data': res}
 
 
 def check_presence(order_id: str) -> List[str]:

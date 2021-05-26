@@ -1,8 +1,11 @@
 document.addEventListener("DOMContentLoaded", init);
-
+var current_page = 1
+var limit = 15
 
 function init() {
-    get_orders_list()
+    current_page = 1
+    limit = 15
+    get_orders_list(current_page, limit)
 }
 
 async function send(endpoint, data = {}) {
@@ -24,13 +27,28 @@ async function send(endpoint, data = {}) {
 }
 
 
-function get_orders_list() {
-    send('api/orders/get_orders').then(data => {
-        render_order_list(data)
-    })
+function get_orders_list(page, limit) {
+    request('api/orders/get_orders', {'limit': limit, 'offset': (page - 1) * limit})
+        .then(data => {
+            render_order_list(data, limit)
+        })
 }
 
-function render_order_list(list) {
+function render_order_list(data, limit) {
+    current_page = Math.floor((data['from'] - 1) / limit) + 1
+    precision = 2
+    const nav = $('#nav-pager')
+    const l = $('<ul>').attr('class', 'pagination pagination-lg')
+    nav.empty()
+    for (let j = current_page - 2; j <= current_page + 2; j++) {
+        console.log(data['count'])
+        if (j > 0 && data['count'] - (j - 1) * limit > 0) {
+            let is_active = j === current_page;
+            l.append(get_btn(j, j, is_active))
+        }
+    }
+    nav.append(l)
+    let list = data['data']
     const tb = $('#orders_table')
     tb.empty()
     list.forEach(order => {
@@ -62,6 +80,15 @@ function get_order_row(order_id, order_num, contragent, user, time, status, tota
         '                    </div>\n' +
         '                  </td>\n' +
         '                </tr>'
+}
+
+function get_btn(page_num, text, is_active) {
+    let classes = 'page-item'
+    if (is_active)
+        classes += ' active'
+    return `<li class="${classes}">` +
+        `<a class="page-link" onclick="get_orders_list(${page_num}, ${limit})" ">${text}</a>` +
+        '</li>'
 }
 
 function view_order(order_id) {
