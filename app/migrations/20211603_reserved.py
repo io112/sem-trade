@@ -1,10 +1,12 @@
-name = "20211603_reserved"
-dependencies = []
+from mongodb_migrations.base import BaseMigration
 
 
-def upgrade(db):
-    db.arm.update_many({'reserved': {'$exists': False}}, {'$set': {'reserved': 0}})
+class Migration(BaseMigration):
+    def upgrade(self):
+        for item in self.db.order.find():
+            num = item['order_num']
+            item['_number'] = int(num[3:])
+            self.db.order.save(item)
 
-
-def downgrade(db):
-    db.arm.update_many({}, {'$unset': 'reserved'})
+    def downgrade(self):
+        self.db.order.update_many({}, {'$unset': '_number'})

@@ -1,8 +1,9 @@
-document.addEventListener("DOMContentLoaded", init);
-
+window.addEventListener("load", init);
+var current_page = 1
+var limit = 15
 
 function init() {
-    get_session_list()
+    get_session_list(current_page, limit)
 }
 
 async function send(endpoint, data = {}) {
@@ -24,13 +25,27 @@ async function send(endpoint, data = {}) {
 }
 
 
-function get_session_list() {
-    send('api/sessions/get_sessions').then(data => {
-        render_session_list(data)
+function get_session_list(page, limit) {
+    request('api/sessions/get_sessions', {'limit': limit, 'offset': (page - 1) * limit}).then(data => {
+        render_session_list(data, limit)
     })
 }
 
-function render_session_list(list) {
+function render_session_list(data) {
+    current_page = Math.floor((data['from'] - 1) / limit) + 1
+    let precision = 2
+    const nav = $('#nav-pager')
+    const l = $('<ul>').attr('class', 'pagination pagination-lg')
+    nav.empty()
+    for (let j = current_page - precision; j <= current_page + precision; j++) {
+        console.log(data['count'])
+        if (j > 0 && data['count'] - (j - 1) * limit > 0) {
+            let is_active = j === current_page;
+            l.append(get_btn(j, j, is_active))
+        }
+    }
+    nav.append(l)
+    let list = data['data']
     const tb = $('#sessions_table')
     tb.empty()
     list.forEach(session => {
@@ -65,6 +80,15 @@ function get_session_row(session_id, time, user, total_price, contragent) {
         '                    </div>\n' +
         '                  </td>\n' +
         '                </tr>'
+}
+
+function get_btn(page_num, text, is_active) {
+    let classes = 'page-item'
+    if (is_active)
+        classes += ' active'
+    return `<li class="${classes}">` +
+        `<a class="page-link" onclick="get_session_list(${page_num}, ${limit})" ">${text}</a>` +
+        '</li>'
 }
 
 function open_session(new_sid) {

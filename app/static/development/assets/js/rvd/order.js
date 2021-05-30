@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", init);
+window.addEventListener("load", init);
 
 let order_id = ''
 let order = {}
@@ -50,6 +50,22 @@ function print_upd() {
         //w.document.close();
         w.window.print();
         w.window.close();
+    })
+}
+
+function print_bill() {
+    let windowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
+    send(`/api/orders/${order_id}/download_bill`).then(data => {
+        w = window.open(window.location.href, "_blank", windowFeatures);
+        //w.document.open();
+        w.document.write(data);
+        //w.document.close();
+        w.addEventListener("load", () => {
+            alert('a')
+            w.window.print();
+            w.window.close();
+
+        });
     })
 }
 

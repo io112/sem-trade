@@ -26,6 +26,7 @@ def route_remove_session():
         abort(404, 'session not found')
     session_controller.remove_session(sid)
     sessions = session_controller.get_user_sessions(current_user.username)
+    sessions = sessions['data']
     resp = make_response(jsonify(sessions))
     current_order = request.cookies.get('current_order')
     if current_order is not None and current_order == sid:
@@ -39,7 +40,9 @@ def route_remove_session():
 @app.route('/api/sessions/get_sessions', methods=['POST'])
 @login_required
 def get_sessions():
-    sessions = session_controller.get_user_sessions(current_user.username)
+    limit = int(request.form.get('limit', 0))
+    offset = int(request.form.get('offset', 0))
+    sessions = session_controller.get_user_sessions(current_user.username, limit=limit, offset=offset)
     return jsonify(sessions)
 
 
@@ -72,6 +75,12 @@ def set_upd(order_id):
 @login_required
 def download_upd(order_id):
     return order_controller.get_upd(order_id)
+
+
+@app.route('/api/orders/<string:order_id>/download_bill', methods=['POST'])
+@login_required
+def download_bill(order_id):
+    return order_controller.get_bill(order_id)
 
 
 @app.route('/api/orders/<string:order_id>/close', methods=['POST'])
@@ -132,8 +141,9 @@ def remove_order():
     sid = request.cookies.get('current_order')
     session_controller.remove_session(sid)
     sessions = session_controller.get_user_sessions(current_user.username)
+    sessions = sessions['data']
     if len(sessions) > 0:
-        return jsonify(sessions[-1]['_id'])
+        return jsonify(sessions[0]['_id'])
     else:
         resp = make_response(jsonify(''))
         resp.delete_cookie('current_order')
@@ -259,7 +269,8 @@ def del_cart_item():
 @sid_required
 @login_required
 def get_carts():
-    carts = session_controller.get_user_sessions(current_user.username)
+    sorting = request.form.get('sorting', None)
+    carts = session_controller.get_user_sessions(current_user.username, sorting=sorting)
     return jsonify(carts)
 
 

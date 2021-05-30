@@ -17,6 +17,7 @@ from app.db import base as db
 from app.db.variables import order_collection
 import app.core.utilities.order_utility as utility
 from app.core.utilities.common import *
+from app.constants import *
 
 
 def get_all_orders(user=None, limit=None, offset=None) -> dict:
@@ -27,7 +28,7 @@ def get_all_orders(user=None, limit=None, offset=None) -> dict:
     for i in orders:
         res.append(i.get_safe())
     count = utility.count_orders(user)
-    from_elem = offset+1
+    from_elem = offset + 1
     to_elem = offset + (len(res) if limit else count)
     return {"from": from_elem, 'to': to_elem, 'count': count, 'data': res}
 
@@ -63,13 +64,30 @@ def get_upd(order_id):
     locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
     time = msk_timezone.localize(order.time_created)
     local_time = time.strftime("%d %B %Y г.")
-    upd = render_template('UPD.htm', order=order.get_safe(),
+    upd = render_template('UPD.htm',
+                          order=order.get_safe(),
                           items=order.cart.items,
                           date=local_time, day=time.strftime('%d'),
                           month=time.strftime('%B'),
                           year=time.strftime('%Y')[2:],
                           total_price=order._price)
     return upd
+
+
+def get_bill(order_id):
+    order = utility.get_order(order_id)
+    locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
+    time = msk_timezone.localize(order.time_created)
+    local_time = time.strftime("%d %B %Y г.")
+    bill = render_template('Bill.htm',
+                           commit_hash=commit_hash,
+                           order=order.get_safe(),
+                           items=order.cart.items,
+                           date=local_time, day=time.strftime('%d'),
+                           month=time.strftime('%B'),
+                           year=time.strftime('%Y')[2:],
+                           total_price=order._price)
+    return bill
 
 
 def set_upd(order_id, upd) -> dict:
@@ -101,8 +119,6 @@ def checkout_order(order_id) -> Order:
             order.status == order.Status.STATUS_CLOSED or
             order.status == order.Status.STATUS_EXPORTED):
         raise ValueError('Заказ уже проведен')
-    if order.upd_num is None:
-        raise ValueError('Заполните номер УПД')
     missing_report = check_presence(order_id)
     if len(missing_report) > 0:
         raise ValueError('\r\n'.join(missing_report))
@@ -136,5 +152,6 @@ def create_order(sid: str) -> Order:
     order.time_created = datetime.datetime.now(tz=pytz.timezone('Europe/Moscow'))
     num = int(utility.find_last_order_num()[3:])
     order.order_num = 'РВ-' + str(num + 1)
+    order._number = num + 1
     order.save()
     return order

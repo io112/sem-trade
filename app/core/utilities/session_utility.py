@@ -12,9 +12,26 @@ def delete_session(sid: str):
     Session.delete(session)
 
 
-def get_user_sessions(username: str) -> QuerySet:
-    sessions = Session.objects(user=username)
+def get_user_sessions(username: str, limit=None, offset=None, sorting=None) -> QuerySet:
+    if username is not None:
+        sessions = Session.objects(user=username)
+    else:
+        sessions = Session.objects
+    if offset:
+        sessions = sessions.skip(offset)
+    if limit:
+        sessions = sessions.limit(limit)
+    if sorting:
+        sessions = sessions.order_by(sorting)
     return sessions
+
+
+def count_user_sessions(username: str = None):
+    if username is not None:
+        sessions = Session.objects(user=username)
+    else:
+        sessions = Session.objects
+    return sessions.count()
 
 
 def get_cart(sid: str) -> Cart:

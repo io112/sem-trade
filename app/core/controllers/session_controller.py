@@ -27,11 +27,15 @@ def remove_session(sid: str):
     utility.delete_session(sid)
 
 
-def get_user_sessions(username: str) -> list:
-    sessions = utility.get_user_sessions(username)
+def get_user_sessions(username: str, limit=0, offset=0, sorting='-last_modified') -> dict:
+    sessions = utility.get_user_sessions(username, limit, offset, sorting)
     res = []
     for i in sessions:
         res.append(i.get_safe())
+    count = utility.count_user_sessions(username)
+    from_elem = offset + 1
+    to_elem = offset + (len(res) if limit else count)
+    res = {"from": from_elem, 'to': to_elem, 'count': count, 'data': res}
     return res
 
 

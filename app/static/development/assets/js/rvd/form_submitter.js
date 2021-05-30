@@ -1,6 +1,6 @@
 'use strict'
 
-document.addEventListener("DOMContentLoaded", init);
+window.addEventListener("load", init);
 let as = ''
 let fs = ''
 let fs1 = ''

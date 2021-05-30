@@ -156,12 +156,13 @@ function init_sessions() {
 }
 
 function get_sessions() {
-    send(get_carts_endpoint).then(carts => {
+    request(get_carts_endpoint, {'sorting': '+last_modified'}).then(carts => {
         render_changer(carts)
     })
 }
 
 function render_changer(data) {
+    data = data['data']
     const nav = $('#nav-pager')
     nav.empty()
     const list = $('<ul>').attr('class', 'pagination pagination-lg')

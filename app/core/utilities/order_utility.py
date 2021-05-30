@@ -12,7 +12,7 @@ def get_orders(user=None, limit=None, offset=None):
         res = res.skip(offset)
     if limit:
         res = res.limit(limit)
-    return res.order_by('-time_created')
+    return res.order_by('-_number')
 
 
 def count_orders(user=None):

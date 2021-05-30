@@ -1,10 +1,8 @@
-document.addEventListener("DOMContentLoaded", init);
+window.addEventListener("load", init);
 var current_page = 1
 var limit = 15
 
 function init() {
-    current_page = 1
-    limit = 15
     get_orders_list(current_page, limit)
 }
 
@@ -36,11 +34,11 @@ function get_orders_list(page, limit) {
 
 function render_order_list(data, limit) {
     current_page = Math.floor((data['from'] - 1) / limit) + 1
-    precision = 2
+    let precision = 2
     const nav = $('#nav-pager')
     const l = $('<ul>').attr('class', 'pagination pagination-lg')
     nav.empty()
-    for (let j = current_page - 2; j <= current_page + 2; j++) {
+    for (let j = current_page - precision; j <= current_page + precision; j++) {
         console.log(data['count'])
         if (j > 0 && data['count'] - (j - 1) * limit > 0) {
             let is_active = j === current_page;

@@ -31,6 +31,7 @@ class Order(Document):
         STATUS_CLOSED = 'Закрыт'
 
     order_num = StringField()
+    _number = IntField()
     status = StringField(default=Status.STATUS_CREATED)
     contragent = ReferenceField(Contragent, required=True)
     upd_num = StringField()

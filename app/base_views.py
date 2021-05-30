@@ -100,6 +100,11 @@ def order(order_id):
 def upd(order_id):
     return order_controller.get_upd(order_id)
 
+@app.route('/orders/<string:order_id>/bill', methods=['GET'])
+@login_required
+def bill(order_id):
+    return order_controller.get_bill(order_id)
+
 
 @app.route('/create_user', methods=['GET'])
 @login_required

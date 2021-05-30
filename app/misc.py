@@ -32,7 +32,7 @@ def make_cookie_resp(url, sid=None):
     else:
         session = start_session(current_user.username)
         resp = make_response(redirect(url_for(url)))
-        resp.set_cookie('current_order', session.get_id())
+        resp.set_cookie('current_order', session.id)
     return resp
 
 
@@ -46,7 +46,6 @@ def sid_required(view):
                 resp = make_cookie_resp('home', sid)
             else:
                 resp = make_cookie_resp('home')
-                resp.delete_cookie('current_order')
             return resp
         sid = request.cookies.get('current_order')
         if not check_sid(sid):

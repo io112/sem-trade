@@ -23,3 +23,5 @@ COPY --from=compile-image /root/.local /root/.local
 COPY --from=compile-image /app/ /app/
 COPY  --from=compile-image /app/app/uwsgi.ini /app/uwsgi.ini
 
+
+
