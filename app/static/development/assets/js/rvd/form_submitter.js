@@ -278,7 +278,8 @@ async function send(endpoint, data = {}) {
 }
 
 async function getCurrentSelection() {
-    let resp = await send('/api/make_order/get_offer');
+    let only_present = $('#rvd_only_present').is(':checked')
+    let resp = await request('/api/make_order/get_offer', {'only_present': only_present});
     if (resp !== 'NaN') {
         console.log(resp)
         current_selection = resp['selection']

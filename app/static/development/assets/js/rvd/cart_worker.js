@@ -38,9 +38,10 @@ var saveData = (function () {
     };
 }());
 
+
 function find_part() {
     let form_data = $('#part_form').serializeArray()
-    send('/api/make_order/find_part', form_data).then(resp => render_parts(resp))
+    request('/api/make_order/find_part', form_data).then(resp => render_parts(resp))
 
 }
 

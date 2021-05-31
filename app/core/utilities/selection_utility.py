@@ -20,30 +20,41 @@ def create_selection() -> RVDSelection:
     return calc_subtotal(RVDSelection())
 
 
-def find_part(collection: BaseItem, query: str):
-    res = collection.objects.search_text(query)
+def find_part(collection: BaseItem, query: str, only_present):
+    if only_present:
+        res = collection.objects(amount__gt=0)
+    else:
+        res = collection.objects
+    res = res.search_text(query)
     for i in res:
         i.price = round(i.price * price_coefficient, 2)
     return res
 
 
-def get_candidates_by_params(selection: RVDSelection):
+def get_candidates_by_params(selection: RVDSelection, only_present):
     items = selection.items or {}
+    present_filter = {'amount__gt': 0} if only_present else None
     fiting1 = items.get("fiting1", {})
     fiting2 = items.get("fiting2", {})
     clutch1 = items.get("clutch1", {})
     clutch2 = items.get("clutch2", {})
     arm = items.get("arm", {})
-    clutch_params = not_zero_amount
-    arms = queryset_to_list(Arm.objects().filter_params(arm))
-    clutch1 = queryset_to_list(Clutch.objects().filter_params(clutch1))
-    clutch2 = queryset_to_list(Clutch.objects().filter_params(clutch2))
-    fiting1 = queryset_to_list(Fiting.objects().filter_params(fiting1))
-    fiting2 = queryset_to_list(Fiting.objects().filter_params(fiting2))
+    arms = queryset_to_list(__get_filtered_item(Arm, only_present, arm))
+    clutch1 = queryset_to_list(__get_filtered_item(Clutch, only_present, clutch1))
+    clutch2 = queryset_to_list(__get_filtered_item(Clutch, only_present, clutch2))
+    fiting1 = queryset_to_list(__get_filtered_item(Fiting, only_present, fiting1))
+    fiting2 = queryset_to_list(__get_filtered_item(Fiting, only_present, fiting2))
     res = {'arm': arms, 'clutch1': clutch1, 'clutch2': clutch2,
            'fiting1': fiting1, 'fiting2': fiting2}
     return res
 
+
+def __get_filtered_item(item, only_present, params):
+    if only_present:
+        res = item.objects(amount__gt=0)
+    else:
+        res = item.objects
+    return res.filter_params(params)
 
 def get_parameters_list(all_candidates: dict) -> dict:
     res = {}

@@ -16,9 +16,16 @@
       </div>
       <div class="modal-body">
         <form id="part_form">
+          <div class="d-flex align-items-center form-group">
+            <label class="custom-toggle">
+              <input id="part_only_present" onclick="find_part()" name="only_present" type="checkbox" checked>
+              <span class="custom-toggle-slider rounded-circle"></span>
+            </label>
+            <div class="ml-2">только в наличии</div>
+          </div>
           <div class="form-group">
             <label class="form-control-label" for="input-category">Категория</label>
-            <select name="collection" class="form-control fstdropdown-select" id="input-category">
+            <select onchange="find_part()" name="collection" class="form-control fstdropdown-select" id="input-category">
               <option value="">Выберите категорию товара</option>
               <option value="fiting">Фитинг</option>
               <option value="clutch">Муфта</option>

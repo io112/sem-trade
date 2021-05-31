@@ -119,9 +119,8 @@ def update_session_view():
 @login_required
 @sid_required
 def find_part():
-    data = json.loads(request.form.get('data', []))
-
-    res = selection_controller.find_part(data[0]['value'], data[1]['value'])
+    data = request.form
+    res = selection_controller.find_part(data['collection'], data['query'], data.get('only_present'))
     return jsonify(res)
 
 
@@ -236,12 +235,7 @@ def move_selection_to_cart():
 @login_required
 def get_offer():
     sid = request.cookies.get('current_order')
-    res = selection_controller.get_filtered_params(sid)
-    # if errors:
-    #     return '\r\n'.join(errors)
-    # result = offer.create_cart_item(False)
-    # if not result:
-    #     return 'success'
+    res = selection_controller.get_filtered_params(sid, request.form.get('only_present'))
     return jsonify(res)
 
 
