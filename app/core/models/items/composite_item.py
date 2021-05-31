@@ -1,12 +1,11 @@
 from typing import List
 
-from mongoengine import ListField, GenericReferenceField, FloatField, StringField, EmbeddedDocument, IntField, \
+from mongoengine import ListField, FloatField, StringField, EmbeddedDocument, IntField, \
     EmbeddedDocumentField
 
 from app.core.models.items.base import BaseItem
 from app.core.models.items.cart_item import CartItem
 from app.core.models.utils import create_simple_item
-
 # noinspection SpellCheckingInspection
 from app.core.utilities.common import document_to_dict
 

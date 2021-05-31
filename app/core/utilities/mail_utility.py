@@ -1,4 +1,5 @@
-import smtplib, ssl
+import smtplib
+import ssl
 from email.header import Header
 from email.mime.text import MIMEText
 

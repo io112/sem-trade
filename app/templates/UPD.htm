@@ -1,7 +1,8 @@
 <html xmlns:o="urn:schemas-microsoft-com:office:office"
       xmlns:x="urn:schemas-microsoft-com:office:excel"
       xmlns="http://www.w3.org/TR/REC-html40">
-
+{#<script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>#}
+<link href="/../static/{{ commit_hash }}/assets/css/interface.css" rel="stylesheet" type="text/css">
 <head>
   {#  <meta name="pdfkit-page-size" content="A4"/>#}
   <meta name="pdfkit-orientation" content="Landscape"/>
@@ -2150,7 +2151,7 @@
           {% endif %}</td>
         <td colspan=6 class=xl10625777
             style='border-right:.5pt solid black;border-left:none'>
-        {% if item.item %}
+          {% if item.item %}
             {{ item.item.MeasureName }}
           {% else %}
             {{ item.MeasureName }}

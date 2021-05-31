@@ -1,12 +1,13 @@
 import copy
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass
+from datetime import datetime
+from datetime import timedelta
 
 import pymongo
 import pytz
 from mongoengine import Document, StringField, ReferenceField, FloatField, BooleanField, EmbeddedDocumentField, \
     DateTimeField, IntField
-from pytz import tzinfo
-from datetime import timedelta
 
 from app.core.models.cart import Cart
 from app.core.models.items.base import BaseItem
@@ -18,8 +19,6 @@ from app.core.models.сontragent import Contragent
 from app.core.utilities.common import document_to_dict
 from app.db import base as db
 from app.db.variables import *
-from datetime import datetime
-import xml.etree.ElementTree as ET
 
 
 class Order(Document):

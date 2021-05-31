@@ -1,11 +1,11 @@
+from datetime import datetime, timedelta
 from typing import Optional
 
+from app.constants import root_password, root_username
 from app.core.controllers import mail_controller
 from app.core.models.user import User
-from app.constants import root_password, root_username
 from app.core.models.user_token import UserToken
 from app.core.utilities import users_utility as utility
-from datetime import datetime, timedelta
 
 token_timeout = timedelta(days=3)
 

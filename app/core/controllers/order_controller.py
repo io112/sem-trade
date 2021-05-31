@@ -2,22 +2,16 @@ import datetime
 import locale
 from typing import List
 
-import pymongo
 import pytz
-from bson import ObjectId
 from flask import render_template
 
+import app.core.utilities.order_utility as utility
 from app.api_views import msk_timezone
-from app.core.controllers import session_controller
+from app.constants import *
 from app.core.models.items.composite_item import CompositeItem
 from app.core.models.order import Order
 from app.core.models.user import User
 from app.core.utilities import session_utility
-from app.db import base as db
-from app.db.variables import order_collection
-import app.core.utilities.order_utility as utility
-from app.core.utilities.common import *
-from app.constants import *
 
 
 def get_all_orders(user=None, limit=None, offset=None) -> dict:
@@ -70,14 +64,15 @@ def get_upd(order_id):
                           date=local_time, day=time.strftime('%d'),
                           month=time.strftime('%B'),
                           year=time.strftime('%Y')[2:],
-                          total_price=order._price)
+                          total_price=order._price,
+                          commit_hash=commit_hash)
     return upd
 
 
 def get_bill(order_id):
     order = utility.get_order(order_id)
     locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
-    time = msk_timezone.localize(order.time_created)
+    time = msk_timezone.localize(datetime.datetime.now())
     local_time = time.strftime("%d %B %Y г.")
     bill = render_template('Bill.htm',
                            commit_hash=commit_hash,

@@ -2,8 +2,6 @@ import app.core.utilities.session_utility as utility
 from app.core.models.cart import Cart
 from app.core.models.items.composite_item import CompositeItem
 from app.core.models.selection import RVDSelection
-from app.core.models.session import Session
-from app.core.models.user import User
 from app.core.utilities import contragent_utility, selection_utility
 from app.core.utilities.common import *
 

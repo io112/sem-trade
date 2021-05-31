@@ -1,5 +1,5 @@
-from app.core.models.items.base import BaseItem
 import app.db.variables as dbvars
+from app.core.models.items.base import BaseItem
 
 
 class Clutch(BaseItem):
@@ -26,4 +26,3 @@ class Clutch(BaseItem):
     def get_item_params(self) -> list:
         return ["_id", "arm_type", "diameter",
                 "measure", "name", "type", "price"]
-

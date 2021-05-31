@@ -8,7 +8,6 @@ from flask_login import login_required, current_user
 from app import app
 from app.core.controllers import order_controller, selection_controller, session_controller, contragent_controller, \
     users_controller
-from app.core.models.user import User
 from app.misc import sid_required, check_sid
 
 # ----------------SESSION ENDPOINTS---------------

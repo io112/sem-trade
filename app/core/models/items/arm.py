@@ -1,7 +1,5 @@
-from mongoengine import Document
-
-from app.core.models.items.base import BaseItem
 import app.db.variables as dbvars
+from app.core.models.items.base import BaseItem
 
 
 class Arm(BaseItem):

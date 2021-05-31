@@ -1,8 +1,6 @@
-from mongoengine import ListField, FloatField, EmbeddedDocument, GenericReferenceField, GenericEmbeddedDocumentField, \
-    signals
+from mongoengine import ListField, FloatField, EmbeddedDocument, GenericEmbeddedDocumentField
 
 from app.core.models.items.base import BaseItem
-from app.core.models.utils import create_item
 from app.core.utilities.common import document_to_dict
 
 

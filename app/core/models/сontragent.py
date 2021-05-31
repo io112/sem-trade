@@ -1,9 +1,6 @@
-from bson import ObjectId
 from mongoengine import Document, StringField, BooleanField, ValidationError
 
-import app.db.base as db
 from app.core.utilities.common import document_to_dict
-from app.db.variables import contragent_collection
 
 
 class Contragent(Document):

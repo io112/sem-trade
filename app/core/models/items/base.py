@@ -1,13 +1,10 @@
 import copy
-from abc import ABC, abstractmethod
-from copy import deepcopy
+from abc import abstractmethod
 
 from mongoengine import Document, QuerySet
 from mongoengine.fields import DictField, FloatField, StringField
 
 import app.db.base as db
-import xml.etree.ElementTree as ET
-
 from app.core.utilities.common import document_to_dict
 
 

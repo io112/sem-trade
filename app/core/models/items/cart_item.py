@@ -1,7 +1,8 @@
+import xml.etree.ElementTree as ET
+
 from mongoengine import EmbeddedDocument, GenericReferenceField, FloatField, StringField
 
 from app.core.utilities.common import document_to_dict
-import xml.etree.ElementTree as ET
 
 
 class CartItem(EmbeddedDocument):

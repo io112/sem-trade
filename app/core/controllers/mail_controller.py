@@ -1,6 +1,6 @@
+from app.constants import *
 from app.core.models.user_token import UserToken
 from app.core.utilities import mail_utility as utility
-from app.constants import *
 
 
 def send_user_created_email(user_token: UserToken):

@@ -1,9 +1,9 @@
 import secrets
+from datetime import datetime
 
 from mongoengine import Document, ReferenceField, StringField, DateTimeField, signals
 
 from app.core.models.user import User
-from datetime import datetime
 
 
 def save_handler(event):

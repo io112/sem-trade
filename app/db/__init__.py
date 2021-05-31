@@ -1,9 +1,9 @@
 from urllib.parse import quote_plus
-from app.constants import db_name, db_login, db_password, db_host
 
+from mongoengine import connect
 from pymongo import MongoClient
-from mongoengine import connect, register_connection
 
+from app.constants import db_name, db_login, db_password, db_host
 
 uri = f"mongodb://%s:%s@%s/%s" % (
     quote_plus(db_login),

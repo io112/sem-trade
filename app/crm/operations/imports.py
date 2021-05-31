@@ -1,10 +1,10 @@
 from app.crm.models.arm import Arm
-from app.crm.variables import *
+from app.crm.models.base import SiteObj
+from app.crm.models.clutch import Clutch
 from app.crm.models.fiting import Fiting
 from app.crm.models.offer import Offer
-from app.db.base import update_upsert, replace_upsert
-from app.crm.models.clutch import Clutch
-from app.crm.models.base import SiteObj
+from app.crm.variables import *
+from app.db.base import update_upsert
 from app.db.variables import *
 
 

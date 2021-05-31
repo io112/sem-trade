@@ -22,7 +22,6 @@ def start_session(user=''):
 def end_session(sid):
     session_utility.delete_session(sid)
 
-
 # def update_session(session):
 #     set_session(session)
 #

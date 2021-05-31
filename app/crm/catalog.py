@@ -1,9 +1,11 @@
+import io
+import zipfile
+from os import path
+
+from lxml import etree
+
 from app.constants import max_filesize, tmp_catalog
 from app.crm.operations import imports
-from os import path
-import zipfile
-import io
-from lxml import etree
 
 
 def catalog_router(args, data):

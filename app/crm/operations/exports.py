@@ -15,7 +15,7 @@ def export_orders() -> str:
     res.attrib['xmlns:xsi'] = "http://www.w3.org/2001/XMLSchema-instance"
     res.attrib['ВерсияСхемы'] = '2.04'
     res.attrib['ДатаФормирования'] = datetime.now(tz=pytz.timezone('Europe/Moscow')).strftime(
-            "%Y-%m-%dT%H:%M:%S")
+        "%Y-%m-%dT%H:%M:%S")
 
     for i in orders:
         res.append(i.create_xml_doc())

@@ -4,8 +4,6 @@ from mongoengine import Document, StringField, BooleanField
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.core.utilities.common import document_to_dict
-from app.db import base as db
-from app.db.variables import users_collection
 
 
 class User(UserMixin, Document):

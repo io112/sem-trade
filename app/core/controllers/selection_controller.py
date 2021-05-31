@@ -3,8 +3,8 @@ from mongoengine import QuerySet
 
 import app.core.utilities.selection_utility as utility
 from app.core.models.items.cart_item import CartItem
-from app.core.utilities.selection_utility import collections
 from app.core.models.session import Session
+from app.core.utilities.selection_utility import collections
 
 msk_timezone = pytz.timezone('Europe/Moscow')
 

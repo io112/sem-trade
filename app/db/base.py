@@ -1,7 +1,6 @@
-from typing import Dict
+from pymongo import ReplaceOne, UpdateOne
 
 from app.db import db
-from pymongo import ReplaceOne, UpdateOne
 
 
 def insert(collection, data):
@@ -29,7 +28,7 @@ def update(collection, query, update_data: dict, upsert=False):
     db[collection].bulk_write(requests)
 
 
-def find_one(collection, query,fields=None, sorting=None):
+def find_one(collection, query, fields=None, sorting=None):
     if sorting is None:
         sorting = []
     return db[collection].find_one(query, fields, sort=sorting)

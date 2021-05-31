@@ -56,6 +56,7 @@ def __get_filtered_item(item, only_present, params):
         res = item.objects
     return res.filter_params(params)
 
+
 def get_parameters_list(all_candidates: dict) -> dict:
     res = {}
     for key, value in all_candidates.items():

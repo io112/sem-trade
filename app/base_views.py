@@ -1,8 +1,5 @@
-import functools
-import sys
-
 import pytz
-from flask import request, render_template, redirect, url_for, make_response
+from flask import request, render_template, redirect, url_for
 from flask_httpauth import HTTPBasicAuth
 from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.urls import url_parse
@@ -12,7 +9,6 @@ from app.constants import *
 from app.core.controllers import order_controller, users_controller
 from app.core.controllers.users_controller import login_using_token
 from app.core.models.user import User
-from app.core.sessions import *
 from app.crm import base
 from app.misc import sid_required, redirect_restore_pass
 
@@ -99,6 +95,7 @@ def order(order_id):
 @login_required
 def upd(order_id):
     return order_controller.get_upd(order_id)
+
 
 @app.route('/orders/<string:order_id>/bill', methods=['GET'])
 @login_required

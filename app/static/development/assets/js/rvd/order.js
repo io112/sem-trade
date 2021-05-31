@@ -3,6 +3,7 @@ window.addEventListener("load", init);
 let order_id = ''
 let order = {}
 
+
 function init() {
     let path = window.location.pathname.split('/');
     order_id = path[path.length - 1];

@@ -1,7 +1,6 @@
-from typing import Optional, Union
+from typing import Union
 
-from bson import ObjectId
-from mongoengine import QuerySet, Document, DictField, GenericReferenceField, EmbeddedDocumentField, EmbeddedDocument
+from mongoengine import QuerySet, Document, EmbeddedDocument
 
 
 def queryset_to_list(qs: QuerySet):

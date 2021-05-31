@@ -2,8 +2,6 @@ import app.db.base as db
 import app.db.variables as dbvars
 from app.core.models.cart import Cart
 from app.core.models.items.arm import Arm
-from app.core.models.items.base import BaseItem
-from app.core.models.items.composite_item import CompositeItem
 from app.core.models.selection import RVDSelection
 from app.core.models.session import Session
 
