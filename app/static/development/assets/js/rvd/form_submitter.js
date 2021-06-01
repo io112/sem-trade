@@ -320,7 +320,7 @@ function updateSelectionSubtotal() {
         '<span class="name mb-0 text-sm">' + name + '</span>\n' +
         '</td>\n' +
         '<td class="number">\n' +
-        '<input class="form-control" id="subtotal_amount" onchange="changeSelectAmount()" type="number" placeholder="количество" value="' + amount + '">\n' +
+        '<input class="form-control form-control-sm" id="subtotal_amount" onchange="changeSelectAmount()" type="number" placeholder="количество" value="' + amount + '">\n' +
         '</td>\n' +
         '<td class="price">\n' + price +
         ' ₽\n' +

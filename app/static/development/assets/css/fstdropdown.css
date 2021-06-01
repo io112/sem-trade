@@ -15,11 +15,12 @@
     font-size: .875rem;
     font-weight: 400;
     line-height: 1.5;
+    /*height: calc(.45em + 1.25rem + 5px);*/
 
     display: block;
 
     width: 100%;
-    padding: .625rem .75rem;
+    /*padding: .625rem .75rem;*/
 
     transition: all .15s cubic-bezier(.68, -.55, .265, 1.55);
 
