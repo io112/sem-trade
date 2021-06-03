@@ -16,3 +16,35 @@ async function request(endpoint, data = {}) {
         }
     });
 }
+
+
+function tryParseFloat(val) {
+    let res = val
+    let regex = /^[+-]?([0-9]*([.]|[,]))?[0-9]+$/;
+    if (regex.test(res) && res.length > 0) {
+        res = parseFloat(val)
+        console.log(res)
+    }
+    return res
+}
+
+function clean_form(mas) {
+    let res = []
+    mas.forEach(i => {
+        if (i.value !== '') {
+            res.push(i)
+        }
+    })
+    return res
+}
+
+function formToDict(mas) {
+    let res = {}
+    mas.forEach(i => {
+        if (i.value !== '') {
+            let val = tryParseFloat(i.value)
+            res[i.name] = val
+        }
+    })
+    return res
+}

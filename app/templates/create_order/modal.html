@@ -9,32 +9,28 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="d-flex align-items-center form-group">
-          <label class="custom-toggle">
-            <input id="rvd_only_present" onclick="updateAllSections()" name="only_present" type="checkbox" checked>
-            <span class="custom-toggle-slider rounded-circle"></span>
-          </label>
-          <div class="ml-2">только в наличии</div>
+        <div id="rvd-modal-body">
+          <div class="d-flex align-items-center form-group">
+            <label class="custom-toggle">
+              <input id="rvd_only_present" onclick="updateAllSections()" name="only_present" type="checkbox" checked>
+              <span class="custom-toggle-slider rounded-circle"></span>
+            </label>
+            <div class="ml-2">только в наличии</div>
+          </div>
+
         </div>
-        <!-- Рукав -->
-        <h6 class="heading-small mb-2">Выбор рукава</h6>
-        <div class="pl-lg-4">
-          {% include 'create_order/arm_section.html' %}
-        </div>
-        <div class="col-4 text-left">
-          <a href="#!" onclick="dropArm()" class="btn btn-sm btn-primary">Сбросить рукав</a>
-        </div>
-        <hr class="my-4"/>
-        <!-- Фитинги -->
-        <h6 class="heading-small mb-2">Фитинги</h6>
-        <div class="pl-lg-4">
-          {% include 'create_order/fiting_section.html' %}
-        </div>
-        <div class="col-4 text-left">
-          <a href="#!" onclick="dropFits()" class="btn btn-sm btn-primary">Сбросить фитинги</a>
-          <a href="#!" onclick="dropClutches()" class="btn btn-sm btn-primary">Сбросить муфты</a>
+        <div class="d-flex text-left w-50">
+          <a href="#!" onclick="addSection()" class="btn btn-sm btn-primary">Добавить секцию</a>
+          <select name="section-type" class="form-control form-control-sm fstdropdown-select" id="input-section-type">
+            <option value="">Выберите секцию</option>
+            <option value="arm">Рукав</option>
+            <option value="fiting">Фитинг</option>
+            <option value="clutch">Муфта</option>
+            <option value="pipe">Трубка</option>
+          </select>
         </div>
         <hr class="my-4"/>
+
         <!-- Description -->
         <h6 class="heading-small mb-2">Подытог</h6>
         <div class="table-responsive">

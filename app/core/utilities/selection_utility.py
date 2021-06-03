@@ -33,19 +33,14 @@ def find_part(collection: BaseItem, query: str, only_present):
 
 def get_candidates_by_params(selection: RVDSelection, only_present):
     items = selection.items or {}
-    present_filter = {'amount__gt': 0} if only_present else None
-    fiting1 = items.get("fiting1", {})
-    fiting2 = items.get("fiting2", {})
-    clutch1 = items.get("clutch1", {})
-    clutch2 = items.get("clutch2", {})
-    arm = items.get("arm", {})
-    arms = queryset_to_list(__get_filtered_item(Arm, only_present, arm))
-    clutch1 = queryset_to_list(__get_filtered_item(Clutch, only_present, clutch1))
-    clutch2 = queryset_to_list(__get_filtered_item(Clutch, only_present, clutch2))
-    fiting1 = queryset_to_list(__get_filtered_item(Fiting, only_present, fiting1))
-    fiting2 = queryset_to_list(__get_filtered_item(Fiting, only_present, fiting2))
-    res = {'arm': arms, 'clutch1': clutch1, 'clutch2': clutch2,
-           'fiting1': fiting1, 'fiting2': fiting2}
+    res = {}
+    for key, value in items.items():
+        t = value.get('type')
+        if t is None:
+            continue
+        type_item = collections.get(t)
+        if type_item is not None:
+            res[key] = queryset_to_list(__get_filtered_item(type_item, only_present, value))
     return res
 
 
@@ -108,15 +103,26 @@ def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
     if not (selection and selection.items):
         return {}
     items = selection.items
-    for i, obj in item_objects.items():
-        if i in items and 'id' in items[i]:
-            amount = items[i]['amount'] if items[i].get('amount') is not None else 1
-            id = items[i]['id']
+    for key, value in items.items():
+        obj = collections.get(value['type'])
+        if obj is not None and 'id' in value:
+            amount = value['amount'] if value.get('amount') is not None else 1
+            id = value['id']
             item = obj.objects(id=id)[0]
             price = round(item.price * price_coefficient, 2)
             cart_item = CartItem(name=item.name, item=item, amount=amount,
                                  price=price, total_price=round(price * amount, 2))
-            res[i] = cart_item
+            res[key] = cart_item
+    #
+    # for i, obj in item_objects.items():
+    #     if i in items and 'id' in items[i]:
+    #         amount = items[i]['amount'] if items[i].get('amount') is not None else 1
+    #         id = items[i]['id']
+    #         item = obj.objects(id=id)[0]
+    #         price = round(item.price * price_coefficient, 2)
+    #         cart_item = CartItem(name=item.name, item=item, amount=amount,
+    #                              price=price, total_price=round(price * amount, 2))
+    #         res[i] = cart_item
     return res
 
 

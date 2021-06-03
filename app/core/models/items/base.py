@@ -21,6 +21,10 @@ class ItemsQuerySet(QuerySet):
         filter_dict = copy.deepcopy(params_dict)
         if 'amount' in filter_dict:
             del filter_dict['amount']
+        if 'type' in filter_dict:
+            del filter_dict['type']
+        if 'part_name' in filter_dict:
+            del filter_dict['part_name']
         if 'id' in filter_dict:
             query_filter = {'_id': filter_dict['id']}
         else:

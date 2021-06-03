@@ -110,7 +110,7 @@ def checkout_order(order_id):
 @sid_required
 def update_session_view():
     sid = request.cookies.get('current_order')
-    data = json.loads(request.form.get('data', []))
+    data = json.loads(request.form.get('data', {}))
     return selection_controller.update_selection(sid, data)
 
 
