@@ -144,7 +144,7 @@ function dropClutches() {
 }
 
 function writeToSession(sid, data) {
-    return request("/api/make_order/update_selection_items", data)
+    return send("/api/make_order/update_selection_items", data)
 }
 
 function updateArmSection() {
