@@ -8,6 +8,7 @@ from app.core.utilities.common import document_to_dict
 class CartItem(EmbeddedDocument):
     item = GenericReferenceField()
     name = StringField()
+    local_name = StringField()
     amount = FloatField()
     price = FloatField()
     total_price = FloatField()

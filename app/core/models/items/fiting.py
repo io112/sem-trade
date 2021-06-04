@@ -15,6 +15,11 @@ class Fiting(BaseItem):
     def get_param_name() -> str:
         return "fiting"
 
+    def get_selection_name(self) -> str:
+        type = self.parameters.get('fiting_type', '')
+        carving = self.parameters.get('carving', '')
+        return f'({type} {carving})'
+
     def get_filter_params(self) -> dict:
         dictvals = ["name",
                     "carving",

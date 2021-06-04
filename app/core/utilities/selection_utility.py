@@ -33,19 +33,14 @@ def find_part(collection: BaseItem, query: str, only_present):
 
 def get_candidates_by_params(selection: RVDSelection, only_present):
     items = selection.items or {}
-    present_filter = {'amount__gt': 0} if only_present else None
-    fiting1 = items.get("fiting1", {})
-    fiting2 = items.get("fiting2", {})
-    clutch1 = items.get("clutch1", {})
-    clutch2 = items.get("clutch2", {})
-    arm = items.get("arm", {})
-    arms = queryset_to_list(__get_filtered_item(Arm, only_present, arm))
-    clutch1 = queryset_to_list(__get_filtered_item(Clutch, only_present, clutch1))
-    clutch2 = queryset_to_list(__get_filtered_item(Clutch, only_present, clutch2))
-    fiting1 = queryset_to_list(__get_filtered_item(Fiting, only_present, fiting1))
-    fiting2 = queryset_to_list(__get_filtered_item(Fiting, only_present, fiting2))
-    res = {'arm': arms, 'clutch1': clutch1, 'clutch2': clutch2,
-           'fiting1': fiting1, 'fiting2': fiting2}
+    res = {}
+    for key, value in items.items():
+        t = value.get('type')
+        if t is None:
+            continue
+        type_item = collections.get(t)
+        if type_item is not None:
+            res[key] = queryset_to_list(__get_filtered_item(type_item, only_present, value))
     return res
 
 
@@ -93,12 +88,12 @@ def calc_subtotal(selection: RVDSelection) -> RVDSelection:
     total_amount = selection.subtotal.get('amount', 1)
     if total_amount is None:
         total_amount = 1
-    items = selection.items
-    for _, obj in get_selected_items(selection).items():
+    selected_items = get_selected_items(selection)
+    for _, obj in selected_items.items():
         price += obj.total_price
     selection.subtotal['price'] = price
     selection.subtotal['total_price'] = price * total_amount
-    selection.subtotal['name'] = create_selection_name(items)
+    selection.subtotal['name'] = create_selection_name(selected_items)
     selection.subtotal['amount'] = total_amount
     return selection
 
@@ -108,31 +103,26 @@ def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
     if not (selection and selection.items):
         return {}
     items = selection.items
-    for i, obj in item_objects.items():
-        if i in items and 'id' in items[i]:
-            amount = items[i]['amount'] if items[i].get('amount') is not None else 1
-            id = items[i]['id']
+    for key, value in items.items():
+        obj = collections.get(value['type'])
+        if obj is not None and 'id' in value:
+            amount = value['amount'] if value.get('amount') is not None else 1
+            id = value['id']
             item = obj.objects(id=id)[0]
             price = round(item.price * price_coefficient, 2)
-            cart_item = CartItem(name=item.name, item=item, amount=amount,
+            cart_item = CartItem(name=item.name, local_name=value.get('part_name', ''), item=item, amount=amount,
                                  price=price, total_price=round(price * amount, 2))
-            res[i] = cart_item
+            res[key] = cart_item
     return res
 
 
-def create_selection_name(items: dict):
-    arm = items.get('arm', {})
-    fit1 = items.get('fiting1', {})
-    fit2 = items.get('fiting2', {})
-    arm_type = arm.get('arm_type', '')
-    diameter = arm.get('diameter', '')
-    braid = arm.get('braid', '')
-    fit1_d = fit1.get('diameter', '')
-    fit2_d = fit2.get('diameter', '')
-    fit1_type = fit1.get('fiting_type', '')
-    fit2_type = fit2.get('fiting_type', '')
-    fit1_carving = fit1.get('carving', '')
-    fit2_carving = fit2.get('carving', '')
-    return f'Рукав {arm_type}x{diameter} {braid} ' \
-           f'({fit1_type} d:{fit1_d} {fit1_carving})+' \
-           f'({fit2_type} d:{fit2_d} {fit2_carving})'
+def create_selection_name(items: Dict[str, CartItem]):
+    arms = ''
+    fitings = ''
+    for i in items.values():
+        item = i.item
+        if type(item) == Arm:
+            arms += (' ' if arms != '' else '') + item.get_selection_name()
+        if type(item) == Fiting:
+            fitings += ('+' if fitings != '' else '') + item.get_selection_name()
+    return f'Рукав {arms} {fitings}'

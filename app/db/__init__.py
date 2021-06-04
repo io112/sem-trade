@@ -1,5 +1,7 @@
+from os import path
 from urllib.parse import quote_plus
 
+from mongodb_migrations.cli import MigrationManager
 from mongoengine import connect
 from pymongo import MongoClient
 
@@ -24,3 +26,11 @@ def init():
     client = MongoClient(uri)
     connect(db=db_name, username=db_login, password=db_password, host=db_host)
     db = client[db_name]
+    migrate()
+
+
+def migrate():
+    manager = MigrationManager()
+    manager.config.mongo_url = uri
+    manager.config.mongo_migrations_path = path.abspath(path.join('app', 'migrations'))
+    manager.run()

@@ -5,6 +5,7 @@ from app.crm.variables import fiting_cat_id
 class Fiting(SiteObj):
     fiting_type_name = 'Тип фиттинга'
     diameter_name = 'Диаметр'
+    angle_name = 'Угол'
     carving_name = 'Резьба'
 
     def __init__(self):
@@ -29,4 +30,6 @@ class Fiting(SiteObj):
                 res.parameters['fiting_type'] = i[2].text
             elif i[1].text == Fiting.diameter_name:
                 res.parameters['diameter'] = float(i[2].text)
+            elif i[1].text == Fiting.angle_name:
+                res.parameters['angle'] = float(i[2].text)
         return res

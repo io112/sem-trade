@@ -25,14 +25,14 @@ def route_remove_session():
         abort(404, 'session not found')
     session_controller.remove_session(sid)
     sessions = session_controller.get_user_sessions(current_user.username)
-    sessions = sessions['data']
+    sessions = sessions
     resp = make_response(jsonify(sessions))
     current_order = request.cookies.get('current_order')
     if current_order is not None and current_order == sid:
         if len(sessions) == 0:
             resp.delete_cookie('current_order')
         else:
-            resp.set_cookie('current_order', sessions[0]['_id'])
+            resp.set_cookie('current_order', sessions['data'][0]['_id'])
     return resp
 
 
@@ -110,7 +110,7 @@ def checkout_order(order_id):
 @sid_required
 def update_session_view():
     sid = request.cookies.get('current_order')
-    data = json.loads(request.form.get('data', []))
+    data = json.loads(request.form.get('data', {}))
     return selection_controller.update_selection(sid, data)
 
 
