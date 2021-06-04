@@ -92,8 +92,8 @@ def add_selection_to_cart(sid: str):
         if i.amount <= 0:
             raise ValueError(f'Выбрано 0 или меньше предметов: {i.name}')
         items.append(i)
-    if len(items) == 0:
-        raise ValueError('Не выделен ни один компонент')
+    if len(items) != len(selection.items):
+        raise ValueError('Выбраны не все компоненты')
     item = CompositeItem()
     item.items = items
     item.price = selection.subtotal['price']

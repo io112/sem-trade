@@ -70,4 +70,21 @@ def set_part(session_id: str, collection: str, part_id: str, amount: float):
 def update_selection(session_id: str, selection: dict):
     session: QuerySet = Session.objects(id=session_id)
     session: Session = session[0]
+    if selection['items'] is not None:
+        selection['items'] = set_linked_params(selection['items'])
     return utility.save_selection(session, selection['items'], selection['subtotal'])
+
+
+def set_linked_params(items: dict) -> dict:
+    DN = None
+    for item in items.values():
+        if item['type'] == 'arm':
+            DN = item.get('diameter')
+            break
+    for item in items.values():
+        if item['type'] == 'clutch' or item['type'] == 'fiting':
+            if DN is not None:
+                item['diameter'] = DN
+            elif item.get('diameter'):
+                del item['diameter']
+    return items

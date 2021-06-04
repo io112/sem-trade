@@ -29,7 +29,7 @@ def get_order(order_id):
 
 
 def find_last_order_num():
-    last_num = Order.objects().order_by('-order_num').only('order_num')
-    if last_num.count() == 0 or last_num[0].order_num is None:
-        return 'РВ-0'
-    return last_num[0].order_num
+    last_num = Order.objects().order_by('-_number').only('_number')
+    if last_num.count() == 0 or last_num[0]._number is None:
+        return 1
+    return last_num[0]._number

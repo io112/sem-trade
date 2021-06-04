@@ -146,7 +146,7 @@ def create_order(sid: str) -> Order:
     order._price = session.cart.subtotal
     order.sale = session.sale
     order.time_created = datetime.datetime.now(tz=pytz.timezone('Europe/Moscow'))
-    num = int(utility.find_last_order_num()[3:])
+    num = utility.find_last_order_num()
     order.order_num = 'РВ-' + str(num + 1)
     order._number = num + 1
     order.save()

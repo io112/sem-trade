@@ -18,7 +18,7 @@ let current_selection = {
     "subtotal": {},
 }
 
-let selection_items = {}
+let selection_items = []
 
 let parameters = {
     "arm": {},
@@ -334,7 +334,9 @@ function addToCart() {
 
 function submitSelection() {
     let data = {}
-    for (const [key, value] of Object.entries(selection_items)) {
+    for (const item of selection_items) {
+        let key = item[0]
+        let value = item[1]
         data[key] = value.collectData();
     }
     current_selection['items'] = data;
@@ -345,9 +347,11 @@ function submitSelection() {
 function updateSections(data) {
     console.log(data)
     let select = data['selection']['items']
-    for (const key of Object.keys(select)) {
-        if (selection_items[key] !== undefined)
-            selection_items[key].setData(data);
+    for (const item of selection_items) {
+        let key = item[0]
+        let value = item[1]
+        if (select[key] !== undefined)
+            value.setData(data);
     }
 }
 
@@ -357,17 +361,13 @@ const selectionModalParent = $('#' + selectionModalParentId);
 function addSection() {
     let section_type_s = $('#input-section-type').val()
     let section_type = getSectionType(section_type_s)
-    let num = 1
-    if (Object.keys(selection_items).length !== 0) {
-        let vals = Object.values(selection_items)
-        console.log(vals)
-        num = (vals[vals.length - 1].num + 1)
-    }
+    let num = getLastSectionNum() + 1
     let section_id = `${section_type_s}-form-${num}`
-    const armSec = new section_type({}, section_id, selectionModalParentId, num)
-    console.log(armSec)
-    selection_items[section_id] = armSec
-    selectionModalParent.append(armSec.HTML)
+    const sec = new section_type({}, section_id, selectionModalParentId, num)
+    console.log(sec)
+    selection_items.push([section_id, sec])
+    selectionModalParent.append(sec.HTML)
+    sec.setName(`${sec.readable_name} ${sec.num}`)
     setFstDropdown()
     $(`#${section_id}`).on('change', submitSelection);
     submitSelection()
@@ -385,6 +385,10 @@ function getSectionType(type) {
                 break
             case 'fiting':
                 section_type = FitingSection
+                break
+            case 'clutch':
+                section_type = ClutchSection
+                break
         }
     }
     return section_type;
@@ -392,22 +396,30 @@ function getSectionType(type) {
 
 function defineSections() {
     getCurrentSelection().then((resp) => {
-        selection_items = {}
+        selection_items = []
         for (const [key, val] of Object.entries(current_selection['items'])) {
             let section_type = getSectionType(val['type'])
-            const sec = new section_type({}, key, selectionModalParentId, val['num'])
+            let n = parseInt(key.substring(key.lastIndexOf("-") + 1))
+            const sec = new section_type({}, key, selectionModalParentId, n)
             sec.setData(resp)
-            selection_items[key] = sec
+            selection_items.push([key, sec])
         }
+        selection_items.sort(function (first, second) {
+            return first[1].num - second[1].num;
+        });
+        console.log(selection_items)
         createSections();
         console.log("sections created")
 
     })
 }
 
+
 function createSections() {
     selectionModalParent.empty()
-    for (const [key, value] of Object.entries(selection_items)) {
+    for (const item of selection_items) {
+        let key = item[0]
+        let value = item[1]
         selectionModalParent.append(value.HTML)
         setFstDropdown();
         value.updateData();
@@ -415,9 +427,13 @@ function createSections() {
     }
 }
 
+function getLastSectionNum() {
+    return selection_items.length;
+}
 
 function dropSection(sectionId) {
-    current_selection['items'][sectionId] = {'type': current_selection['items'][sectionId]['type']}
+    current_selection['items'][sectionId] = {'type': current_selection['items'][sectionId]['type'],
+    'part_name': current_selection['items'][sectionId]['part_name']}
     send("/api/make_order/update_selection_items", current_selection).then(updateAllSections)
 }
 
@@ -458,6 +474,11 @@ class BasicSection {
         let res = form.serializeArray()
         return formToDict(res)
     }
+
+    setName(name) {
+        console.log(name)
+        $(`#${this.id}_input-part-name`).val(name)
+    }
 }
 
 class FitingSection extends BasicSection {
@@ -474,6 +495,7 @@ class FitingSection extends BasicSection {
         const carving_select = $(`#${this.id}_input-fit-carving`)
         const angle_select = $(`#${this.id}_input-fit-angle`)
         const fit_select = $(`#${this.id}_input-fit`)
+        const part_name = $(`#${this.id}_input-part-name`)
         type_select.empty().append(new Option("Выберите тип", ""));
         carving_select.empty().append(new Option("Выберите резьбу", ""));
         angle_select.empty().append(new Option("Выберите угол", ""));
@@ -483,25 +505,33 @@ class FitingSection extends BasicSection {
         if (selection === undefined) {
             selection = {}
         }
-        offer['fiting_type'].forEach((type) => {
+        if (selection['part_name'] !== undefined) {
+            part_name.val(selection['part_name'])
+        } else {
+            part_name.val('');
+        }
+        for (const type of offer['fiting_type'] || []) {
             type_select.append(new Option(type, type));
-        })
-        offer['carving'].forEach((carving) => {
+        }
+        for (const carving of offer['carving'] || []) {
             carving_select.append(new Option(carving, carving));
-        })
-        offer['angle'].forEach((angle) => {
+        }
+        for (const angle of offer['angle'] || []) {
             angle_select.append(new Option(angle, angle));
-        })
-        if (selection[`fiting_type`] !== undefined) {
+        }
+        for (const fiting of resp['candidates'][this.id] || []) {
+            fit_select.append(new Option(`${fiting['name']}: ${fiting['amount']}`, fiting['_id']));
+        }
+        if (selection['fiting_type'] !== undefined) {
             $(`#${this.id}_input-fit-type` + " option:last").attr("selected", "selected");
         }
-        if (selection[`carving`] !== undefined) {
-            $(`#${this.id}input-fit-carving` + " option:last").attr("selected", "selected");
+        if (selection['carving'] !== undefined) {
+            $(`#${this.id}_input-fit-carving` + " option:last").attr("selected", "selected");
         }
         if (selection[`angle`] !== undefined) {
-            $(`#${this.id}input-fit-angle` + " option:last").attr("selected", "selected");
+            $(`#${this.id}_input-fit-angle` + " option:last").attr("selected", "selected");
         }
-        if (selection[`id`] !== undefined) {
+        if (selection['id'] !== undefined) {
             $(`#${this.id}_input-fit` + " option:last").attr("selected", "selected");
         }
 
@@ -519,7 +549,7 @@ class FitingSection extends BasicSection {
             `           placeholder="Фитинг N"></div>\n` +
             `  <div class="d-flex">\n` +
             `    <div class="d-flex form-group col">\n` +
-            `      <label class="form-control-label w-100 p-2" for="${this.id}_input-fit-type">Тип</label>\n` +
+            `      <label class="form-control-label p-2" for="${this.id}_input-fit-type">Тип</label>\n` +
             `      <select name="fiting_type" class="form-control form-control-sm fstdropdown-select" id="${this.id}_input-fit-type">\n` +
             `        <option value="">Выберите стандарт фитинга</option>\n` +
             `        <option value="1">DK</option>\n` +
@@ -527,7 +557,7 @@ class FitingSection extends BasicSection {
             `      </select>\n` +
             `    </div>\n` +
             `    <div class="d-flex form-group col">\n` +
-            `      <label class="form-control-label w-100 p-2" for="${this.id}_input-fit-carving">Резьба</label>\n` +
+            `      <label class="form-control-label p-2" for="${this.id}_input-fit-carving">Резьба</label>\n` +
             `      <select name="carving" class="form-control form-control-sm fstdropdown-select" id="${this.id}_input-fit-carving">\n` +
             `        <option value="">Выберите резьбу</option>\n` +
             `        <option value="1">6</option>\n` +
@@ -537,7 +567,7 @@ class FitingSection extends BasicSection {
             `  </div>\n` +
             '  <div class="d-flex">' +
             `    <div class="d-flex form-group col">\n` +
-            `      <label class="form-control-label w-100 p-2" for="${this.id}_input-angle">Угол</label>\n` +
+            `      <label class="form-control-label p-2" for="${this.id}_input-angle">Угол</label>\n` +
             `      <select name="angle" class="form-control form-control-sm fstdropdown-select" id="${this.id}_input-fit-angle">\n` +
             `        <option value="">Выберите угол</option>\n` +
             `        <option value="1">DK 2x03</option>\n` +
@@ -545,7 +575,7 @@ class FitingSection extends BasicSection {
             `      </select>\n` +
             `    </div>\n` +
             `  <div class="d-flex form-group col">\n` +
-            `    <label class="form-control-label w-100 p-2" for="${this.id}_input-fit">Фитинг</label>\n` +
+            `    <label class="form-control-label p-2" for="${this.id}_input-fit">Фитинг</label>\n` +
             `    <select name="id" class="form-control form-control-sm fstdropdown-select" id="${this.id}_input-fit">\n` +
             `      <option value="">Выберите фитинг</option>\n` +
             `      <option value="1">Муфта 2x03</option>\n` +
@@ -555,7 +585,62 @@ class FitingSection extends BasicSection {
             ' </div>' +
             `</form>\n` +
             `          <div class="d-flex text-left">\n` +
-            `            <a href="#!" onclick="dropSection('${this.id}')" class="btn btn-sm btn-primary">Сбросить рукав</a>\n` +
+            `            <a href="#!" onclick="dropSection('${this.id}')" class="btn btn-sm btn-primary">Сбросить деталь</a>\n` +
+            `            <a href="#!" onclick="deleteSection('${this.id}')" class="btn btn-sm btn-primary">Удалить запчасть</a>\n` +
+            `          </div>` +
+            `<hr/>`
+    }
+}
+
+class ClutchSection extends BasicSection {
+    type = 'clutch';
+    readable_name = "Муфта"
+
+    constructor(data, id, parentBlockId, num) {
+        super(data, id, parentBlockId, num);
+    }
+
+    updateData() {
+        let resp = this.data;
+        const part_name = $(`#${this.id}_input-part-name`)
+        const clutch_select = $(`#${this.id}_input-clutch`)
+        clutch_select.empty().append(new Option("Выберите муфту", ""));
+        let selection = current_selection["items"][this.id]
+        if (selection === undefined) {
+            selection = {}
+        }
+        if (selection['part_name'] !== undefined) {
+            part_name.val(selection['part_name'])
+        } else {
+            part_name.val('');
+        }
+        for (const clutch of resp['candidates'][this.id] || []) {
+            clutch_select.append(new Option(`${clutch['name']}: ${clutch['amount']}`, clutch['_id']));
+        }
+        if (selection[`id`] !== undefined) {
+            $(`#${this.id}_input-clutch` + " option:last").attr("selected", "selected");
+        }
+
+        document.getElementById(`${this.id}_input-clutch`).fstdropdown.rebind()
+    }
+
+    get HTML() {
+        return `<form id="${this.id}">\n` +
+            `  <input type="hidden" name="type" value="${this.type}">\n` +
+            `  <div class="d-inline-flex  mb-2"><h6 class="heading-small w-100">Выбор муфты</h6>\n` +
+            `    <input name="part_name" id="${this.id}_input-part-name" class="form-control form-control-sm ml-1" type="text"\n` +
+            `           placeholder="Муфта N"></div>\n` +
+            `  <div class="d-flex form-group col">\n` +
+            `    <label class="form-control-label text-nowrap p-2" for="${this.id}_input-clutch">Муфта</label>\n` +
+            `    <select name="id" class="form-control form-control-sm fstdropdown-select" id="${this.id}_input-clutch">\n` +
+            `      <option value="">Выберите муфту</option>\n` +
+            `      <option value="1">Муфта 2x03</option>\n` +
+            `      <option value="2">Муфта 2x06</option>\n` +
+            `    </select>\n` +
+            `  </div>\n` +
+            `</form>\n` +
+            `          <div class="d-flex text-left">\n` +
+            `            <a href="#!" onclick="dropSection('${this.id}')" class="btn btn-sm btn-primary">Сбросить муфту</a>\n` +
             `            <a href="#!" onclick="deleteSection('${this.id}')" class="btn btn-sm btn-primary">Удалить запчасть</a>\n` +
             `          </div>` +
             `<hr/>`
@@ -597,15 +682,15 @@ class ArmSection extends BasicSection {
         } else {
             part_name.val('');
         }
-        offer['diameter'].forEach((diameter) => {
-            diameter_select.append(new Option(diameter + ' мм', diameter));
-        })
-        offer['arm_type'].forEach((type) => {
+        for (const type of offer['arm_type'] || []) {
             type_select.append(new Option(type, type));
-        })
-        resp['candidates'][this.id].forEach((arm) => {
+        }
+        for (const diameter of offer['diameter'] || []) {
+            diameter_select.append(new Option(diameter + ' мм', diameter));
+        }
+        for (const arm of resp['candidates'][this.id] || []) {
             arm_select.append(new Option(`${arm['name']}: ${arm['amount']}`, arm['_id']));
-        })
+        }
         if (selection['diameter'] !== undefined) {
             $(`#${this.id}_input-arm-diameter option:last`).attr("selected", "selected");
         }
@@ -633,7 +718,7 @@ class ArmSection extends BasicSection {
             `  <div class="row">\n` +
             `    <div class="col-lg-6">\n` +
             `      <div class="d-flex form-group">\n` +
-            `        <label class="form-control-label w-100 p-2" for="${this.id}_input-arm-diameter">Диаметр</label>\n` +
+            `        <label class="form-control-label text-nowrap p-2" for="${this.id}_input-arm-diameter">Диаметр</label>\n` +
             `        <select name="diameter" class="form-control form-control-sm fstdropdown-select" id="${this.id}_input-arm-diameter">\n` +
             `          <option value="">Выберите диаметр</option>\n` +
             `        </select>\n` +
@@ -641,7 +726,7 @@ class ArmSection extends BasicSection {
             `    </div>\n` +
             `    <div class="col-lg-6">\n` +
             `      <div class="d-flex form-group">\n` +
-            `        <label class="form-control-label w-100 p-2" for="${this.id}_input-arm-type">Тип рукава</label>\n` +
+            `        <label class="form-control-label text-nowrap p-2" for="${this.id}_input-arm-type">Тип рукава</label>\n` +
             `        <select name="arm_type" class="form-control form-control-sm fstdropdown-select" id="${this.id}_input-arm-type">\n` +
             `          <option value="">Выберите тип рукава</option>\n` +
             `        </select>\n` +
@@ -651,13 +736,13 @@ class ArmSection extends BasicSection {
             `  <div class="row">\n` +
             `    <div class="col-lg-6">\n` +
             `      <div class="d-flex form-group">\n` +
-            `        <label class="form-control-label w-100 p-2" for="${this.id}_input-length">Длина рукава (м)</label>\n` +
+            `        <label class="form-control-label text-nowrap p-2" for="${this.id}_input-length">Длина рукава (м)</label>\n` +
             `        <input name="amount" id="${this.id}_input-arm-length" class="form-control form-control-sm" type="number" placeholder="1">\n` +
             `      </div>\n` +
             `    </div>\n` +
             `    <div class="col-lg-6">\n` +
             `  <div class="d-flex form-group">\n` +
-            `    <label class="form-control-label w-100 p-2" for="${this.id}_input-arm">Рукав</label>\n` +
+            `    <label class="form-control-label text-nowrap p-2" for="${this.id}_input-arm">Рукав</label>\n` +
             `    <select name="id" class="fstdropdown-select form-control form-control-sm" id="${this.id}_input-arm">\n` +
             `      <option value="">Выберите рукав</option>\n` +
             `    </select>\n` +
@@ -672,3 +757,4 @@ class ArmSection extends BasicSection {
             `<hr/>`
     }
 }
+

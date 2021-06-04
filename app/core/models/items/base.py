@@ -71,6 +71,10 @@ class BaseItem(Document):
             return {prop: val}
         return {}
 
+
+    def get_selection_name(self) -> str:
+        return ''
+
     @staticmethod
     @abstractmethod
     def get_param_name() -> str:

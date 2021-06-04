@@ -97,7 +97,10 @@ function render_item_list(list) {
         if (item['items']) {
             let num = 1;
             item['items'].forEach(i => {
-                tb.append(get_included_item_row(num, i['item']['name'], i['amount']))
+                let name = i['item']['name']
+                if (i['local_name'])
+                    name += ' [' + i['local_name']+']'
+                tb.append(get_included_item_row(num, name, i['amount']))
                 num += 1;
             })
         }

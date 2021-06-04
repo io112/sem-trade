@@ -23,6 +23,9 @@ class Clutch(BaseItem):
         res["amount"] = {'$gte': int(self.amount)}
         return res
 
+    def get_selection_name(self) -> str:
+        return ''
+
     def get_item_params(self) -> list:
         return ["_id", "arm_type", "diameter",
                 "measure", "name", "type", "price"]

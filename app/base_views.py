@@ -2,6 +2,7 @@ import pytz
 from flask import request, render_template, redirect, url_for
 from flask_httpauth import HTTPBasicAuth
 from flask_login import login_user, current_user, login_required, logout_user
+from werkzeug.security import check_password_hash
 from werkzeug.urls import url_parse
 
 from app import app, login_manager
