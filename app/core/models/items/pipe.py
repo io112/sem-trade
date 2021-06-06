@@ -1,11 +1,13 @@
-import app.db.variables as dbvars
 from app.core.models.items.base import BaseItem
 
 
-class Clutch(BaseItem):
-    crm_parameters = {'Диаметр': 'diameter', 'Тип рукава': 'arm_type'}
-    collection = dbvars.clutch_collection
-    NomenclatureType = 'Муфта'
+class Pipe(BaseItem):
+    crm_parameters = {'Размер': 'size'}
+    MeasureCode = '006'
+    MeasureName = 'Метр'
+    MeasureInt = 'MTR'
+    MeasureText = 'метров'
+    NomenclatureType = 'Трубка'
 
     def __init__(self, *args, **values):
         super().__init__(*args, **values)
@@ -14,11 +16,11 @@ class Clutch(BaseItem):
 
     @staticmethod
     def get_param_name() -> str:
-        return "clutch"
+        return "pipe"
 
     @staticmethod
     def get_category_id() -> str:
-        return "d29cf72d-6561-11ea-8182-002590a66847"
+        return 'd6d02938-c6ee-11eb-9258-00155d462101'
 
     def get_selection_name(self) -> str:
-        return ''
+        return f''

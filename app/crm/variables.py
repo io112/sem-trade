@@ -1,4 +1,11 @@
-clutch_cat_id = 'd29cf72d-6561-11ea-8182-002590a66847'
-arm_cat_id = 'd9da1352-656c-11ea-8182-002590a66847'
-fiting_cat_id = '612c1a12-6567-11ea-8182-002590a66847'
-offer_collection = 'offer'
+from app.core.models.items.arm import Arm
+from app.core.models.items.clutch import Clutch
+from app.core.models.items.fiting import Fiting
+from app.core.models.items.pipe import Pipe
+
+available_types = [Arm, Clutch, Fiting, Pipe]
+category_ids = {}
+nomenclatyre_types = {}
+for i in available_types:
+    category_ids[i.get_category_id()] = i
+    nomenclatyre_types[i.NomenclatureType] = i

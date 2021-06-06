@@ -28,6 +28,26 @@ function tryParseFloat(val) {
     return res
 }
 
+
+async function send(endpoint, data = {}) {
+    if (data === undefined)
+        data = []
+    var request = {"data": JSON.stringify(data)}
+    return await $.ajax({
+        type: "POST",
+        url: endpoint,
+        data: request,
+        dataType: 'json',
+        success: function (e, textStatus, xhr) {
+            console.log(e)
+            return e
+        },
+        error: function (e) {
+            alert(e.responseText)
+        }
+    });
+}
+
 function clean_form(mas) {
     let res = []
     mas.forEach(i => {

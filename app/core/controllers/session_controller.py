@@ -88,6 +88,8 @@ def add_selection_to_cart(sid: str):
     selection: RVDSelection = session.selection
     selection_items = selection_utility.get_selected_items(selection)
     items = []
+    if not selection.subtotal['job_type']:
+        raise ValueError(f'Выберите тип рукава')
     for i in selection_items.values():
         if i.amount <= 0:
             raise ValueError(f'Выбрано 0 или меньше предметов: {i.name}')

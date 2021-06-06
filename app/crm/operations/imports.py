@@ -1,11 +1,4 @@
-from app.crm.models.arm import Arm
-from app.crm.models.base import SiteObj
-from app.crm.models.clutch import Clutch
-from app.crm.models.fiting import Fiting
-from app.crm.models.offer import Offer
-from app.crm.variables import *
-from app.db.base import update_upsert
-from app.db.variables import *
+from app.crm.variables import category_ids, nomenclatyre_types
 
 
 def import_data(tree):
@@ -22,7 +15,7 @@ def import_objects(tree):
         if req is None:
             continue
         type = req[1][1].text
-        obj = parse_object(i, type)
+        parse_object(i, type)
 
 
 def import_offers(tree):
@@ -31,42 +24,45 @@ def import_offers(tree):
         req = i.find("{urn:1C.ru:commerceml_2}БазоваяЕдиница")
         if req is None:
             continue
-        obj = parse_offer(i)
+        parse_offer(i)
 
 
 def parse_offer(obj):
-    offer = Offer.create_from_cml(obj)
-    collection_id = offer.id[:36]
-    if collection_id == clutch_cat_id:
-        offer.collection = clutch_collection
-    elif collection_id == arm_cat_id:
-        offer.collection = arm_collection
-    elif collection_id == fiting_cat_id:
-        offer.collection = fiting_collection
+    id = obj[0].text
+    collection_id = id[:36]
+    if collection_id in category_ids.keys():
+        item = category_ids[collection_id]
     else:
         return
-
-    update_upsert(offer.collection, {"_id": offer.id}, offer.convert_for_update())
-    return offer
+    item = item.objects(id=id).first()
+    item.price = float(obj.find("{urn:1C.ru:commerceml_2}Цены")[0][2].text)
+    item.amount = float(obj.find("{urn:1C.ru:commerceml_2}Количество").text)
+    item.save()
 
 
 def parse_object(obj, type):
     req = obj.find("{urn:1C.ru:commerceml_2}ХарактеристикиТовара")
-    site_obj: SiteObj
-    collection = ''
     if req is None:
         return
-    if type == 'Муфта':
-        site_obj = Clutch.create_from_cml(obj)
-        collection = clutch_collection
-    elif type == 'Фитинг':
-        site_obj = Fiting.create_from_cml(obj)
-        collection = fiting_collection
-    elif type == 'Рукав':
-        site_obj = Arm.create_from_cml(obj)
-        collection = arm_collection
+    if type in nomenclatyre_types.keys():
+        create_object(obj, nomenclatyre_types[type])
     else:
         return
 
-    update_upsert(collection, {"_id": site_obj.id}, site_obj.convert_for_update())
-    return site_obj
+
+def create_object(obj, obj_type):
+    res = obj_type()
+    res.id = obj[0].text
+    res.name = obj[2].text
+    res.measure = obj[3].attrib['НаименованиеПолное']
+
+    req = obj.find("{urn:1C.ru:commerceml_2}ХарактеристикиТовара")
+    for i in req:
+        if i[1].text in obj_type.crm_parameters.keys():
+            param = i[2].text
+            try:
+                param = float(i[2].text)
+            except:
+                pass
+            res.parameters[obj_type.crm_parameters[i[1].text]] = param
+    res.save()

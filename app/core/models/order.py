@@ -7,13 +7,11 @@ from datetime import timedelta
 import pymongo
 import pytz
 from mongoengine import Document, StringField, ReferenceField, FloatField, BooleanField, EmbeddedDocumentField, \
-    DateTimeField, IntField
+    DateTimeField, IntField, ValidationError
 
 from app.core.models.cart import Cart
-from app.core.models.items.base import BaseItem
 from app.core.models.items.cart_item import CartItem
 from app.core.models.items.composite_item import CompositeItem
-from app.core.models.session import Session
 from app.core.models.user import User
 from app.core.models.сontragent import Contragent
 from app.core.utilities.common import document_to_dict
@@ -32,7 +30,7 @@ class Order(Document):
     order_num = StringField()
     _number = IntField()
     status = StringField(default=Status.STATUS_CREATED)
-    contragent = ReferenceField(Contragent, required=True)
+    contragent = ReferenceField(Contragent)
     upd_num = StringField()
     user = ReferenceField(User, required=True)
     comment = StringField()
@@ -50,16 +48,11 @@ class Order(Document):
     def price(self) -> float:
         return self._price * (1 - self.sale)
 
-    @staticmethod
-    def create(cart: Cart, contragent: Contragent, comment: str, user: str):
-        order = Order()
-        order.cart = cart
-        order.contragent = contragent
-        order.comment = comment
-        order.time_created = datetime.now(pytz.timezone('Europe/Moscow'))
-        order.user = user
-        order.count_price()
-        return order
+    def clean(self):
+        if not self.contragent:
+            raise ValidationError('Установите контрагента')
+        if not self.cart or len(self.cart.items) == 0:
+            raise ValidationError('В корзине нет ни одного товара')
 
     def get_safe(self):
         res = document_to_dict(self)
@@ -69,28 +62,6 @@ class Order(Document):
         res['_id'] = str(res['_id'])
         res['user'] = self.user.get_safe()
         return res
-
-    @staticmethod
-    def create_from_session(session: Session):
-        comment = ''
-        if 'cart' not in session.data or len(session.data['cart']) < 1:
-            raise NotImplementedError('cart is incorrect')
-        if 'comment' in session.data:
-            comment = session.data['comment']
-        cart = Cart.create_from_session(session)
-        contragent = Contragent.create_from_session(session)
-        user = session.user
-        return Order.create(cart, contragent, comment, user)
-
-    def checkout_order(self) -> None:
-        if self.is_checked_out:
-            raise OverflowError('Order is already checked out')
-        for i in self.cart.items:
-            i: BaseItem
-            i.checkout_item()
-        self.is_checked_out = True
-        self.status = self.Status.STATUS_CHECKED_OUT
-        self._save()
 
     def get_db_dict(self):
         res = copy.deepcopy(self.__dict__)

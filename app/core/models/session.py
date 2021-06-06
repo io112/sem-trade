@@ -34,13 +34,7 @@ def update_modified(sender, document):
         price = 0
         for i in cart.items:
             price += i.total_price
-        cart.subtotal = price
-    from app.core.utilities.selection_utility import get_selected_items
-    selected_items = get_selected_items(document.selection)
-    if len(selected_items) > 0:
-        for key, item in selected_items.items():
-            for k, v in item.item.parameters.items():
-                document.selection[key][k] = v
+        cart.subtotal = round(price, 2)
 
 
 @update_modified.apply

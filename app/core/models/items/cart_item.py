@@ -18,7 +18,8 @@ class CartItem(EmbeddedDocument):
 
     def get_safe(self) -> dict:
         res = document_to_dict(self)
-        res['item'] = self.item.get_safe()
+        if self.item:
+            res['item'] = self.item.get_safe()
         return res
 
     def create_xml(self, amount=None) -> list:
@@ -35,7 +36,7 @@ class CartItem(EmbeddedDocument):
         res.append(measure)
         ET.SubElement(res, 'ЦенаЗаЕдиницу').text = str(self.price)
         ET.SubElement(res, 'Количество').text = str(amount)
-        ET.SubElement(res, 'Сумма').text = str(self.price * amount)
+        ET.SubElement(res, 'Сумма').text = str(round(self.price * amount, 2))
         recs = ET.Element('ЗначенияРеквизитов')
         rec1 = ET.Element('ЗначениеРеквизита')
         ET.SubElement(rec1, 'Наименование').text = 'ВидНоменклатуры'

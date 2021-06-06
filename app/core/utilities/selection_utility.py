@@ -5,15 +5,15 @@ from app.core.models.items.base import BaseItem
 from app.core.models.items.cart_item import CartItem
 from app.core.models.items.clutch import Clutch
 from app.core.models.items.fiting import Fiting
+from app.core.models.items.pipe import Pipe
 from app.core.models.selection import RVDSelection
 from app.core.models.session import Session
 from app.core.utilities.common import queryset_to_list
 
 not_zero_amount = {'amount': {'$not': {'$eq': 0}}}
-item_objects = {'arm': Arm, 'clutch1': Clutch, 'clutch2': Clutch,
-                'fiting1': Fiting, 'fiting2': Fiting}
-collections = {'arm': Arm, 'clutch': Clutch, 'fiting': Fiting}
-price_coefficient = 2.2
+
+collections = {'arm': Arm, 'clutch': Clutch, 'fiting': Fiting, 'pipe': Pipe}
+price_coefficients = {'hydro': 2.3, 'gur': 7, 'break': 7, 'conditioner': 7, 'clutch': 7, 'transmission': 7}
 
 
 def create_selection() -> RVDSelection:
@@ -78,16 +78,45 @@ def get_available_parameters(candidates: list) -> dict:
 def save_selection(session: Session, items: dict, subtotal: dict, part: CartItem = None) -> dict:
     selection = RVDSelection(items=items, subtotal=subtotal, part=part)
     selection = calc_subtotal(selection)
+    selection = copy_selection_parameters(selection)
     session.selection = selection
     session.save()
     return selection.get_safe()
 
 
+def copy_selection_parameters(selection: RVDSelection) -> RVDSelection:
+    selected_items = get_selected_items(selection)
+    if len(selected_items) > 0:
+        for key, item in selected_items.items():
+            if item.item:
+                for k, v in item.item.parameters.items():
+                    selection['items'][key][k] = v
+    selection['items'] = fix_linked_params(selection['items'])
+    return selection
+
+
+def fix_linked_params(items: Dict[str, dict]) -> Dict[str, dict]:
+    DN = None
+    for item in items.values():
+        if item['type'] == 'arm':
+            DN = item.get('diameter')
+            break
+    for i in items:
+        item = items[i]
+        if item['type'] == 'clutch' or item['type'] == 'fiting':
+            cur_dn = item.get('diameter')
+            if DN is not None and cur_dn is not None and DN != cur_dn:
+                items[i] = {'type': item.get('type', ''), 'part_name': item.get('part_name', '')}
+            elif DN is None and cur_dn is not None:
+                del items[i]['diameter']
+            if DN is not None:
+                items[i]['diameter'] = DN
+    return items
+
+
 def calc_subtotal(selection: RVDSelection) -> RVDSelection:
     price = 0
     total_amount = selection.subtotal.get('amount', 1)
-    if total_amount is None:
-        total_amount = 1
     selected_items = get_selected_items(selection)
     for _, obj in selected_items.items():
         price += obj.total_price
@@ -100,6 +129,11 @@ def calc_subtotal(selection: RVDSelection) -> RVDSelection:
 
 def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
     res = {}
+    services_price = get_services_price(selection)
+    items_amount = services_price['items_amount']
+    services_price = services_price['services_price']
+    additional_price = round(services_price / items_amount, 2) if items_amount else 0
+    price_coefficient = price_coefficients.get(selection.subtotal.get('job_type'), 1)
     if not (selection and selection.items):
         return {}
     items = selection.items
@@ -109,11 +143,31 @@ def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
             amount = value['amount'] if value.get('amount') is not None else 1
             id = value['id']
             item = obj.objects(id=id)[0]
-            price = round(item.price * price_coefficient, 2)
+            price = round(item.price * price_coefficient + additional_price, 2)
             cart_item = CartItem(name=item.name, local_name=value.get('part_name', ''), item=item, amount=amount,
                                  price=price, total_price=round(price * amount, 2))
             res[key] = cart_item
+        if value['type'] == 'service':
+            cart_item = CartItem(name=value.get('part_name', ''), amount=1,
+                                 price=0, total_price=0)
+            res[key] = cart_item
     return res
+
+
+def get_services_price(selection: RVDSelection) -> Dict[str, float]:
+    res = {'items_amount': 0, 'services_price': 0}
+    price = 0
+    total_items_amount = 0
+    total_amount = selection.subtotal.get('amount', 1)
+    if not (selection and selection.items):
+        return res
+    items = selection.items
+    for key, value in items.items():
+        if value['type'] == 'service':
+            price += float(value.get('amount', 0))
+        elif 'id' in value:
+            total_items_amount += value.get('amount', 0)
+    return {'items_amount': total_items_amount * total_amount, 'services_price': price}
 
 
 def create_selection_name(items: Dict[str, CartItem]):

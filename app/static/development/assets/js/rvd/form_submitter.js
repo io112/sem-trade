@@ -46,17 +46,8 @@ function init() {
     sid = Cookies.get('current_order');
     console.log(sid)
     init_cw()
-    // as = $('#arm_section');
-    // fs = $('#fiting_section');
-    // fs1 = $('#fiting_1_section');
-    // fs2 = $('#fiting_2_section');
-    // as.on('change', submitArm);
-    // fs1.on('change', submitFits);
-    // fs2.on('change', submitFits);
     console.log('cw ended')
     defineSections();
-    // updateArmSection();
-    // updateFitSections();
     update_cart();
     init_sessions();
     if (current_part !== undefined) {
@@ -64,212 +55,10 @@ function init() {
     }
 }
 
-
-// function submitArm() {
-//     let formRes = as.serializeArray()
-//     formRes.forEach(i => {
-//         let val = tryParseFloat(i.value)
-//         if (i.value !== "")
-//             current_selection["items"]["arm"][i.name] = val
-//         else
-//             delete current_selection["items"]["arm"][i.name]
-//         if (i.name === "diameter") {
-//             current_selection["items"]["clutch1"] = {'diameter': val}
-//             current_selection["items"]["clutch2"] = {'diameter': val}
-//         }
-//
-//     })
-//     writeToSession(sid, current_selection).then(() => {
-//         getCurrentSelection().then(() => {
-//             updateArmSection()
-//             updateFitSections()
-//         })
-//     })
-// }
-
-function submitFits() {
-    let fit1 = fs1.serializeArray()
-    let fit2 = fs2.serializeArray()
-    fit1.forEach(i => {
-        let val = tryParseFloat(i.value)
-        if (i.value !== "") {
-            if (i.name === "clutch_name")
-                current_selection["items"]["clutch1"]["id"] = val
-            else
-                current_selection["items"]["fiting1"][i.name] = val
-        } else {
-            if (i.name === "clutch_name")
-                delete current_selection["items"]["clutch1"]["id"]
-            else
-                delete current_selection["items"]["fiting1"][i.name]
-        }
-    })
-    fit2.forEach(i => {
-        let val = tryParseFloat(i.value)
-        if (i.value !== "") {
-            if (i.name === "clutch_name")
-                current_selection["items"]["clutch2"]["id"] = val
-            else
-                current_selection["items"]["fiting2"][i.name] = val
-        } else {
-            if (i.name === "clutch_name")
-                delete current_selection["items"]["clutch2"]["id"]
-            else
-                delete current_selection["items"]["fiting2"][i.name]
-        }
-    })
-    // writeToSession(sid, current_selection).then(() => getCurrentSelection().then(() => updateFitSections()))
-}
-
-function dropArm() {
-    current_selection["items"]["arm"] = {}
-    current_selection["items"]["clutch1"] = {}
-    current_selection["items"]["clutch2"] = {}
-
-    // let resp = writeToSession(sid, current_selection).then(() => getCurrentSelection().then(() => updateArmSection()))
-}
-
-function dropFits() {
-    current_selection["items"]["fiting1"] = {}
-    current_selection["items"]["fiting2"] = {}
-
-    // let resp = writeToSession(sid, current_selection).then(() => getCurrentSelection().then(() => updateFitSections()))
-}
-
-function dropClutches() {
-    current_selection["items"]["clutch1"] = {}
-    current_selection["items"]["clutch2"] = {}
-
-    // writeToSession(sid, current_selection).then(() => getCurrentSelection().then(() => updateFitSections()))
-}
-
 function writeToSession(sid, data) {
     return send("/api/make_order/update_selection_items", data)
 }
 
-function updateArmSection() {
-    let resp = current_offer;
-    const diameter_select = $('#input-arm-diameter')
-    const braid_select = $('#input-arm-braid')
-    const type_select = $('#input-arm-type')
-    const length_select = $('#input-arm-length')
-    const arm_select = $('#input-arm')
-    diameter_select.empty().append(new Option("Выберите диаметр", ""));
-    braid_select.empty().append(new Option("Выберите оплетку", ""));
-    type_select.empty().append(new Option("Выберите тип рукава", ""));
-    arm_select.empty().append(new Option("Выберите рукав", ""));
-    console.log(resp)
-    let offer = resp['parameters']['arm']
-    let selection = current_selection["items"]['arm']
-    if (selection === undefined) {
-        selection = {}
-    }
-    if (selection['amount'] !== undefined) {
-        length_select.val(current_selection["items"]["arm"]['amount'])
-    } else {
-        length_select.val(0);
-    }
-    offer['diameter'].forEach((diameter) => {
-        diameter_select.append(new Option(diameter + ' мм', diameter));
-    })
-    offer['braid'].forEach((braid) => {
-        braid_select.append(new Option(braid, braid));
-    })
-    offer['arm_type'].forEach((type) => {
-        type_select.append(new Option(type, type));
-    })
-    resp['candidates']['arm'].forEach((arm) => {
-        arm_select.append(new Option(`${arm['name']}: ${arm['amount']}`, arm['_id']));
-    })
-    if (selection['diameter'] !== undefined) {
-        $("#input-arm-diameter option:last").attr("selected", "selected");
-    }
-    if (selection['braid'] !== undefined) {
-        $("#input-arm-braid option:last").attr("selected", "selected");
-    }
-    if (selection['arm_type'] !== undefined) {
-        $("#input-arm-type option:last").attr("selected", "selected");
-    }
-    if (selection['id'] !== undefined) {
-        $("#input-arm option:last").attr("selected", "selected");
-    }
-
-    document.getElementById('input-arm-diameter').fstdropdown.rebind()
-    document.getElementById('input-arm-type').fstdropdown.rebind()
-    document.getElementById('input-arm-braid').fstdropdown.rebind()
-    document.getElementById('input-arm').fstdropdown.rebind()
-    updateFitSections();
-}
-
-function updateFitSections() {
-    let resp = current_offer;
-    ['1', '2'].forEach((num) => updateFitSection(num, resp));
-}
-
-function updateFitSection(num, resp) {
-    const standart_select = $('#input-fit-std-' + num)
-    const diameter_select = $('#input-fit-d-' + num)
-    const fit_select = $('#input-fit-' + num)
-    const muf_select = $('#input-muf-' + num)
-    diameter_select.empty().append(new Option("Выберите диаметр", ""));
-    standart_select.empty().append(new Option("Выберите стандарт фитинга", ""));
-    fit_select.empty().append(new Option("Выберите фитинг", ""));
-    muf_select.empty().append(new Option("Выберите муфту", ""));
-    let offer = resp['parameters']['fiting' + num]
-    let selection = current_selection["items"]['fiting' + num]
-    if (selection === undefined) {
-        selection = {}
-    }
-    offer['diameter'].forEach((diameter) => {
-        diameter_select.append(new Option(diameter + ' мм', diameter));
-    })
-    offer['fiting_type'].forEach((standart) => {
-        standart_select.append(new Option(standart, standart));
-    })
-    resp['candidates']['fiting' + num].forEach((fit) => {
-        fit_select.append(new Option(`${fit["name"]}: ${fit["amount"]}`, fit["_id"]));
-    })
-    resp['candidates']['clutch1'].forEach((muf) => {
-        muf_select.append(new Option(`${muf["name"]}: ${muf["amount"]}`, muf["_id"]));
-    })
-    if (selection['fiting_type'] !== undefined) {
-        $('#input-fit-std-' + num + " option:last").attr("selected", "selected");
-    }
-    if (selection['diameter'] !== undefined) {
-        $("#input-fit-d-" + num + " option:last").attr("selected", "selected");
-    }
-    if (selection['id'] !== undefined) {
-        $("#input-fit-" + num + " option:last").attr("selected", "selected");
-    }
-    if (current_selection["items"]['clutch' + num] !== undefined && current_selection["items"]['clutch' + num]['id'] !== undefined) {
-        $("#input-muf-" + num + " option:last").attr("selected", "selected");
-    }
-
-    document.getElementById('input-fit-std-' + num).fstdropdown.rebind()
-    document.getElementById('input-fit-d-' + num).fstdropdown.rebind()
-    document.getElementById('input-fit-' + num).fstdropdown.rebind()
-    document.getElementById('input-muf-' + num).fstdropdown.rebind()
-}
-
-
-async function send(endpoint, data = {}) {
-    if (data === undefined)
-        data = []
-    var request = {"data": JSON.stringify(data)}
-    return await $.ajax({
-        type: "POST",
-        url: endpoint,
-        data: request,
-        dataType: 'json',
-        success: function (e, textStatus, xhr) {
-            console.log(e)
-            return e
-        },
-        error: function (e) {
-            alert(e.responseText)
-        }
-    });
-}
 
 async function getCurrentSelection() {
     let only_present = $('#rvd_only_present').is(':checked')
@@ -286,9 +75,10 @@ async function getCurrentSelection() {
 }
 
 
-function changeSelectAmount() {
+function changeSubtotal() {
     current_selection["subtotal"]["amount"] = parseInt($('#subtotal_amount').val());
-    let resp = writeToSession(sid, current_selection).then(() => {
+    current_selection["subtotal"]["job_type"] = $('#input-job-type').val();
+    writeToSession(sid, current_selection).then(() => {
         getCurrentSelection()
     })
 
@@ -299,12 +89,16 @@ function updateSelectionSubtotal() {
     let price = current_selection["subtotal"]["price"]
     let amount = current_selection["subtotal"]["amount"]
     let total_price = current_selection["subtotal"]["total_price"]
+    // $('#input-job-type').val(current_selection["subtotal"]["job_type"])
+    if (current_selection["subtotal"]["job_type"])
+        $(`#input-job-type option[value=${current_selection["subtotal"]["job_type"]}]`).attr("selected", "selected");
+    document.getElementById('input-job-type').fstdropdown.rebind()
     $('#select_subtotal tbody').empty().append('<tr>\n' +
         '<td>\n' +
         '<span class="name mb-0 text-sm">' + name + '</span>\n' +
         '</td>\n' +
         '<td class="number">\n' +
-        '<input class="form-control form-control-sm" id="subtotal_amount" onchange="changeSelectAmount()" type="number" placeholder="количество" value="' + amount + '">\n' +
+        '<input class="form-control form-control-sm" id="subtotal_amount" onchange="changeSubtotal()" type="number" placeholder="количество" value="' + amount + '">\n' +
         '</td>\n' +
         '<td class="price">\n' + price +
         ' ₽\n' +
@@ -389,6 +183,12 @@ function getSectionType(type) {
             case 'clutch':
                 section_type = ClutchSection
                 break
+            case 'pipe':
+                section_type = PipeSection
+                break
+            case 'service':
+                section_type = ServiceSection
+                break
         }
     }
     return section_type;
@@ -432,8 +232,10 @@ function getLastSectionNum() {
 }
 
 function dropSection(sectionId) {
-    current_selection['items'][sectionId] = {'type': current_selection['items'][sectionId]['type'],
-    'part_name': current_selection['items'][sectionId]['part_name']}
+    current_selection['items'][sectionId] = {
+        'type': current_selection['items'][sectionId]['type'],
+        'part_name': current_selection['items'][sectionId]['part_name']
+    }
     send("/api/make_order/update_selection_items", current_selection).then(updateAllSections)
 }
 
@@ -491,54 +293,26 @@ class FitingSection extends BasicSection {
 
     updateData() {
         let resp = this.data;
-        const type_select = $(`#${this.id}_input-fit-type`)
-        const carving_select = $(`#${this.id}_input-fit-carving`)
-        const angle_select = $(`#${this.id}_input-fit-angle`)
-        const fit_select = $(`#${this.id}_input-fit`)
-        const part_name = $(`#${this.id}_input-part-name`)
-        type_select.empty().append(new Option("Выберите тип", ""));
-        carving_select.empty().append(new Option("Выберите резьбу", ""));
-        angle_select.empty().append(new Option("Выберите угол", ""));
-        fit_select.empty().append(new Option("Выберите фитинг", ""));
-        let offer = resp['parameters'][this.id]
-        let selection = current_selection["items"][this.id]
-        if (selection === undefined) {
-            selection = {}
-        }
-        if (selection['part_name'] !== undefined) {
-            part_name.val(selection['part_name'])
-        } else {
-            part_name.val('');
-        }
-        for (const type of offer['fiting_type'] || []) {
-            type_select.append(new Option(type, type));
-        }
-        for (const carving of offer['carving'] || []) {
-            carving_select.append(new Option(carving, carving));
-        }
-        for (const angle of offer['angle'] || []) {
-            angle_select.append(new Option(angle, angle));
-        }
-        for (const fiting of resp['candidates'][this.id] || []) {
-            fit_select.append(new Option(`${fiting['name']}: ${fiting['amount']}`, fiting['_id']));
-        }
-        if (selection['fiting_type'] !== undefined) {
-            $(`#${this.id}_input-fit-type` + " option:last").attr("selected", "selected");
-        }
-        if (selection['carving'] !== undefined) {
-            $(`#${this.id}_input-fit-carving` + " option:last").attr("selected", "selected");
-        }
-        if (selection[`angle`] !== undefined) {
-            $(`#${this.id}_input-fit-angle` + " option:last").attr("selected", "selected");
-        }
-        if (selection['id'] !== undefined) {
-            $(`#${this.id}_input-fit` + " option:last").attr("selected", "selected");
-        }
 
-        document.getElementById(`${this.id}_input-fit-type`).fstdropdown.rebind()
-        document.getElementById(`${this.id}_input-fit-carving`).fstdropdown.rebind()
-        document.getElementById(`${this.id}_input-fit-angle`).fstdropdown.rebind()
-        document.getElementById(`${this.id}_input-fit`).fstdropdown.rebind()
+        const part_name = $(`#${this.id}_input-part-name`)
+        let selection = current_selection["items"][this.id] || {}
+        let offer = resp['parameters'][this.id]
+        const amount_select = $(`#${this.id}_input-fiting-amount`)
+        amount_select.val(selection['amount'] || 1)
+        part_name.val(selection['part_name'] || '')
+
+
+        updateSelect(`${this.id}_input-fit-type`, "Выберите тип", offer['fiting_type'],
+            offer['fiting_type'], "", selection['fiting_type'] !== undefined)
+
+        updateSelect(`${this.id}_input-fit-carving`, "Выберите резьбу", offer['carving'],
+            offer['carving'], "", selection['carving'] !== undefined)
+
+        updateSelect(`${this.id}_input-fit-angle`, "Выберите угол", offer['angle'],
+            offer['angle'], "", selection['angle'] !== undefined)
+
+        updateIdSelect(`${this.id}_input-fit`, "Выберите фитинг", resp['candidates'][this.id], "",
+            selection['id'] !== undefined)
     }
 
     get HTML() {
@@ -546,7 +320,10 @@ class FitingSection extends BasicSection {
             `  <input type="hidden" name="type" value="${this.type}">\n` +
             `  <div class="d-inline-flex  mb-2"><h6 class="heading-small w-100">Выбор фитинга</h6>\n` +
             `    <input name="part_name" id="${this.id}_input-part-name" class="form-control form-control-sm ml-1" type="text"\n` +
-            `           placeholder="Фитинг N"></div>\n` +
+            `           placeholder="Фитинг N">` +
+            `        <label class="form-control-label text-nowrap p-2 ml-2" for="${this.id}_input-fiting-amount">количество</label>` +
+            `        <input name="amount" id="${this.id}_input-fiting-amount" class="form-control form-control-sm" type="number" placeholder="1">` +
+            `</div>\n` +
             `  <div class="d-flex">\n` +
             `    <div class="d-flex form-group col">\n` +
             `      <label class="form-control-label p-2" for="${this.id}_input-fit-type">Тип</label>\n` +
@@ -602,26 +379,14 @@ class ClutchSection extends BasicSection {
 
     updateData() {
         let resp = this.data;
+        let selection = current_selection["items"][this.id] || {}
         const part_name = $(`#${this.id}_input-part-name`)
-        const clutch_select = $(`#${this.id}_input-clutch`)
-        clutch_select.empty().append(new Option("Выберите муфту", ""));
-        let selection = current_selection["items"][this.id]
-        if (selection === undefined) {
-            selection = {}
-        }
-        if (selection['part_name'] !== undefined) {
-            part_name.val(selection['part_name'])
-        } else {
-            part_name.val('');
-        }
-        for (const clutch of resp['candidates'][this.id] || []) {
-            clutch_select.append(new Option(`${clutch['name']}: ${clutch['amount']}`, clutch['_id']));
-        }
-        if (selection[`id`] !== undefined) {
-            $(`#${this.id}_input-clutch` + " option:last").attr("selected", "selected");
-        }
+        const amount_select = $(`#${this.id}_input-clutch-amount`)
+        amount_select.val(selection['amount'] || 1)
+        part_name.val(selection['part_name'] || '')
 
-        document.getElementById(`${this.id}_input-clutch`).fstdropdown.rebind()
+        updateIdSelect(`${this.id}_input-clutch`, "Выберите муфту", resp['candidates'][this.id], "",
+            selection['id'] !== undefined)
     }
 
     get HTML() {
@@ -629,7 +394,10 @@ class ClutchSection extends BasicSection {
             `  <input type="hidden" name="type" value="${this.type}">\n` +
             `  <div class="d-inline-flex  mb-2"><h6 class="heading-small w-100">Выбор муфты</h6>\n` +
             `    <input name="part_name" id="${this.id}_input-part-name" class="form-control form-control-sm ml-1" type="text"\n` +
-            `           placeholder="Муфта N"></div>\n` +
+            `           placeholder="Муфта N">` +
+            `        <label class="form-control-label text-nowrap p-2 ml-2" for="${this.id}_input-clutch-amount">Количество</label>` +
+            `        <input name="amount" id="${this.id}_input-clutch-amount" class="form-control form-control-sm" type="number" placeholder="1">` +
+            `</div>\n` +
             `  <div class="d-flex form-group col">\n` +
             `    <label class="form-control-label text-nowrap p-2" for="${this.id}_input-clutch">Муфта</label>\n` +
             `    <select name="id" class="form-control form-control-sm fstdropdown-select" id="${this.id}_input-clutch">\n` +
@@ -638,6 +406,107 @@ class ClutchSection extends BasicSection {
             `      <option value="2">Муфта 2x06</option>\n` +
             `    </select>\n` +
             `  </div>\n` +
+            `</form>\n` +
+            `          <div class="d-flex text-left">\n` +
+            `            <a href="#!" onclick="dropSection('${this.id}')" class="btn btn-sm btn-primary">Сбросить муфту</a>\n` +
+            `            <a href="#!" onclick="deleteSection('${this.id}')" class="btn btn-sm btn-primary">Удалить запчасть</a>\n` +
+            `          </div>` +
+            `<hr/>`
+    }
+}
+
+
+class ServiceSection extends BasicSection {
+    type = 'service';
+    readable_name = "Услуга"
+
+    constructor(data, id, parentBlockId, num) {
+        super(data, id, parentBlockId, num);
+    }
+
+    updateData() {
+        let resp = this.data;
+        let selection = current_selection["items"][this.id] || {}
+
+        const part_name = $(`#${this.id}_input-part-name`)
+        const amount_select = $(`#${this.id}_input-service-amount`)
+        amount_select.val(selection['amount'] || 0)
+        part_name.val(selection['part_name'] || '')
+
+    }
+
+    get HTML() {
+        return `<form id="${this.id}">\n` +
+            `  <input type="hidden" name="type" value="${this.type}">\n` +
+            `  <div class="d-inline-flex  mb-2"><h6 class="heading-small w-100">Выбор услуги</h6>\n` +
+            `</div>\n` +
+            `  <div class="d-flex">\n` +
+            `        <label class="form-control-label text-nowrap p-2 ml-2" for="${this.id}_input-part-name">Название</label>` +
+            `    <input name="part_name" id="${this.id}_input-part-name" class="form-control form-control-sm ml-1" type="text"\n` +
+            `           placeholder="Трубка N">` +
+            `        <label class="form-control-label text-nowrap p-2 ml-2" for="${this.id}_input-service-amount">Стоимость</label>` +
+            `        <input name="amount" id="${this.id}_input-service-amount" class="form-control form-control-sm" type="number" placeholder="1">` +
+            `  </div>\n` +
+            `</form>\n` +
+            `          <div class="d-flex text-left">\n` +
+            `            <a href="#!" onclick="dropSection('${this.id}')" class="btn btn-sm btn-primary">Сбросить услугу</a>\n` +
+            `            <a href="#!" onclick="deleteSection('${this.id}')" class="btn btn-sm btn-primary">Удалить услугу</a>\n` +
+            `          </div>` +
+            `<hr/>`
+    }
+}
+
+
+class PipeSection extends BasicSection {
+    type = 'pipe';
+    readable_name = "Трубка"
+
+    constructor(data, id, parentBlockId, num) {
+        super(data, id, parentBlockId, num);
+    }
+
+    updateData() {
+        let resp = this.data;
+        let offer = resp['parameters'][this.id]
+        let selection = current_selection["items"][this.id] || {}
+
+        const part_name = $(`#${this.id}_input-part-name`)
+        const amount_select = $(`#${this.id}_input-pipe-amount`)
+        amount_select.val(selection['amount'] || 1)
+        part_name.val(selection['part_name'] || '')
+
+
+        updateSelect(`${this.id}_input-pipe-size`, "Выберите размер", offer['size'],
+            offer['size'], "", selection['size'] !== undefined)
+
+        updateIdSelect(`${this.id}_input-pipe`, "Выберите трубку", resp['candidates'][this.id], "",
+            selection['id'] !== undefined)
+
+    }
+
+    get HTML() {
+        return `<form id="${this.id}">\n` +
+            `  <input type="hidden" name="type" value="${this.type}">\n` +
+            `  <div class="d-inline-flex  mb-2"><h6 class="heading-small w-100">Выбор трубки</h6>\n` +
+            `    <input name="part_name" id="${this.id}_input-part-name" class="form-control form-control-sm ml-1" type="text"\n` +
+            `           placeholder="Трубка N">` +
+            `        <label class="form-control-label text-nowrap p-2 ml-2" for="${this.id}_input-pipe-amount">Длина (м)</label>` +
+            `        <input name="amount" id="${this.id}_input-pipe-amount" class="form-control form-control-sm" type="number" placeholder="1">` +
+            `</div>\n` +
+            `  <div class="d-flex">\n` +
+            `  <div class="d-flex form-group col">\n` +
+            `    <label class="form-control-label text-nowrap p-2" for="${this.id}_input-pipe-size">Трубка</label>\n` +
+            `    <select name="size" class="form-control form-control-sm fstdropdown-select" id="${this.id}_input-pipe-size">\n` +
+            `      <option value="">Выберите размер</option>\n` +
+            `    </select>\n` +
+            `  </div>\n` +
+            `  <div class="d-flex form-group col">\n` +
+            `    <label class="form-control-label text-nowrap p-2" for="${this.id}_input-pipe">Трубка</label>\n` +
+            `    <select name="id" class="form-control form-control-sm fstdropdown-select" id="${this.id}_input-pipe">\n` +
+            `      <option value="">Выберите трубку</option>\n` +
+            `    </select>\n` +
+            `  </div>\n` +
+            '</div>' +
             `</form>\n` +
             `          <div class="d-flex text-left">\n` +
             `            <a href="#!" onclick="dropSection('${this.id}')" class="btn btn-sm btn-primary">Сбросить муфту</a>\n` +
@@ -659,61 +528,28 @@ class ArmSection extends BasicSection {
 
     updateData() {
         let resp = this.data;
-        let selection = resp['selection']["items"][this.id]
-        const diameter_select = $(`#${this.id}_input-arm-diameter`)
-        const type_select = $(`#${this.id}_input-arm-type`)
+        let selection = current_selection["items"][this.id] || {}
         const length_select = $(`#${this.id}_input-arm-length`)
-        const arm_select = $(`#${this.id}_input-arm`)
         const part_name = $(`#${this.id}_input-part-name`)
-        diameter_select.empty().append(new Option("Выберите диаметр", ""));
-        type_select.empty().append(new Option("Выберите тип рукава", ""));
-        arm_select.empty().append(new Option("Выберите рукав", ""));
         let offer = resp['parameters'][this.id]
-        if (selection === undefined) {
-            selection = {}
-        }
-        if (selection['amount'] !== undefined) {
-            length_select.val(selection['amount'])
-        } else {
-            length_select.val(0);
-        }
-        if (selection['part_name'] !== undefined) {
-            part_name.val(selection['part_name'])
-        } else {
-            part_name.val('');
-        }
-        for (const type of offer['arm_type'] || []) {
-            type_select.append(new Option(type, type));
-        }
-        for (const diameter of offer['diameter'] || []) {
-            diameter_select.append(new Option(diameter + ' мм', diameter));
-        }
-        for (const arm of resp['candidates'][this.id] || []) {
-            arm_select.append(new Option(`${arm['name']}: ${arm['amount']}`, arm['_id']));
-        }
-        if (selection['diameter'] !== undefined) {
-            $(`#${this.id}_input-arm-diameter option:last`).attr("selected", "selected");
-        }
-        if (selection['braid'] !== undefined) {
-            $(`#${this.id}_input-arm-braid option:last`).attr("selected", "selected");
-        }
-        if (selection['arm_type'] !== undefined) {
-            $(`#${this.id}_input-arm-type option:last`).attr("selected", "selected");
-        }
-        if (selection['id'] !== undefined) {
-            $(`#${this.id}_input-arm option:last`).attr("selected", "selected");
-        }
-        // console.log('rebinding')
-        document.getElementById(`${this.id}_input-arm-diameter`).fstdropdown.rebind()
-        document.getElementById(`${this.id}_input-arm-type`).fstdropdown.rebind()
-        document.getElementById(`${this.id}_input-arm`).fstdropdown.rebind()
+        length_select.val(selection['amount'] || 0)
+        part_name.val(selection['part_name'] || '')
+
+        updateSelect(`${this.id}_input-arm-type`, "Выберите тип", offer['arm_type'],
+            offer['arm_type'], "", selection['arm_type'] !== undefined)
+        updateSelect(`${this.id}_input-arm-diameter`, "Выберите диаметр", offer['diameter'],
+            offer['diameter'], " мм", selection['diameter'] !== undefined)
+        updateIdSelect(`${this.id}_input-arm`, "Выберите рукав", resp['candidates'][this.id], "",
+            selection['id'] !== undefined)
+
     }
 
 
     get HTML() {
         return `<form id="${this.id}">\n` +
             `<input type="hidden" name="type" value="${this.type}">` +
-            `<div class="d-inline-flex mb-2"><h6 class="heading-small w-100">Выбор рукава</h6><input name="part_name" id="${this.id}_input-part-name" class="form-control form-control-sm ml-1" type="text" placeholder="Рукав N"></div>\n` +
+            `<div class="d-inline-flex align-items-center mb-2"><h6 class="heading-small text-nowrap p-2">Выбор рукава</h6><input name="part_name" id="${this.id}_input-part-name" class="form-control form-control-sm ml-1" type="text" placeholder="Рукав N">` +
+            `</div>\n` +
             '<div class="pl-lg-4">\n' +
             `  <div class="row">\n` +
             `    <div class="col-lg-6">\n` +
@@ -758,3 +594,28 @@ class ArmSection extends BasicSection {
     }
 }
 
+function updateSelect(id, optionName, visibleList, optionList, nameAppendix, isSelected) {
+    visibleList = visibleList || []
+    const select = $(`#${id}`)
+    select.empty().append(new Option(optionName, ""));
+
+    for (let i = 0; i < visibleList.length; i++) {
+        select.append(new Option(`${visibleList[i]}${nameAppendix}`, optionList[i]));
+    }
+
+    if (isSelected) {
+        $(`#${id} option:last`).attr("selected", "selected");
+    }
+
+    document.getElementById(id).fstdropdown.rebind()
+}
+
+function updateIdSelect(id, optionName, candidatesList, nameAppendix, isSelected) {
+    let res = []
+    let options = []
+    for (const candidate of candidatesList) {
+        res.push(`${candidate['name']}: ${candidate['amount']}`)
+        options.push(candidate['_id'])
+    }
+    updateSelect(id, optionName, res, options, nameAppendix, isSelected)
+}
