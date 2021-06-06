@@ -18,7 +18,10 @@ def set_comment(sid: str, comment: str):
 
 
 def get_comment(sid: str):
-    return utility.get_session(sid).comment or ''
+    session = utility.get_session(sid)
+    if session:
+        return session.comment or ''
+    return ''
 
 
 def remove_session(sid: str):
