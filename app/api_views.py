@@ -1,5 +1,6 @@
 import json
 import sys
+import traceback
 
 import pytz
 from flask import request, jsonify, make_response, abort, Response
@@ -88,6 +89,7 @@ def close_order(order_id):
     try:
         order = order_controller.close_order(order_id)
     except Exception as e:
+        traceback.print_exc()
         return Response(str(e), status=409)
     return jsonify(order)
 
@@ -98,6 +100,7 @@ def checkout_order(order_id):
     try:
         order = order_controller.checkout_order(order_id)
     except Exception as e:
+        traceback.print_exc()
         return Response(str(e), status=409)
     return jsonify(order)
 
@@ -166,8 +169,8 @@ def set_contragent():
     try:
         session_controller.set_contragent(sid, contragent_id)
         return contragent_controller.get_contragent(contragent_id)
-    except Exception:
-        print(sys.exc_info()[0])
+    except Exception as e:
+        traceback.print_exc()
         return str(sys.exc_info()[0]), 404
 
 
@@ -179,7 +182,8 @@ def get_contragent():
     try:
         contragent = session_controller.get_contragent(sid)
         return contragent
-    except Exception:
+    except Exception as e:
+        traceback.print_exc()
         return jsonify({})
 
 
@@ -213,6 +217,7 @@ def move_part_to_cart():
     try:
         session_controller.add_part_to_cart(sid)
     except Exception as e:
+        traceback.print_exc()
         return Response(str(e), status=409)
     return jsonify('success')
 
@@ -225,6 +230,7 @@ def move_selection_to_cart():
     try:
         session_controller.add_selection_to_cart(sid)
     except Exception as e:
+        traceback.print_exc()
         return Response(str(e), status=409)
     return jsonify('success')
 
@@ -275,6 +281,7 @@ def checkout_order_view():
     try:
         order = order_controller.create_order(sid)
     except Exception as e:
+        traceback.print_exc()
         return Response(str(e), status=409)
     session_controller.remove_session(sid)
     resp = make_response(jsonify(order.order_num))
@@ -314,6 +321,7 @@ def create_contragent():
     try:
         contragent_controller.create_contragent_from_form(data)
     except Exception as e:
+        traceback.print_exc()
         return Response(str(e), status=409)
     return jsonify('success')
 
@@ -335,6 +343,7 @@ def create_user():
         user_token = users_controller.create_user(**request.form)
         return jsonify('success')
     except ValueError as e:
+        traceback.print_exc()
         resp = Response(str(e))
         resp.status = 409
         return resp
