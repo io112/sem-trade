@@ -111,7 +111,7 @@ function updateSelectionSubtotal() {
 }
 
 function updateAllSections() {
-    getCurrentSelection().then(updateSections)
+    getCurrentSelection().then(defineSections)
 }
 
 function addToCart() {

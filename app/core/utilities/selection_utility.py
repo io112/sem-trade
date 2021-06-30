@@ -13,7 +13,7 @@ from app.core.utilities.common import queryset_to_list
 not_zero_amount = {'amount': {'$not': {'$eq': 0}}}
 
 collections = {'arm': Arm, 'clutch': Clutch, 'fiting': Fiting, 'pipe': Pipe}
-price_coefficients = {'hydro': 2.3, 'gur': 7, 'break': 7, 'conditioner': 7, 'clutch': 7, 'transmission': 7}
+price_coefficients = {'hydro': 1, 'gur': 1, 'break': 1, 'conditioner': 1, 'clutch': 1, 'transmission': 1}
 
 
 def create_selection() -> RVDSelection:
@@ -143,15 +143,30 @@ def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
             amount = value['amount'] if value.get('amount') is not None else 1
             id = value['id']
             item = obj.objects(id=id)[0]
-            price = round(item.price * price_coefficient + additional_price, 2)
+            price = item.price * price_coefficient
+            price += price * get_price_coef(price, amount) + additional_price
+            price = round(price, 2)
+            total_price = round(price * amount, 2)
             cart_item = CartItem(name=item.name, local_name=value.get('part_name', ''), item=item, amount=amount,
-                                 price=price, total_price=round(price * amount, 2))
+                                 price=price, total_price=total_price)
             res[key] = cart_item
         if value['type'] == 'service':
             cart_item = CartItem(name=value.get('part_name', ''), amount=1,
                                  price=0, total_price=0)
             res[key] = cart_item
     return res
+
+
+def get_price_coef(price, amount):
+    total_price = price * amount
+    if total_price <= 100:
+        return 3
+    elif total_price <= 500:
+        return 1.3
+    elif total_price <= 1000:
+        return 0.8
+    else:
+        return 0.5
 
 
 def get_services_price(selection: RVDSelection) -> Dict[str, float]:
