@@ -130,6 +130,8 @@ def calc_subtotal(selection: RVDSelection) -> RVDSelection:
 def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
     res = {}
     services_price = get_services_price(selection)
+    fp = get_full_price(selection)
+    price_coef = get_price_coef(fp['total_price'])
     items_amount = services_price['items_amount']
     services_price = services_price['services_price']
     additional_price = round(services_price / items_amount, 2) if items_amount else 0
@@ -144,7 +146,7 @@ def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
             id = value['id']
             item = obj.objects(id=id)[0]
             price = item.price * price_coefficient
-            price += price * get_price_coef(price, amount) + additional_price
+            price += price * price_coef + additional_price
             price = round(price, 2)
             total_price = round(price * amount, 2)
             cart_item = CartItem(name=item.name, local_name=value.get('part_name', ''), item=item, amount=amount,
@@ -157,7 +159,7 @@ def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
     return res
 
 
-def get_price_coef(price, amount):
+def get_price_coef(price, amount=1):
     total_price = price * amount
     if total_price <= 100:
         return 3
@@ -183,6 +185,20 @@ def get_services_price(selection: RVDSelection) -> Dict[str, float]:
         elif 'id' in value:
             total_items_amount += value.get('amount', 0)
     return {'items_amount': total_items_amount * total_amount, 'services_price': price}
+
+
+def get_full_price(selection: RVDSelection) -> Dict[str, float]:
+    res = {'items_amount': 0, 'full_price': 0}
+    price = 0
+    total_items_amount = 0
+    total_amount = selection.subtotal.get('amount', 1)
+    if not (selection and selection.items):
+        return res
+    items = selection.items
+    for key, value in items.items():
+        price += float(value.get('amount', 0))
+        total_items_amount += value.get('amount', 0)
+    return {'items_amount': total_items_amount * total_amount, 'full_price': price}
 
 
 def create_selection_name(items: Dict[str, CartItem]):
