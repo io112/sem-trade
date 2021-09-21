@@ -19,14 +19,14 @@ def get_selection(session_id):
     return selection.to_mongo().to_dict()
 
 
-def find_part(collection, query, only_present):
+def find_part(collection, query, only_present, amount):
     res = {'items': []}
     collection_object = None
     for i in collections:
         if i == collection:
             collection_object = collections[i]
     if collection_object is not None:
-        search = utility.find_part(collection_object, query, only_present)
+        search = utility.find_part(collection_object, query, only_present, amount)
         for i in search:
             res['items'].append(i.get_safe())
         return res
@@ -59,7 +59,7 @@ def set_part(session_id: str, collection: str, part_id: str, amount: float):
     session = Session.objects(id=session_id)[0]
     collection = collections[collection]
     part = collection.objects(id=part_id)[0]
-    price = round(part.price * utility.price_coefficient, 2)
+    price = round(part.price * utility.get_price_coef(part.price, amount), 2)
     item = CartItem(name=part.name, item=part, amount=amount, price=price, total_price=round(price * amount, 2))
     selection = utility.save_selection(session, {}, {}, item)
     res_part = selection['part']

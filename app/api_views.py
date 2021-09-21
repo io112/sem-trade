@@ -122,7 +122,7 @@ def update_session_view():
 @sid_required
 def find_part():
     data = request.form
-    res = selection_controller.find_part(data['collection'], data['query'], data.get('only_present'))
+    res = selection_controller.find_part(data['collection'], data['query'], data.get('only_present'), data.get('amount', 1))
     return jsonify(res)
 
 
@@ -337,7 +337,7 @@ def find_contragents():
 
 
 @app.route('/api/create_user', methods=['POST'])
-@login_required
+# @login_required
 def create_user():
     try:
         user_token = users_controller.create_user(**request.form)

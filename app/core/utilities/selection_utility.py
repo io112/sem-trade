@@ -20,13 +20,14 @@ def create_selection() -> RVDSelection:
     return calc_subtotal(RVDSelection())
 
 
-def find_part(collection: BaseItem, query: str, only_present):
+def find_part(collection: BaseItem, query: str, only_present, amount: int):
     if only_present:
         res = collection.objects(amount__gt=0)
     else:
         res = collection.objects
     res = res.search_text(query)
     for i in res:
+        price_coefficient = get_price_coef(i.price, float(amount))
         i.price = round(i.price * price_coefficient, 2)
     return res
 
@@ -159,7 +160,7 @@ def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
     return res
 
 
-def get_price_coef(price, amount=1):
+def get_price_coef(price, amount=1.0):
     total_price = price * amount
     if total_price <= 100:
         return 3
@@ -188,7 +189,7 @@ def get_services_price(selection: RVDSelection) -> Dict[str, float]:
 
 
 def get_full_price(selection: RVDSelection) -> Dict[str, float]:
-    res = {'items_amount': 0, 'full_price': 0}
+    res = {'items_amount': 0, 'total_price': 0}
     price = 0
     total_items_amount = 0
     total_amount = selection.subtotal.get('amount', 1)
@@ -196,9 +197,12 @@ def get_full_price(selection: RVDSelection) -> Dict[str, float]:
         return res
     items = selection.items
     for key, value in items.items():
-        price += float(value.get('amount', 0))
-        total_items_amount += value.get('amount', 0)
-    return {'items_amount': total_items_amount * total_amount, 'full_price': price}
+        obj = collections.get(value['type'])
+        if obj is not None and 'id' in value:
+            item = obj.objects(id=value['id'])[0]
+            price += item.price * value.get('amount', 0)
+            total_items_amount += value.get('amount', 0)
+    return {'items_amount': total_items_amount * total_amount, 'total_price': price}
 
 
 def create_selection_name(items: Dict[str, CartItem]):
