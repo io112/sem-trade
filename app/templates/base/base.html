@@ -20,13 +20,18 @@
     <link rel="stylesheet" href="../static/{{ commit_hash }}/assets/css/rvd.css">
     <script src="../static/{{ commit_hash }}/assets/js/fstdropdown.js"></script>
     <link rel="stylesheet" href="../static/{{ commit_hash }}/assets/css/fstdropdown.css">
-    <link href="https://unpkg.com/primevue/resources/themes/saga-blue/theme.css" rel="stylesheet">
-    <link href="https://unpkg.com/primevue/resources/primevue.min.css" rel="stylesheet">
-    <link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet">
 
+    <!-- PrimeVue -->
+    <link href="https://unpkg.com/primevue@3.8.2/resources/themes/saga-blue/theme.css" rel="stylesheet"/>
+    <link href="https://unpkg.com/primevue@3.8.2/resources/primevue.min.css" rel="stylesheet"/>
+    <link href="https://unpkg.com/primeflex@2.0.0/primeflex.min.css" rel="stylesheet"/>
+    <link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet"/>
+
+    <!-- Dependencies -->
     <script src="https://unpkg.com/vue@next"></script>
-    <script src="https://unpkg.com/primevue/core/core.min.js"></script>
-    <script src="https://unpkg.com/primevue/slider/slider.min.js"></script>
+    <script src="https://unpkg.com/primevue@3.8.2/core/core.min.js"></script>
+  {% endblock %}
+  {% block additional_head %}
   {% endblock %}
 </head>
 
@@ -63,19 +68,19 @@
       <div class="container-fluid mt--6">
         {% block content %}
         {% endblock %}
-        {% block footer %}
-          <!-- Footer -->
-          <footer class="footer pt-0">
-            <div class="row align-items-center justify-content-lg-between">
-              <div class="col-lg-6">
-                <div class="copyright text-center  text-lg-left  text-muted">
-                  &copy; 2021 СтройЭксперт-М
-                </div>
+      </div>
+      {% block footer %}
+        <!-- Footer -->
+        <footer class="footer pt-0">
+          <div class="row align-items-center justify-content-lg-between">
+            <div class="col-lg-6">
+              <div class="copyright text-center  text-lg-left  text-muted">
+                &copy; 2021 СтройЭксперт-М
               </div>
             </div>
-          </footer>
-        {% endblock %}
-      </div>
+          </div>
+        </footer>
+      {% endblock %}
       </div>
     {% endblock %}
 </div>

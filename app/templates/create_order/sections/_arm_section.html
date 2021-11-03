@@ -1,0 +1,47 @@
+<form @change="getItems" id="${this.id}">
+  <input type="hidden" name="type" value="${this.type}">
+
+  <div class="pl-lg-4">
+
+    <div class="d-flex form-group">
+      <label class="form-control-label text-nowrap p-2">Диаметр</label>
+      <p-dropdown @change="getItems" v-model="part.params.diameter" :options="suggestion.params.diameter"
+                  placeholder="Диаметр">
+        <template #option="slotProps">
+          <div>[[ slotProps.option ]] мм</div>
+        </template>
+      </p-dropdown>
+    </div>
+
+    <div class="d-flex form-group">
+      <label class="form-control-label text-nowrap p-2" for="${this.id}_input-arm-type">Тип рукава</label>
+      <p-dropdown @change="getItems" v-model="part.params.arm_type" :options="suggestion.params.arm_type"
+                  placeholder="Тип рукава">
+      </p-dropdown>
+
+
+    </div>
+
+    <div class="d-flex form-group">
+      <label class="form-control-label text-nowrap p-2" for="${this.id}_input-length">Длина рукава (м)</label>
+      <p-inputnumber @change="getItems" v-model="part.amount" mode="decimal" :maxFractionDigits="2"></p-inputnumber>
+    </div>
+
+
+    <div class="d-flex form-group">
+      <label class="form-control-label text-nowrap p-2" for="${this.id}_input-arm">Рукав</label>
+      <select name="id" class="fstdropdown-select form-control form-control-sm" id="${this.id}_input-arm">
+        <option value="">Выберите рукав</option>
+
+      </select>
+
+
+    </div>
+  </div>
+
+</form>
+<div class="d-flex text-left">
+  <a href="#!" onclick="dropSection(${this.id})" class="btn btn-sm btn-primary">Сбросить рукав</a>
+  <a href="#!" onclick="deleteSection(${this.id})" class="btn btn-sm btn-primary">Удалить запчасть</a>
+</div>
+<hr/>

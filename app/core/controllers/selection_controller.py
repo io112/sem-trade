@@ -53,6 +53,17 @@ def get_filtered_params(session_id, only_present):
     return {'candidates': candidates, 'parameters': parameters, 'selection': selection.get_safe()}
 
 
+def get_suggestion(session_id, only_present, part_params, part_type):
+    only_present = True if only_present == 'true' else False
+    session = Session.objects(id=session_id)[0]
+    if session.selection is None:
+        session.selection = utility.create_selection()
+        session.save()
+    candidate = utility.get_candidate_by_params(part_params, part_type, only_present)
+    parameters = utility.get_candidate_params(candidate)
+    return {'suggestion': candidate, 'parameters': parameters}
+
+
 def set_part(session_id: str, collection: str, part_id: str, amount: float):
     if amount == '':
         amount = 0

@@ -47,6 +47,15 @@ def get_candidates_by_params(selection: RVDSelection, only_present):
     return res
 
 
+def get_candidate_by_params(params: dict, type: str, only_present):
+    type_item = collections.get(type)
+    if type_item is not None:
+        res = queryset_to_list(__get_filtered_item(type_item, only_present, params))
+    else:
+        return None
+    return res
+
+
 def __get_filtered_item(item, only_present, params):
     if only_present:
         res = item.objects(amount__gt=0)
@@ -58,11 +67,14 @@ def __get_filtered_item(item, only_present, params):
 def get_parameters_list(all_candidates: dict) -> dict:
     res = {}
     for key, value in all_candidates.items():
-        if type(value) == dict:
-            res[key] = get_parameters_list(value)
-            continue
-        res[key] = get_available_parameters(value)
+        get_candidate_params(value)
     return res
+
+
+def get_candidate_params(candidate) -> dict:
+    if type(candidate) == dict:
+        return get_parameters_list(candidate)
+    return get_available_parameters(candidate)
 
 
 def get_available_parameters(candidates: list) -> dict:
@@ -75,6 +87,7 @@ def get_available_parameters(candidates: list) -> dict:
                 continue
             if value not in res[key]:
                 res[key].append(value)
+            res[key].sort()
     return res
 
 

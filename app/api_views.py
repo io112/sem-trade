@@ -9,6 +9,7 @@ from flask_login import login_required, current_user
 from app import app
 from app.core.controllers import order_controller, selection_controller, session_controller, contragent_controller, \
     users_controller
+from app.core.models.suggestion_request import SuggestionRequest
 from app.misc import sid_required, check_sid
 
 # ----------------SESSION ENDPOINTS---------------
@@ -122,7 +123,8 @@ def update_session_view():
 @sid_required
 def find_part():
     data = request.form
-    res = selection_controller.find_part(data['collection'], data['query'], data.get('only_present'), data.get('amount', 1))
+    res = selection_controller.find_part(data['collection'], data['query'], data.get('only_present'),
+                                         data.get('amount', 1))
     return jsonify(res)
 
 
@@ -241,6 +243,18 @@ def move_selection_to_cart():
 def get_offer():
     sid = request.cookies.get('current_order')
     res = selection_controller.get_filtered_params(sid, request.form.get('only_present'))
+    return jsonify(res)
+
+
+@app.route('/api/make_order/suggest_part', methods=['POST'])
+@sid_required
+@login_required
+def get_suggestion():
+    sid = request.cookies.get('current_order')
+    d = json.loads(request.data)
+    res = selection_controller.get_suggestion(sid, d.get('only_present'),
+                                              d.get('part_params', {}),
+                                              d.get('part_type'))
     return jsonify(res)
 
 
