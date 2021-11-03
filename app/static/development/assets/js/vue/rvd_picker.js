@@ -66,7 +66,7 @@ const RVDPicker = {
             });
             this.suggestion.params = resp["parameters"];
             this.suggestion.parts = resp["suggestion"];
-            console.log(this.part);
+            console.log(this.suggestion.parts);
 
         },
         change() {
