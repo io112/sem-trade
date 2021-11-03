@@ -20,7 +20,9 @@ def create_selection() -> RVDSelection:
     return calc_subtotal(RVDSelection())
 
 
-def find_part(collection: BaseItem, query: str, only_present, amount: int):
+def find_part(collection: BaseItem, query: str, only_present, amount: int = 0):
+    if amount == '':
+        amount = 0
     if only_present:
         res = collection.objects(amount__gt=0)
     else:

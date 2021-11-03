@@ -20,56 +20,66 @@
     <link rel="stylesheet" href="../static/{{ commit_hash }}/assets/css/rvd.css">
     <script src="../static/{{ commit_hash }}/assets/js/fstdropdown.js"></script>
     <link rel="stylesheet" href="../static/{{ commit_hash }}/assets/css/fstdropdown.css">
+    <link href="https://unpkg.com/primevue/resources/themes/saga-blue/theme.css" rel="stylesheet">
+    <link href="https://unpkg.com/primevue/resources/primevue.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet">
+
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://unpkg.com/primevue/core/core.min.js"></script>
+    <script src="https://unpkg.com/primevue/slider/slider.min.js"></script>
   {% endblock %}
 </head>
 
 <body>
-{% block sidenav %}
-  {% include 'base/sidenav.html' %}
-{% endblock %}
-<!-- Main content -->
-<div class="main-content" id="panel">
-  <!-- Topnav -->
-  {% block topnav %}
-    {% include 'base/topnav.html' %}
+<div id="app">
+  {% block sidenav %}
+    {% include 'base/sidenav.html' %}
   {% endblock %}
-
-  {% block body %}
-    {% block pagehead %}
-      <!-- Header -->
-      <div class="header pb-6 d-flex align-items-center"
-           style="min-height: 250px;">
-        <!-- Mask -->
-        <span class="mask bg-gradient-default opacity-8"></span>
-        <!-- Header container -->
-        <div class="container-fluid d-flex align-items-center">
-          <div class="row">
-            <div class="col-lg-20 col-md">
-              <h1 class="display-2 text-white">
-                {% block pagename %}Создание заказа {% endblock %}</h1>
-            </div>
-          </div>
-        </div>
-      </div>
+  <!-- Main content -->
+  <div class="main-content" id="panel">
+    <!-- Topnav -->
+    {% block topnav %}
+      {% include 'base/topnav.html' %}
     {% endblock %}
-    <div class="container-fluid mt--6">
-      {% block content %}
-      {% endblock %}
-      {% block footer %}
-        <!-- Footer -->
-        <footer class="footer pt-0">
-          <div class="row align-items-center justify-content-lg-between">
-            <div class="col-lg-6">
-              <div class="copyright text-center  text-lg-left  text-muted">
-                &copy; 2021 СтройЭксперт-М
+
+    {% block body %}
+      {% block pagehead %}
+        <!-- Header -->
+        <div class="header pb-6 d-flex align-items-center"
+             style="min-height: 250px;">
+          <!-- Mask -->
+          <span class="mask bg-gradient-default opacity-8"></span>
+          <!-- Header container -->
+          <div class="container-fluid d-flex align-items-center">
+            <div class="row">
+              <div class="col-lg-20 col-md">
+                <h1 class="display-2 text-white">
+                  {% block pagename %}Создание заказа {% endblock %}</h1>
               </div>
             </div>
           </div>
-        </footer>
+        </div>
       {% endblock %}
-    </div>
-    </div>
-  {% endblock %}
+      <div class="container-fluid mt--6">
+        {% block content %}
+        {% endblock %}
+        {% block footer %}
+          <!-- Footer -->
+          <footer class="footer pt-0">
+            <div class="row align-items-center justify-content-lg-between">
+              <div class="col-lg-6">
+                <div class="copyright text-center  text-lg-left  text-muted">
+                  &copy; 2021 СтройЭксперт-М
+                </div>
+              </div>
+            </div>
+          </footer>
+        {% endblock %}
+      </div>
+      </div>
+    {% endblock %}
+</div>
+
 <!-- Argon Scripts -->
 <!-- Core -->
 {% block scripts %}
@@ -89,5 +99,23 @@
 {% block additional_scripts %}
 
 {% endblock %}
+<script>
+    const {createApp, ref} = Vue;
+
+    const App = {
+        setup() {
+            const val = ref(null);
+
+            return {
+                val
+            };
+        },
+        components: {
+            'p-slider': primevue.slider
+        }
+    };
+
+    createApp(App).use(primevue.config.default).mount("#app");
+</script>
 </body>
 </html>
