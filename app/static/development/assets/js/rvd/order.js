@@ -26,7 +26,7 @@ function init() {
 // }
 
 function print_upd() {
-    send(`/api/orders/${order_id}/download_upd`).then(data => {
+    textRequest(`/api/orders/${order_id}/download_upd`).then(data => {
         w = window.open(window.location.href, "_blank");
         //w.document.open();
         w.document.write(data);
@@ -38,7 +38,7 @@ function print_upd() {
 
 function print_bill() {
     let windowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
-    send(`/api/orders/${order_id}/download_bill`).then(data => {
+    textRequest(`/api/orders/${order_id}/download_bill`).then(data => {
         w = window.open(window.location.href, "_blank", windowFeatures);
         //w.document.open();
         w.document.write(data);
