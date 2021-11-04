@@ -1,0 +1,26 @@
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2">Количество</label>
+  <p-inputnumber class="w-100" v-model="part.amount"></p-inputnumber>
+</div>
+
+
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2"><b>Муфта</b></label>
+  <p-dropdown class="w-100" v-model="selected_part" :options="suggestion.parts" @change="setPart"
+              placeholder="Муфта">
+    <template #value="slotProps">
+      <div v-if="slotProps.value">[[ slotProps.value.name ]]: [[ slotProps.value.amount ]]</div>
+      <div v-else>[[ slotProps.placeholder ]]</div>
+    </template>
+    <template #option="slotProps">
+      <div>[[ slotProps.option.name ]]: [[ slotProps.option.amount ]]</div>
+    </template>
+  </p-dropdown>
+  <a class="col-md-1" href="#!" @click="clearSelectedPart">
+    <i class="fa fa-trash-alt text-red">
+    </i>
+  </a>
+
+</div>
+
+

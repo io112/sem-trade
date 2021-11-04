@@ -11,3 +11,7 @@
     margin: 25px 10px;
     width: 18rem;
 }
+
+.p-dropdown-panel {
+    z-index: 1200 !important;
+}

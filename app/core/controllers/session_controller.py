@@ -2,7 +2,7 @@ import app.core.utilities.session_utility as utility
 from app.core.models.cart import Cart
 from app.core.models.items.composite_item import CompositeItem
 from app.core.models.selection import RVDSelection
-from app.core.utilities import contragent_utility, selection_utility
+from app.core.utilities import contragent_utility
 from app.core.utilities.common import *
 
 
@@ -92,16 +92,7 @@ def add_part_to_cart(sid: str):
 def add_selection_to_cart(sid: str):
     session = utility.get_session(sid)
     selection: RVDSelection = session.selection
-    selection_items = selection_utility.get_selected_items(selection)
-    items = []
-    if not selection.subtotal['job_type']:
-        raise ValueError(f'Выберите тип рукава')
-    for i in selection_items.values():
-        if i.amount <= 0:
-            raise ValueError(f'Выбрано 0 или меньше предметов: {i.name}')
-        items.append(i)
-    if len(items) != len(selection.items):
-        raise ValueError('Выбраны не все компоненты')
+    items = selection.items
     item = CompositeItem()
     item.items = items
     item.price = selection.subtotal['price']

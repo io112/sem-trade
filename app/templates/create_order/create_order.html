@@ -1,5 +1,12 @@
 {% extends 'base/base.html' %}
 
+{% block additional_head %}
+  <script src="https://unpkg.com/primevue@3.8.2/dropdown/dropdown.min.js"></script>
+  <script src="https://unpkg.com/primevue@3.8.2/core/core.min.js"></script>
+  <script src="https://unpkg.com/primevue@3.8.2/inputswitch/inputswitch.min.js"></script>
+
+{% endblock %}
+
 {% block content %}
 
   <!-- Page content -->
@@ -55,7 +62,8 @@
             <div class="col-4 text-right">
               <a href="#!" class="btn btn-sm btn-primary" data-toggle="modal"
                  data-target="#addModal">Добавить рукав</a>
-              <a href="#!" data-target="#addPartModal" data-toggle="modal" class="btn btn-sm btn-primary">Добавить запчасть</a>
+              <a href="#!" data-target="#addPartModal" data-toggle="modal" class="btn btn-sm btn-primary">Добавить
+                запчасть</a>
             </div>
             <div class="table-responsive">
               <table id="items_list" class="table align-items-center table-flush">
@@ -113,7 +121,7 @@
     </nav>
   </div>
   <!-- Modal -->
-  {% include 'create_order/modal.html' %}
+  {% include 'create_order/new_modal.html' %}
   {% include 'create_order/part_modal.html' %}
   {% include 'create_order/create_contr_modal.html' %}
 
@@ -121,6 +129,8 @@
 
 {% block additional_scripts %}
   <script src="../static/{{ commit_hash }}/assets/js/rvd/cart_worker.js"></script>
-  <script src="../static/{{ commit_hash }}/assets/js/rvd/form_submitter.js"></script>
+  <script src="../static/{{ commit_hash }}/assets/js/vue/rvd_picker.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"
+          integrity="sha256-qXBd/EfAdjOA2FGrGAG+b3YBn2tn5A6bhz+LSgYD96k=" crossorigin="anonymous"></script>
 {% endblock %}
 
