@@ -122,6 +122,8 @@ const RVDPicker = {
         }
         ,
         async getItems() {
+            if (this.part.type === null)
+                return
             if (this.part.type === 'service') {
                 if (!this.selected_part)
                     this.selected_part = {}
