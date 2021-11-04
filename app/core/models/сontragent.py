@@ -33,7 +33,7 @@ class Contragent(Document):
         if not self.kpp:
             raise ValidationError('КПП не заполнен')
         if len(self.inn) != 10:
-            raise ValidationError('ИНН должен быть из 12 символов')
+            raise ValidationError('ИНН должен быть из 10 символов')
         if len(self.kpp) != 9:
             raise ValidationError('КПП должен быть из 9 символов')
 
