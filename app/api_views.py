@@ -130,7 +130,7 @@ def update_selection_items():
 @login_required
 @sid_required
 def find_part():
-    data = request.form
+    data = json.loads(request.data)
     res = selection_controller.find_part(data['collection'], data['query'], data.get('only_present'),
                                          data.get('amount', 1))
     return jsonify(res)
@@ -330,7 +330,8 @@ def del_cart_item():
 @sid_required
 @login_required
 def get_carts():
-    sorting = request.form.get('sorting', None)
+    d = json.loads(request.data)
+    sorting = d.get('sorting', None)
     carts = session_controller.get_user_sessions(current_user.username, sorting=sorting)
     return jsonify(carts)
 
