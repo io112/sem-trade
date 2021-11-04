@@ -6,23 +6,6 @@ function init() {
     get_orders_list(current_page, limit)
 }
 
-async function send(endpoint, data = {}) {
-    if (data === undefined)
-        data = []
-    var request = {"data": JSON.stringify(data)}
-    return await $.ajax({
-        type: "POST",
-        url: endpoint,
-        data: request,
-        success: function (e) {
-            return e
-        },
-        fail: function (e) {
-            alert(e)
-            return e
-        }
-    });
-}
 
 
 function get_orders_list(page, limit) {

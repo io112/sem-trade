@@ -13,24 +13,6 @@ function init() {
 }
 
 
-async function send(endpoint, data = {}) {
-    if (data === undefined)
-        data = []
-    var request = {"data": JSON.stringify(data)}
-    return await $.ajax({
-        type: "POST",
-        url: endpoint,
-        data: request,
-        success: function (e) {
-            return e
-        },
-        error: function (e) {
-            alert(e.responseText)
-            return e
-        }
-    });
-}
-
 //
 // function download_upd() {
 //     send(`/api/orders/${order_id}/download_upd`).then(data => {
@@ -99,7 +81,7 @@ function render_item_list(list) {
             item['items'].forEach(i => {
                 let name = i['name']
                 if (i['local_name'])
-                    name += ' [' + i['local_name']+']'
+                    name += ' [' + i['local_name'] + ']'
                 tb.append(get_included_item_row(num, name, i['amount']))
                 num += 1;
             })
