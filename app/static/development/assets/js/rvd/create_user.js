@@ -5,7 +5,6 @@ function create_user() {
         if (item.value !== "")
             res[item.name] = item.value
     })
-    console.log(res)
     send('/api/create_user', res).then(resp => alert('Пользователь успешно создан!'))
 }
 

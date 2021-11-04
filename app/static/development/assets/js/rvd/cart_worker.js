@@ -68,13 +68,12 @@ function render_parts(list) {
         $('#part_search').show()
         return;
     }
-    console.log(list)
     parts_list.empty();
     if (list['current_part']) {
         $('#part_search').hide()
         let part = list['current_part']
         let item = part['item']
-        console.log(part)
+        console.lg(part)
         parts_list.append(get_part(item['name'], item['amount'], item['_id'], true, item['type']))
         $('#part_price').html(part['price'])
         $('#part_total').html(part['total_price'])
@@ -98,7 +97,6 @@ function get_part(name, amount, id, is_selected, type) {
 function clear_part() {
     current_part = undefined
     send('/api/make_order/clear_part').then(res => {
-        console.log(res)
         if (res === 'success') {
             render_parts(current_part)
         }
@@ -116,7 +114,6 @@ function set_part(id, collection) {
         'amount': tryParseFloat($('#part-input-amount').val())
     }
     send('/api/make_order/set_part', req).then(resp => {
-        console.log(resp)
         current_part = resp['current_part']
         render_parts(resp)
     })
@@ -133,7 +130,6 @@ function checkout() {
     // })
 
     send(checkout_endpoint).then(resp => {
-        console.log(resp.status)
         if (!resp.status || resp.status === 200) {
             window.location.href = '/'
         }
@@ -147,7 +143,6 @@ function set_comment() {
 
 function render_comment() {
     send(get_comment_endpoint).then(comment => {
-        console.log(comment)
         $('#comment_text').val(comment)
     })
 }
@@ -213,7 +208,6 @@ function update_cart() {
 
 function render_cart(cart) {
     const cart_table = $('#items_list tbody')
-    console.log(cart)
     cart_table.empty()
     let items = cart['items']
     let subtotal = cart['subtotal']
@@ -306,7 +300,6 @@ function render_clients(data) {
 
 function del_order() {
     send(cancel_order_endpoint).then(new_sid => {
-        console.log(new_sid)
         if (new_sid !== '')
             window.location.href = `/?sid=${new_sid}`;
         else

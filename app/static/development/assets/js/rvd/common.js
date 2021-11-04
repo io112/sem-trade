@@ -8,7 +8,6 @@ async function request(endpoint, data = {}) {
         data: data,
         dataType: 'json',
         success: function (e, textStatus, xhr) {
-            console.log(e)
             return e
         },
         error: function (e) {
@@ -23,7 +22,6 @@ function tryParseFloat(val) {
     let regex = /^[+-]?([0-9]*([.]|[,]))?[0-9]+$/;
     if (regex.test(res) && res.length > 0) {
         res = parseFloat(val)
-        console.log(res)
     }
     return res
 }
@@ -39,7 +37,6 @@ async function send(endpoint, data = {}) {
         data: request,
         dataType: 'json',
         success: function (e, textStatus, xhr) {
-            console.log(e)
             return e
         },
         error: function (e) {

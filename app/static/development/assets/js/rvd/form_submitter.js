@@ -44,9 +44,7 @@ let current_offer = {
 
 function init() {
     sid = Cookies.get('current_order');
-    console.log(sid)
     init_cw()
-    console.log('cw ended')
     defineSections();
     update_cart();
     init_sessions();
