@@ -40,8 +40,9 @@ def route_remove_session():
 @app.route('/api/sessions/get_sessions', methods=['POST'])
 @login_required
 def get_sessions():
-    limit = int(request.form.get('limit', 0))
-    offset = int(request.form.get('offset', 0))
+    d = json.loads(request.data)
+    limit = int(d.get('limit', 0))
+    offset = int(d.get('offset', 0))
     sessions = session_controller.get_user_sessions(current_user.username, limit=limit, offset=offset)
     return jsonify(sessions)
 
