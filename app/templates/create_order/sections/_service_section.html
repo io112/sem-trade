@@ -1,0 +1,13 @@
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2">Название</label>
+  <p-inputtext class="w-100" v-model="part.name" type="text"></p-inputtext>
+</div>
+
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2">Стоимость</label>
+  <p-inputnumber class="w-100" v-model="part.price" mode="decimal"
+                 :maxFractionDigits="2"></p-inputnumber>
+</div>
+
+
+

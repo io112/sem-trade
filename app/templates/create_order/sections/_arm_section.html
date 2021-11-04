@@ -1,50 +1,59 @@
-<form @change="getItems" id="${this.id}">
-  <input type="hidden" name="type" value="${this.type}">
-  <div class="d-flex row">
-    <div class="col">
-
-      <div class="d-flex form-group">
-        <label class="form-control-label text-nowrap p-2">Диаметр</label>
-        <p-dropdown class="w-100" @change="getItems" v-model="part.params.diameter" :options="suggestion.params.diameter"
-                    placeholder="Диаметр">
-          <template #option="slotProps">
-            <div>[[ slotProps.option ]] мм</div>
-          </template>
-        </p-dropdown>
-      </div>
-
-      <div class="d-flex form-group">
-        <label class="form-control-label text-nowrap p-2" for="${this.id}_input-arm-type">Тип рукава</label>
-        <p-dropdown class="w-100" @change="getItems" v-model="part.params.arm_type" :options="suggestion.params.arm_type"
-                    placeholder="Тип рукава">
-        </p-dropdown>
-
-
-      </div>
-
-      <div class="d-flex form-group">
-        <label class="form-control-label text-nowrap p-2" for="${this.id}_input-length">Длина рукава (м)</label>
-        <p-inputnumber class="w-100" @change="getItems" v-model="part.amount" mode="decimal" :maxFractionDigits="2"></p-inputnumber>
-      </div>
-
-
-      <div class="d-flex form-group">
-        <label class="form-control-label text-nowrap p-2" for="${this.id}_input-arm">Рукав</label>
-        <p-dropdown class="w-100" @change="getItems" v-model="part.id" :options="suggestion.parts" option-value="_id"
-                    option-label="name"
-                    placeholder="Рукав">
-        </p-dropdown>
-
-
-      </div>
-    </div>
-    <div class="col">
-    </div>
-  </div>
-
-</form>
-<div class="d-flex text-left">
-  <a href="#!" onclick="dropSection(${this.id})" class="btn btn-sm btn-primary">Сбросить рукав</a>
-  <a href="#!" onclick="deleteSection(${this.id})" class="btn btn-sm btn-primary">Удалить запчасть</a>
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2">Диаметр</label>
+  <p-dropdown class="w-100" v-model="part.parameters.diameter"
+              :options="suggestion.parameters.diameter"
+              placeholder="Диаметр">
+    <template #value="slotProps">
+      <div v-if="slotProps.value">[[ slotProps.value ]] мм</div>
+      <div v-else>[[ slotProps.placeholder ]]</div>
+    </template>
+    <template #option="slotProps">
+      <div>[[ slotProps.option ]] мм</div>
+    </template>
+  </p-dropdown>
+  <a class="col-md-1" href="#!" @click="clearSelectedParam('diameter')">
+    <i class="fa fa-trash-alt text-red">
+    </i>
+  </a>
 </div>
-<hr/>
+
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2" for="${this.id}_input-arm-type">Тип рукава</label>
+  <p-dropdown class="w-100" v-model="part.parameters.arm_type"
+              :options="suggestion.parameters.arm_type"
+              placeholder="Тип рукава">
+  </p-dropdown>
+  <a class="col-md-1" href="#!" @click="clearSelectedParam('arm_type')">
+    <i class="fa fa-trash-alt text-red">
+    </i>
+  </a>
+
+</div>
+
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2">Длина рукава (м)</label>
+  <p-inputnumber class="w-100" v-model="part.amount" mode="decimal"
+                 :maxFractionDigits="2"></p-inputnumber>
+</div>
+
+
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2" for="${this.id}_input-arm"><b>Рукав</b></label>
+  <p-dropdown class="w-100" v-model="selected_part" :options="suggestion.parts" @change="setPart"
+              placeholder="Рукав">
+    <template #value="slotProps">
+      <div v-if="slotProps.value">[[ slotProps.value.name ]]: [[ slotProps.value.amount ]]</div>
+      <div v-else>[[ slotProps.placeholder ]]</div>
+    </template>
+    <template #option="slotProps">
+      <div>[[ slotProps.option.name ]]: [[ slotProps.option.amount ]]</div>
+    </template>
+  </p-dropdown>
+  <a class="col-md-1" href="#!" @click="clearSelectedPart">
+    <i class="fa fa-trash-alt text-red">
+    </i>
+  </a>
+
+</div>
+
+

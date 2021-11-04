@@ -9,34 +9,22 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="d-flex align-items-center form-group">
-          <label class="custom-toggle">
-            <input id="rvd_only_present" onclick="updateAllSections()" name="only_present" type="checkbox" checked>
-            <span class="custom-toggle-slider rounded-circle"></span>
-          </label>
-          <div class="ml-2">только в наличии</div>
-        </div>
-        <div class="mb-2 d-flex text-left">
-          <select onchange="changeSubtotal()" name="job-type" class="form-control form-control-sm fstdropdown-select"
-                  id="input-job-type">
-            <option value="">Выберите тип рукава</option>
-            <option value="hydro">Гидравлический</option>
-            <option value="gur">ГУР</option>
-            <option value="break">Тормозной</option>
-            <option value="conditioner">Кондиционер</option>
-            <option value="clutch">Сцепление</option>
-            <option value="transmission">КПП</option>
-          </select>
-        </div>
+
         <div id="rvd-modal-body">
         </div>
 
         <div id="rvd-modal-vue-body">
           <div class="d-flex align-items-center form-group">
+
+          </div>
+          <div class="d-flex align-items-center form-group">
             <div class="form-control-label p-3">Тип рукава:</div>
             <p-dropdown v-model="current_selection.job_type" :options="job_types" option-label="name"
                         option-value="value"
-                        placeholder="Тип рукава" v-on:change="updateSelectionItems"></p-dropdown>
+                        placeholder="Тип рукава" @change="updateRVDType"></p-dropdown>
+            <div class="form-control-label ml-4 p-3">Только в наличии:</div>
+            <p-inputswitch id="rvd_only_present" @change="getItems" v-model="only_present">
+            </p-inputswitch>
           </div>
           <hr class="my-2"/>
 
@@ -44,69 +32,49 @@
             <div class="form-control-label p-3">Тип детали:</div>
             <p-dropdown v-model="part.type" :options="part_types" option-label="name"
                         option-value="value"
-                        placeholder="Тип детали" v-on:change="getItems"></p-dropdown>
+                        placeholder="Тип детали" @change="setType"></p-dropdown>
           </div>
-          <div v-if="part.type === 'arm'">
-            {% include 'create_order/sections/_arm_section.html' %}
+          <div class="d-flex row">
+            <div class="col">
+              <div v-if="part.type === 'arm'">
+                {% include 'create_order/sections/_arm_section.html' %}
+              </div>
+              <div v-if="part.type === 'fiting'">
+                {% include 'create_order/sections/_fiting_section.html' %}
+              </div>
+              <div v-if="part.type === 'clutch'">
+                {% include 'create_order/sections/_clutch_section.html' %}
+              </div>
+              <div v-if="part.type === 'pipe'">
+                {% include 'create_order/sections/_pipe_section.html' %}
+              </div>
+              <div v-if="part.type === 'service'">
+                {% include 'create_order/sections/_service_section.html' %}
+              </div>
+            </div>
+            <div class="col">
+              {% include'create_order/_part_total.html' %}
+            </div>
           </div>
-        </div>
+          <div v-if="current_selection.items.length !== 0">
+            <hr class="my-4"/>
+            {% include 'create_order/_selection.html' %}
+          </div>
+          <hr class="my-4"/>
 
-        {#        <div class="d-flex text-left w-50">#}
-        {#          <a href="#!" onclick="addSection()" class="btn btn-sm btn-primary">Добавить секцию</a>#}
-        {#          <select name="section-type" class="form-control form-control-sm fstdropdown-select" id="input-section-type">#}
-        {#            <option value="">Выберите секцию</option>#}
-        {#            <option value="arm">Рукав</option>#}
-        {#            <option value="fiting">Фитинг</option>#}
-        {#            <option value="clutch">Муфта</option>#}
-        {#            <option value="pipe">Трубка</option>#}
-        {#            <option value="service">Услуга</option>#}
-        {#          </select>#}
-        {#        </div>#}
+          <!-- Subtotal -->
 
-        <hr class="my-4"/>
+          <h6 class="heading-small mb-2">Подытог</h6>
+          {% include 'create_order/_selection_subtotal.html' %}
 
-        <!-- Subtotal -->
-
-        <h6 class="heading-small mb-2">Подытог</h6>
-
-
-        <div class="table-responsive">
-          <table id="select_subtotal" class="table align-items-center table-flush">
-            <thead class="thead-light">
-            <tr>
-              <th scope="col" class="sort" data-sort="name">Наименование</th>
-              <th scope="col" class="sort" data-sort="number">Количество</th>
-              <th scope="col" class="sort" data-sort="price">цена за штуку</th>
-              <th scope="col" class="sort" data-sort="fullprice">Общая цена</th>
-            </tr>
-            </thead>
-            <tbody class="list">
-            <tr>
-              <td>
-                <span class="name mb-0 text-sm">Рукав DK test</span>
-              </td>
-              <td class="number">
-                <input class="form-control form-control-sm" type="number" placeholder="количество" value="1">
-              </td>
-              <td class="price">
-                <input class="form-control form-control-sm" type="number" placeholder="цена" value="1">
-              </td>
-              <td class="fullprice">
-                1₽
-              </td>
-              <td>
-                <a class="nav-link" href="/main">
-                  <i class="fa fa-trash-alt text-red"></i>
-                </a>
-              </td>
-            </tr>
-            </tbody>
-          </table>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-        <button onclick="addToCart()" type="button" class="btn btn-primary">Сохранить</button>
+        <button @click="addToCart" type="button" class="btn"
+                :class="[total_errors.length !== 0 ? 'btn-danger': 'btn-primary']"
+                :disabled="errors.length !== 0">Сохранить
+        </button>
       </div>
     </div>
   </div>

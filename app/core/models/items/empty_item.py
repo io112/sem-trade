@@ -4,7 +4,7 @@ from app.core.models.items.base import BaseItem
 class EmptyItem(BaseItem):
 
     def __init__(self):
-        super(EmptyItem, self).__init__("Empty")
+        super(EmptyItem, self).__init__()
 
     @staticmethod
     def get_param_name(): return "None"

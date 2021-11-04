@@ -1,18 +1,18 @@
-from typing import Dict
+from typing import Dict, List
 
+from app.core.controllers.price_controller import RVDPrice
 from app.core.models.items.arm import Arm
 from app.core.models.items.base import BaseItem
 from app.core.models.items.cart_item import CartItem
-from app.core.models.items.clutch import Clutch
+from app.core.models.items.empty_item import EmptyItem
 from app.core.models.items.fiting import Fiting
-from app.core.models.items.pipe import Pipe
 from app.core.models.selection import RVDSelection
 from app.core.models.session import Session
 from app.core.utilities.common import queryset_to_list
+from app.core.utilities.items_utility import collections
 
 not_zero_amount = {'amount': {'$not': {'$eq': 0}}}
 
-collections = {'arm': Arm, 'clutch': Clutch, 'fiting': Fiting, 'pipe': Pipe}
 price_coefficients = {'hydro': 1, 'gur': 1, 'break': 1, 'conditioner': 1, 'clutch': 1, 'transmission': 1}
 
 
@@ -87,15 +87,25 @@ def get_available_parameters(candidates: list) -> dict:
                 continue
             if value not in res[key]:
                 res[key].append(value)
-            res[key].sort()
+    for i in res:
+        try:
+            res[i].sort()
+        except:
+            pass
     return res
 
 
-def save_selection(session: Session, items: dict, subtotal: dict, part: CartItem = None) -> dict:
+def save_selection(session: Session, items: list, subtotal: dict, part: CartItem = None) -> dict:
     selection = RVDSelection(items=items, subtotal=subtotal, part=part)
     selection = calc_subtotal(selection)
     selection = copy_selection_parameters(selection)
     session.selection = selection
+    session.save()
+    return selection.get_safe()
+
+
+def update_selection(session: Session, selection: RVDSelection) -> dict:
+    session.selection = calc_subtotal(selection)
     session.save()
     return selection.get_safe()
 
@@ -133,11 +143,14 @@ def fix_linked_params(items: Dict[str, dict]) -> Dict[str, dict]:
 def calc_subtotal(selection: RVDSelection) -> RVDSelection:
     price = 0
     total_amount = selection.subtotal.get('amount', 1)
-    selected_items = get_selected_items(selection)
-    for _, obj in selected_items.items():
+    selected_items = selection.items
+    for obj in selection.items:
+        p = RVDPrice.calc_cart_item_price(obj, selection.subtotal['job_type'])
+        obj.price = p.price
+        obj.total_price = p.full_price
         price += obj.total_price
-    selection.subtotal['price'] = price
-    selection.subtotal['total_price'] = price * total_amount
+    selection.subtotal['price'] = RVDPrice.round_price(price)
+    selection.subtotal['total_price'] = RVDPrice.round_price(price * total_amount)
     selection.subtotal['name'] = create_selection_name(selected_items)
     selection.subtotal['amount'] = total_amount
     return selection
@@ -173,6 +186,19 @@ def get_selected_items(selection: RVDSelection) -> Dict[str, CartItem]:
                                  price=0, total_price=0)
             res[key] = cart_item
     return res
+
+
+def get_cart_item(rvd_type: str, part: dict):
+    if part['type'] == 'service':
+        return CartItem(name=part['name'], local_name='', amount=1,
+                        price=part['price'], total_price=part['price'])
+    obj = collections.get(part['type'])
+    item = obj.objects(id=part['id'])[0]
+    amount = part['amount']
+    price = RVDPrice.calc_part_price(part, rvd_type)
+    cart_item = CartItem(name=item.name, local_name='', item=item, amount=amount,
+                         price=price.price, total_price=price.full_price)
+    return cart_item
 
 
 def get_price_coef(price, amount=1.0):
@@ -220,10 +246,10 @@ def get_full_price(selection: RVDSelection) -> Dict[str, float]:
     return {'items_amount': total_items_amount * total_amount, 'total_price': price}
 
 
-def create_selection_name(items: Dict[str, CartItem]):
+def create_selection_name(items: List[CartItem]):
     arms = ''
     fitings = ''
-    for i in items.values():
+    for i in items:
         item = i.item
         if type(item) == Arm:
             arms += (' ' if arms != '' else '') + item.get_selection_name()

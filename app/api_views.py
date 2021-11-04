@@ -8,8 +8,7 @@ from flask_login import login_required, current_user
 
 from app import app
 from app.core.controllers import order_controller, selection_controller, session_controller, contragent_controller, \
-    users_controller
-from app.core.models.suggestion_request import SuggestionRequest
+    users_controller, price_controller
 from app.misc import sid_required, check_sid
 
 # ----------------SESSION ENDPOINTS---------------
@@ -116,6 +115,15 @@ def update_session_view():
     sid = request.cookies.get('current_order')
     data = json.loads(request.form.get('data', {}))
     return selection_controller.update_selection(sid, data)
+
+
+@app.route('/api/make_order/add_item_to_selection', methods=['POST'])
+@login_required
+@sid_required
+def update_selection_items():
+    sid = request.cookies.get('current_order')
+    data = json.loads(request.data)
+    return jsonify(selection_controller.add_item_to_selection(sid, data['part'], data['type']))
 
 
 @app.route('/api/make_order/find_part', methods=['POST'])
@@ -252,10 +260,50 @@ def get_offer():
 def get_suggestion():
     sid = request.cookies.get('current_order')
     d = json.loads(request.data)
-    res = selection_controller.get_suggestion(sid, d.get('only_present'),
+    only_present = d.get('only_present')
+    res = selection_controller.get_suggestion(sid, only_present,
                                               d.get('part_params', {}),
                                               d.get('part_type'))
     return jsonify(res)
+
+
+@app.route('/api/make_order/calc_part_price', methods=['POST'])
+@sid_required
+@login_required
+def calc_part_price():
+    sid = request.cookies.get('current_order')
+    d = json.loads(request.data)
+    part = d.get('part')
+    type = d.get('job_type')
+    res = price_controller.RVDPrice.calc_part_price(part, type)
+    return jsonify(res.dict())
+
+
+@app.route('/api/make_order/del_selected_part', methods=['POST'])
+@sid_required
+@login_required
+def del_selected_part():
+    sid = request.cookies.get('current_order')
+    d = json.loads(request.data)
+    return jsonify(selection_controller.del_item_from_selection(sid, d.get('item_index')))
+
+
+@app.route('/api/make_order/set_job_type', methods=['POST'])
+@sid_required
+@login_required
+def set_job_type():
+    sid = request.cookies.get('current_order')
+    d = json.loads(request.data)
+    return jsonify(selection_controller.set_job_type(sid, d.get('job_type')))
+
+
+@app.route('/api/make_order/update_amount', methods=['POST'])
+@sid_required
+@login_required
+def update_amount():
+    sid = request.cookies.get('current_order')
+    d = json.loads(request.data)
+    return jsonify(selection_controller.update_amount(sid, d.get('amount')))
 
 
 # ----------------CART ENDPOINTS---------------

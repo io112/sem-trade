@@ -1,0 +1,62 @@
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2">Тип</label>
+  <p-dropdown class="w-100" v-model="part.parameters.fiting_type"
+              :options="suggestion.parameters.fiting_type"
+              placeholder="Тип фитинга">
+  </p-dropdown>
+  <a class="col-md-1" href="#!" @click="clearSelectedParam('fiting_type')">
+    <i class="fa fa-trash-alt text-red">
+    </i>
+  </a>
+</div>
+
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2">Угол</label>
+  <p-dropdown class="w-100" v-model="part.parameters.angle"
+              :options="suggestion.parameters.angle"
+              placeholder="Угол">
+  </p-dropdown>
+  <a class="col-md-1" href="#!" @click="clearSelectedParam('angle')">
+    <i class="fa fa-trash-alt text-red">
+    </i>
+  </a>
+</div>
+
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2">Резьба</label>
+  <p-dropdown class="w-100" v-model="part.parameters.carving"
+              :options="suggestion.parameters.carving"
+              placeholder="Резьба">
+  </p-dropdown>
+  <a class="col-md-1" href="#!" @click="clearSelectedParam('carving')">
+    <i class="fa fa-trash-alt text-red">
+    </i>
+  </a>
+</div>
+
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2">Количество</label>
+  <p-inputnumber class="w-100" v-model="part.amount"></p-inputnumber>
+</div>
+
+
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2"><b>Фитинг</b></label>
+  <p-dropdown class="w-100" v-model="selected_part" :options="suggestion.parts" @change="setPart"
+              placeholder="Фитинг">
+    <template #value="slotProps">
+      <div v-if="slotProps.value">[[ slotProps.value.name ]]: [[ slotProps.value.amount ]]</div>
+      <div v-else>[[ slotProps.placeholder ]]</div>
+    </template>
+    <template #option="slotProps">
+      <div>[[ slotProps.option.name ]]: [[ slotProps.option.amount ]]</div>
+    </template>
+  </p-dropdown>
+  <a class="col-md-1" href="#!" @click="clearSelectedPart">
+    <i class="fa fa-trash-alt text-red">
+    </i>
+  </a>
+
+</div>
+
+
