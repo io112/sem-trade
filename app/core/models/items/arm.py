@@ -25,5 +25,8 @@ class Arm(BaseItem):
 
     def get_selection_name(self) -> str:
         arm_type = self.parameters.get('arm_type', '')
+        length = self.amount
+        if length is None:
+            length = ''
         diameter = self.parameters.get('diameter', '')
         return f'{arm_type}x{diameter}'

@@ -252,7 +252,7 @@ def create_selection_name(items: List[CartItem]):
     for i in items:
         item = i.item
         if type(item) == Arm:
-            arms += (' ' if arms != '' else '') + item.get_selection_name()
+            arms += (' ' if arms != '' else '') + str(i.amount) + ' м.' + ' ' + item.get_selection_name()
         if type(item) == Fiting:
             fitings += ('+' if fitings != '' else '') + item.get_selection_name()
     return f'Рукав {arms} {fitings}'

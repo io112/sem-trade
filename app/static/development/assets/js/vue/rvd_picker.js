@@ -118,6 +118,7 @@ const RVDPicker = {
             this.part = _.cloneDeep(this.default_part);
             this.part.type = pt;
             this.resetWatchers();
+            this.getItems();
         }
         ,
         async getItems() {
