@@ -1,0 +1,33 @@
+<div class="table-responsive">
+  <table id="select_subtotal" class="table align-items-center table-flush">
+    <thead class="thead-light">
+    <tr>
+      <th scope="col" class="sort" data-sort="name">Наименование</th>
+      <th scope="col" class="sort" data-sort="number">Количество</th>
+      <th scope="col" class="sort" data-sort="price">цена за штуку</th>
+      <th scope="col" class="sort" data-sort="fullprice">Общая цена</th>
+    </tr>
+    </thead>
+    <tbody class="list">
+    <tr>
+      <td>
+        <span class="name mb-0 text-sm">[[ subtotal.name ]]</span>
+      </td>
+      <td class="number">
+        <p-inputnumber v-model="subtotal.amount" :min="1" show-buttons></p-inputnumber>
+      </td>
+      <td class="number">
+        <span class="name mb-0 text-sm">[[ subtotal.price ]] ₽</span>
+      </td>
+      <td class="number">
+        <span class="name mb-0 text-sm">[[ subtotal.total_price ]] ₽</span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<div class=" text-nowrap text-danger mt-2" v-if="errors">
+  <div v-for="error in total_errors"><small>[[ error ]]</small></div>
+</div>

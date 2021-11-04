@@ -1,0 +1,59 @@
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2">Диаметр</label>
+  <p-dropdown class="w-100" v-model="part.parameters.diameter"
+              :options="suggestion.parameters.diameter"
+              placeholder="Диаметр">
+    <template #value="slotProps">
+      <div v-if="slotProps.value">[[ slotProps.value ]] мм</div>
+      <div v-else>[[ slotProps.placeholder ]]</div>
+    </template>
+    <template #option="slotProps">
+      <div>[[ slotProps.option ]] мм</div>
+    </template>
+  </p-dropdown>
+  <a class="col-md-1" href="#!" @click="clearSelectedParam('diameter')">
+    <i class="fa fa-trash-alt text-red">
+    </i>
+  </a>
+</div>
+
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2" for="${this.id}_input-arm-type">Тип рукава</label>
+  <p-dropdown class="w-100" v-model="part.parameters.arm_type"
+              :options="suggestion.parameters.arm_type"
+              placeholder="Тип рукава">
+  </p-dropdown>
+  <a class="col-md-1" href="#!" @click="clearSelectedParam('arm_type')">
+    <i class="fa fa-trash-alt text-red">
+    </i>
+  </a>
+
+</div>
+
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2">Длина рукава (м)</label>
+  <p-inputnumber class="w-100" v-model="part.amount" mode="decimal"
+                 :maxFractionDigits="2"></p-inputnumber>
+</div>
+
+
+<div class="d-flex form-group align-items-center">
+  <label class="form-control-label text-nowrap p-2" for="${this.id}_input-arm"><b>Рукав</b></label>
+  <p-dropdown class="w-100" v-model="selected_part" :options="suggestion.parts" @change="setPart"
+              placeholder="Рукав">
+    <template #value="slotProps">
+      <div v-if="slotProps.value">[[ slotProps.value.name ]]: [[ slotProps.value.amount ]]</div>
+      <div v-else>[[ slotProps.placeholder ]]</div>
+    </template>
+    <template #option="slotProps">
+      <div>[[ slotProps.option.name ]]: [[ slotProps.option.amount ]]</div>
+    </template>
+  </p-dropdown>
+  <a class="col-md-1" href="#!" @click="clearSelectedPart">
+    <i class="fa fa-trash-alt text-red">
+    </i>
+  </a>
+
+</div>
+
+

@@ -1,6 +1,5 @@
 'use strict'
 
-window.addEventListener("load", init);
 let as = ''
 let fs = ''
 let fs1 = ''

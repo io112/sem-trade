@@ -1,0 +1,17 @@
+<div class="text-center" v-if="selected_part">
+  <h5 class="h4">
+    Стоимость 1 [[ part.measure ]]: [[ part.price ]] ₽
+  </h5>
+  <h5 class="h4">
+    Стоимость [[ part.amount ]] [[ part.measure ]]: [[ part.full_price ]] ₽
+  </h5>
+  <h5 class="h4">
+    Доступное количество: [[ selected_part.amount ]] [[ selected_part.measure ]]
+  </h5>
+  <button type="button" @click="addItemToSelection" class="btn" :class="[errors.length !== 0 ? 'btn-danger': 'btn-success']"
+          :disabled="errors.length !== 0">Добавить
+  </button>
+  <div class=" text-nowrap text-danger mt-2" v-if="errors">
+    <div v-for="error in errors"><small>[[ error ]]</small></div>
+  </div>
+</div>

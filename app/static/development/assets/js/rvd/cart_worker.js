@@ -1,4 +1,5 @@
 let is_org_slider = ""
+window.addEventListener("load", init);
 
 // ENDPOINTS
 const get_carts_endpoint = 'api/make_order/get_carts'
@@ -15,6 +16,19 @@ const get_comment_endpoint = 'api/make_order/get_comment'
 const checkout_endpoint = 'api/make_order/checkout'
 
 let current_part = undefined
+
+function init() {
+    sid = Cookies.get('current_order');
+    console.log(sid)
+    init_cw()
+    console.log('cw ended')
+    update_cart();
+    init_sessions();
+    if (current_part !== undefined) {
+        render_parts({'current_part': current_part})
+    }
+}
+
 
 function init_cw() {
     is_org_slider = $('#contragent_is_org');
