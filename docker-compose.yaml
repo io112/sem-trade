@@ -29,6 +29,7 @@ services:
 
   mongodb:
     image: docker.io/bitnami/mongodb
+    restart: always
     ports:
       - "27017:27017"
     volumes:
