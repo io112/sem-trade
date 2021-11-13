@@ -22,7 +22,7 @@ function init() {
     console.log(sid)
     init_cw()
     console.log('cw ended')
-    update_cart();
+    // update_cart();
     init_sessions();
     if (current_part !== undefined) {
         render_parts({'current_part': current_part})
@@ -66,7 +66,7 @@ function submit_part() {
             current_part = undefined
             render_parts(current_part)
             $('#addPartModal').modal('hide');
-            update_cart();
+            // update_cart();
         }
     })
 
@@ -212,13 +212,13 @@ function change_contragent_type() {
     }
 }
 
-async function get_cart() {
-    return await send(get_cart_endpoint)
-}
+// async function get_cart() {
+//     return await send(get_cart_endpoint)
+// }
 
-function update_cart() {
-    get_cart().then(render_cart)
-}
+// function update_cart() {
+//     get_cart().then(render_cart)
+// }
 
 function render_cart(cart) {
     const cart_table = $('#items_list tbody')

@@ -345,7 +345,7 @@ def get_cart():
 @login_required
 def del_cart_item():
     sid = request.cookies.get('current_order')
-    data = json.loads(request.form.get('data', []))
+    data = json.loads(request.data)
     return jsonify(session_controller.del_cart_item(sid, data['id']))
 
 

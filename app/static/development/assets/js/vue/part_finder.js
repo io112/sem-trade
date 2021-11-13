@@ -102,7 +102,7 @@ const PartFinder = {
             if (resp === "success") {
                 $('#addPartModal').modal('hide');
                 this.dropPart();
-                update_cart();
+                emitter.emit('updateCart');
             }
         },
         validate() {

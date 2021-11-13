@@ -4,6 +4,10 @@
   <script src="https://unpkg.com/primevue@3.8.2/dropdown/dropdown.min.js"></script>
   <script src="https://unpkg.com/primevue@3.8.2/core/core.min.js"></script>
   <script src="https://unpkg.com/primevue@3.8.2/inputswitch/inputswitch.min.js"></script>
+  <script src="https://unpkg.com/primevue@3.8.2/datatable/datatable.min.js"></script>
+  <script src="https://unpkg.com/primevue@3.8.2/column/column.min.js"></script>
+  <script src="https://unpkg.com/primevue@3.8.2/columngroup/columngroup.min.js"></script>
+  <script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
 
 {% endblock %}
 
@@ -67,21 +71,8 @@
                   запчасть</a>
               </div>
             </div>
-            <div class="table-responsive">
-              <table id="items_list" class="table align-items-center table-flush">
-                <thead class="thead-light">
-                <tr>
-                  <th scope="col" class="sort" data-sort="name">Наименование</th>
-                  <th scope="col" class="sort" data-sort="number">Количество</th>
-                  <th scope="col" class="sort" data-sort="price">цена за штуку</th>
-                  <th scope="col" class="sort" data-sort="fullprice">Общая цена</th>
-                  <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody class="list">
-                {% include "create_order/items_list.html" %}
-                </tbody>
-              </table>
+            <div id="cart">
+              {% include "create_order/items_list.html" %}
             </div>
           </div>
           <hr class="my-4"/>
@@ -133,6 +124,7 @@
   <script src="../static/{{ commit_hash }}/assets/js/rvd/cart_worker.js"></script>
   <script src="../static/{{ commit_hash }}/assets/js/vue/rvd_picker.js"></script>
   <script src="../static/{{ commit_hash }}/assets/js/vue/part_finder.js"></script>
+  <script src="../static/{{ commit_hash }}/assets/js/vue/cart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"
           integrity="sha256-qXBd/EfAdjOA2FGrGAG+b3YBn2tn5A6bhz+LSgYD96k=" crossorigin="anonymous"></script>
 {% endblock %}

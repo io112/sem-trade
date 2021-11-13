@@ -1,4 +1,5 @@
 const {createApp, ref, watch} = Vue;
+const emitter = mitt();
 
 const RVDPicker = {
     compilerOptions: {
@@ -289,7 +290,7 @@ const RVDPicker = {
             this.part.type = null;
             this.current_selection.job_type = null;
             $('#addModal').modal('hide');
-            update_cart();
+            emitter.emit('updateCart');
         }
     }
 }
