@@ -7,6 +7,7 @@
   <script src="https://unpkg.com/primevue@3.8.2/datatable/datatable.min.js"></script>
   <script src="https://unpkg.com/primevue@3.8.2/column/column.min.js"></script>
   <script src="https://unpkg.com/primevue@3.8.2/columngroup/columngroup.min.js"></script>
+  <script src="https://unpkg.com/primevue@3.8.2/card/card.min.js"></script>
   <script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
 
 {% endblock %}
@@ -34,31 +35,8 @@
         </div>
         <div class="card-body">
           <h6 class="heading-small text-muted mb-4">Информация о клиенте</h6>
-          <div class="pl-lg-4">
-            <div class="row">
-              <div class="col-lg">
-                <div class="form-group">
-                  <div class="row mb-3"><label class="form-control-label" for="input-clientname">Организация или имя
-                    клиента</label>
-                    <div class="flex-fill justify-content-end text-right">
-                      <div class="text-right col">
-                        <a href="#!" onclick="remove_contragent()" class="btn btn-sm btn-primary">Сбросить
-                          клиента</a>
-                      </div>
-                    </div>
-                  </div>
-
-                  <input oninput="update_clients()" type="text" id="input-clientname" class="form-control"
-                         value="{{ client_name }}"
-                         placeholder="ООО &#34Рога и Копыта&#34">
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="client_div" class="scrolling-wrapper-flexbox">
-          </div>
+          {% include 'create_order/_contragent.html' %}
           <hr class="my-4"/>
-          <!-- Address -->
           <div>
             <div class="d-flex flex-row">
               <div class="text-nowrap">
@@ -71,7 +49,7 @@
                   запчасть</a>
               </div>
             </div>
-            <div id="cart">
+            <div id="cart" v-cloak>
               {% include "create_order/items_list.html" %}
             </div>
           </div>
@@ -96,7 +74,7 @@
           </div>
           <hr class="my-4">
         </div>
-        <div class="card-body pt-0" id="checkout_list">
+        <div class="card-body pt-0" id="checkout_list" v-cloak>
           {% include 'create_order/checkout_list.html' %}
         </div>
       </div>
@@ -125,6 +103,8 @@
   <script src="../static/{{ commit_hash }}/assets/js/vue/rvd_picker.js"></script>
   <script src="../static/{{ commit_hash }}/assets/js/vue/part_finder.js"></script>
   <script src="../static/{{ commit_hash }}/assets/js/vue/cart.js"></script>
+  <script src="../static/{{ commit_hash }}/assets/js/vue/contragent.js"></script>
+  <script src="../static/{{ commit_hash }}/assets/js/vue/checkout.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"
           integrity="sha256-qXBd/EfAdjOA2FGrGAG+b3YBn2tn5A6bhz+LSgYD96k=" crossorigin="anonymous"></script>
 {% endblock %}

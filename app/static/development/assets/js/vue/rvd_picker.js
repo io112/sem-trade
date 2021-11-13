@@ -216,7 +216,6 @@ const RVDPicker = {
         clearSelectedPart() {
             this.selected_part = null;
             this.part.parameters = {};
-            console.log(this.selected_part)
         }
         ,
         clearSelectedParam(paramName) {

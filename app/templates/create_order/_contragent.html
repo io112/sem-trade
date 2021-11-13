@@ -1,0 +1,28 @@
+<div id="contragent" v-cloak>
+  <div class="pl-lg-4">
+    <div class="row">
+      <div class="col-lg">
+        <div class="form-group">
+          <div class="row mb-3"><label class="form-control-label" for="input-clientname">Организация или имя
+            клиента</label>
+            <div class="flex-fill justify-content-end text-right">
+              <div class="text-right col">
+                <a data-toggle="modal" data-target="#addContragentModal" href="#!" class="btn btn-sm btn-primary">Создать клиента</a>
+                <a href="#!" @click="dropContragent()" class="btn btn-sm btn-primary">Сбросить
+                  клиента</a>
+              </div>
+            </div>
+          </div>
+
+          <p-inputtext v-model="query.query" type="text" class="form-control" :disabled="contragent"></p-inputtext>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="client_div" v-if="!contragent" style="max-height: 30vh; display: none" class="overflow-auto list-group">
+    <a v-for="client in suggestion" href="#!" class="list-group-item list-group-item-action"
+       aria-current="true" @click="setContragent(client._id)">
+      [[ client.name ]] [[ client.surname? client.surname: '' ]]
+    </a>
+  </div>
+</div>

@@ -177,7 +177,7 @@ def remove_contragent():
 @sid_required
 def set_contragent():
     sid = request.cookies.get('current_order')
-    contragent_id = json.loads(request.form.get('data', []))
+    contragent_id = json.loads(request.data)['id']
     try:
         session_controller.set_contragent(sid, contragent_id)
         return contragent_controller.get_contragent(contragent_id)
@@ -372,10 +372,12 @@ def checkout_order_view():
     session_controller.remove_session(sid)
     resp = make_response(jsonify(order.order_num))
     resp.delete_cookie('current_order')
-
-    # return Response(result,
-    #                 mimetype="application/xml",
-    #                 headers={"Content-Disposition": "attachment;filename=orders.xml"})
+    sessions = session_controller.get_user_sessions(current_user.username)['data']
+    resp = make_response(jsonify({}))
+    if len(sessions) != 0:
+        resp.set_cookie('current_order', sessions[-1]['_id'])
+    else:
+        resp.delete_cookie('current_order')
     return resp
 
 
@@ -415,8 +417,9 @@ def create_contragent():
 @app.route('/api/contragent/find_contragents', methods=['POST'])
 @login_required
 def find_contragents():
-    data = json.loads(request.form.get('data', []))
-    return jsonify(contragent_controller.find_contragents(data))
+    data = json.loads(request.data)
+    query = data['query']
+    return jsonify(contragent_controller.find_contragents(query))
 
 
 # ----------------ADMIN ROUTES------------------

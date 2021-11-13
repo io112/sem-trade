@@ -19,12 +19,13 @@ const RVDCart = {
     methods: {
         async getCart() {
             let resp = await request('/api/make_order/get_cart', {'sorting': '+last_modified'})
-            console.log(resp)
             this.cart = resp;
+            emitter.emit('setCart', this.cart)
         },
         async deleteItem(index) {
             let resp = await request('/api/make_order/del_cart_item', {'id': index})
             this.cart = resp;
+            emitter.emit('setCart', this.cart)
         },
         async updateCart() {
             this.getCart();

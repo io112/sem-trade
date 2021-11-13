@@ -35,7 +35,7 @@ function init_cw() {
     $('#comment_text').on('blur', set_comment);
     $('#checkout_btn').on('click', checkout);
     is_org_slider.on('change', change_contragent_type);
-    get_contragent();
+    // get_contragent();
     render_comment();
 }
 
@@ -295,22 +295,22 @@ function render_contragent(resp) {
     clear_finder()
 }
 
-function clear_finder() {
-    const cd = $('#client_div')
-    cd.empty()
-}
+// function clear_finder() {
+//     const cd = $('#client_div')
+//     cd.empty()
+// }
 
-function render_clients(data) {
-    const cd = $('#client_div')
-    cd.empty()
-    cd.append(get_add_card())
-    data.forEach(i => {
-        let name = i['name']
-        if (!i['is_org'])
-            name += ' ' + i['surname']
-        cd.append(get_client_card(i['_id'], name, i['phone'], i['is_org']))
-    })
-}
+// function render_clients(data) {
+//     const cd = $('#client_div')
+//     cd.empty()
+//     cd.append(get_add_card())
+//     data.forEach(i => {
+//         let name = i['name']
+//         if (!i['is_org'])
+//             name += ' ' + i['surname']
+//         cd.append(get_client_card(i['_id'], name, i['phone'], i['is_org']))
+//     })
+// }
 
 function del_order() {
     send(cancel_order_endpoint).then(new_sid => {

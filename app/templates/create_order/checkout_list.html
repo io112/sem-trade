@@ -1,23 +1,32 @@
 <div class="table-responsive">
-
   <div class="col mb-4">
-    <select name="sale" class="form-control form-control-sm fstdropdown-select" id="input-sale">
+    <select name="sale" class="form-control form-control-sm fstdropdown-select fstcreated" id="input-sale">
       <option value="">Выберите скидку</option>
       <option type="number" value="0">0%</option>
     </select>
+    <div class="fstdiv">
+      <div class="fstdropdown" tabindex="0">
+        <div class="fstselected">Выберите скидку</div>
+        <div class="fstsearch"><input class="fstsearchinput" placeholder=""></div>
+        <div class="fstlist">
+          <div data-value="" class="selected">Выберите скидку</div>
+          <div data-value="0">0%</div>
+        </div>
+      </div>
+    </div>
   </div>
-    <div class="text-center mt-4 mb-4">
+  <div class="text-center mt-4 mb-4">
     <h5 class="h4">
-      Клиент: <span id="client_name"></span>
+      Клиент: [[ contragent? contragent.name: '' ]]
     </h5>
   </div>
   <div class="text-center mt-4 mb-4">
     <h5 class="h4">
-      Сумма: <span id="cart_total"></span> ₽
+      Сумма: [[ cart? cart.subtotal: 0 ]] ₽
     </h5>
   </div>
   <hr class="my-4">
   <div class="d-flex justify-content-center">
-    <button id="checkout_btn" type="button" class="btn btn-primary">Печать чека</button>
+    <button @click="checkout()" type="button" class="btn btn-primary">Создать заказ</button>
   </div>
 </div>

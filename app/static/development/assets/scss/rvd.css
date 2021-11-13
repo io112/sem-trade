@@ -1,3 +1,4 @@
+@import url(https://unpkg.com/primeicons/primeicons.css);
 .scrolling-wrapper-flexbox {
   display: flex;
   flex-wrap: nowrap;
