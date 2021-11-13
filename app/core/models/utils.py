@@ -3,9 +3,11 @@ from app.core.models.items.base import BaseItem
 from app.core.models.items.clutch import Clutch
 from app.core.models.items.empty_item import EmptyItem
 from app.core.models.items.fiting import Fiting
+from app.core.models.items.pipe import Pipe
+from app.crm.meta import *
 
-objects = {Arm.get_param_name(): Arm, Clutch.get_param_name(): Clutch,
-           Fiting.get_param_name(): Fiting}
+objects = {ARM_PARAM_NAME: Arm, CLUTCH_PARAM_NAME: Clutch,
+           FITING_PARAM_NAME: Fiting, PIPE_PARAM_NAME: Pipe}
 
 
 def create_simple_item(name: str, out_name: str) -> BaseItem:

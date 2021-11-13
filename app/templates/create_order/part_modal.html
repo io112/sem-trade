@@ -6,7 +6,7 @@
         <h5 class="modal-title">Добавление запчасти</h5>
         <div class="flex-fill justify-content-end text-right">
           <div class="text-right col">
-            <a href="#!" onclick="clear_part()" class="btn btn-sm btn-primary">Сбросить
+            <a href="#!" @click="dropPart()" class="btn btn-sm btn-primary">Сбросить
               запчасть</a>
           </div>
         </div>
@@ -17,46 +17,40 @@
       <div class="modal-body">
         <form id="part_form">
           <div class="d-flex align-items-center form-group">
-            <label class="custom-toggle">
-              <input id="part_only_present" onclick="find_part()" name="only_present" type="checkbox" checked>
-              <span class="custom-toggle-slider rounded-circle"></span>
-            </label>
-            <div class="ml-2">только в наличии</div>
+            <div v-if="!is_service" class="d-flex align-items-center">
+              <div class="form-control-label pr-3">Только в наличии:</div>
+              <p-inputswitch v-model="form.only_present">
+              </p-inputswitch>
+            </div>
+            <div class="form-control-label ml-3 pr-3">Услуга:</div>
+            <p-inputswitch v-model="is_service">
+            </p-inputswitch>
           </div>
-          <div class="form-group">
-            <label class="form-control-label" for="input-category">Категория</label>
-            <select onchange="find_part()" name="collection" class="form-control form-control-sm fstdropdown-select" id="input-category">
-              <option value="">Выберите категорию товара</option>
-              <option value="fiting">Фитинг</option>
-              <option value="clutch">Муфта</option>
-              <option value="arm">Рукав</option>
-            </select>
+          <div v-if="!is_service">
+            {% include 'create_order/part_sections/_part_section.html' %}
           </div>
-          <div id="part_search" class="form-group">
-            <label class="form-control-label" for="input-query">Поиск</label>
-            <input oninput="find_part()" name="query" id="input-query" class="form-control form-control-sm" type="text"
-                   placeholder="BANJO 1">
-          </div>
-          <div style="max-height: 30vh" id="parts_list" class="overflow-auto list-group">
-          </div>
-          <div class="mt-3 form-group">
-            <label class="form-control-label" for="part-input-amount">Количество</label>
-            <input onblur="update_part()" name="amount" id="part-input-amount" class="form-control form-control-sm" type="number"
-                   placeholder="1">
+          <div v-else>
+            {% include 'create_order/part_sections/_service_section.html' %}
           </div>
         </form>
         <h5 class="h4">
-          Цена: <span id="part_price"></span> ₽
+          Цена: [[ price.price ? price.price: 0 ]] ₽
         </h5>
         <div>
           <h5 class="h4">
-            Общая цена: <span id="part_total"></span> ₽
+            Общая цена: [[ price.full_price ? price.full_price: 0 ]] ₽
           </h5>
+        </div>
+        <div class=" text-nowrap text-danger mt-2" v-if="errors">
+          <div v-for="error in errors"><small>[[ error ]]</small></div>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-        <button onclick="submit_part()" type="button" class="btn btn-primary">Сохранить</button>
+        <button @click="submitPart()" type="button" class="btn btn-primary"
+                :class="[errors.length !== 0 ? 'btn-danger': 'btn-primary']"
+                :disabled="errors.length !== 0">Сохранить
+        </button>
       </div>
     </div>
   </div>

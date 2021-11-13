@@ -29,7 +29,7 @@ class CartItem(EmbeddedDocument):
         ET.SubElement(res, 'Ид').text = str(item.id)
         ET.SubElement(res, 'Наименование').text = item.NomenclatureType
         measure = ET.Element('БазоваяЕдиница')
-        measure.text = item.MeasureText
+        measure.text = item.MeasureName
         measure.attrib['Код'] = item.MeasureCode
         measure.attrib['НаименованиеПолное'] = item.MeasureName
         measure.attrib['МеждународноеСокращение'] = item.MeasureInt

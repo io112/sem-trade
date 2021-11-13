@@ -1,26 +1,19 @@
 from app.core.models.items.base import BaseItem
+from app.crm.meta import *
 
 
 class Pipe(BaseItem):
     crm_parameters = {'Размер': 'size'}
-    MeasureCode = '006'
-    MeasureName = 'Метр'
-    MeasureInt = 'MTR'
-    MeasureText = 'метров'
-    NomenclatureType = 'Трубка'
 
     def __init__(self, *args, **values):
         super().__init__(*args, **values)
-        self.type = self.get_param_name()
-        self.category_id = self.get_category_id()
-
-    @staticmethod
-    def get_param_name() -> str:
-        return "pipe"
-
-    @staticmethod
-    def get_category_id() -> str:
-        return 'd6d02938-c6ee-11eb-9258-00155d462101'
+        self.type = PIPE_PARAM_NAME
+        self.category_id = PIPE_CAT_ID
+        self.MeasureCode = '006'
+        self.MeasureName = 'Метр'
+        self.MeasureInt = 'MTR'
+        self.MeasureText = 'метров'
+        self.NomenclatureType = PIPE_NOMENCLATURE_TYPE
 
     def get_selection_name(self) -> str:
         return f''

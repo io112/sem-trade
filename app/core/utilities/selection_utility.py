@@ -1,10 +1,9 @@
 from typing import Dict, List
 
-from app.core.controllers.price_controller import RVDPrice
+from app.core.controllers.price_controller import RVDPrice, PartPrice
 from app.core.models.items.arm import Arm
 from app.core.models.items.base import BaseItem
 from app.core.models.items.cart_item import CartItem
-from app.core.models.items.empty_item import EmptyItem
 from app.core.models.items.fiting import Fiting
 from app.core.models.selection import RVDSelection
 from app.core.models.session import Session
@@ -20,14 +19,15 @@ def create_selection() -> RVDSelection:
     return calc_subtotal(RVDSelection())
 
 
-def find_part(collection: BaseItem, query: str, only_present, amount: int = 0):
+def find_part(query: str, only_present, amount: int = 0):
+    collection = BaseItem
     if amount == '':
         amount = 0
+    querymod = {'name__icontains': query}
     if only_present:
-        res = collection.objects(amount__gt=0)
-    else:
-        res = collection.objects
-    res = res.search_text(query)
+        querymod['amount__gt'] = 0
+
+    res = collection.objects(**querymod)
     for i in res:
         price_coefficient = get_price_coef(i.price, float(amount))
         i.price = round(i.price * price_coefficient, 2)
@@ -196,6 +196,18 @@ def get_cart_item(rvd_type: str, part: dict):
     item = obj.objects(id=part['id'])[0]
     amount = part['amount']
     price = RVDPrice.calc_part_price(part, rvd_type)
+    cart_item = CartItem(name=item.name, local_name='', item=item, amount=amount,
+                         price=price.price, total_price=price.full_price)
+    return cart_item
+
+
+def get_cart_item_from_part(part: dict, amount: float):
+    if part['type'] == 'service':
+        return CartItem(name=part['name'], local_name='', amount=1,
+                        price=amount, total_price=amount)
+    obj = BaseItem
+    item = obj.objects(id=part['_id'])[0]
+    price = PartPrice.calc_part_price(part, amount)
     cart_item = CartItem(name=item.name, local_name='', item=item, amount=amount,
                          price=price.price, total_price=price.full_price)
     return cart_item

@@ -21,19 +21,12 @@ def get_selection(session_id):
     return selection.get_safe()
 
 
-def find_part(collection, query, only_present, amount):
+def find_part(query, only_present, amount):
     res = {'items': []}
-    collection_object = None
-    for i in collections:
-        if i == collection:
-            collection_object = collections[i]
-    if collection_object is not None:
-        search = utility.find_part(collection_object, query, only_present, amount)
-        for i in search:
-            res['items'].append(i.get_safe())
-        return res
-    else:
-        return {}
+    search = utility.find_part(query, only_present, amount)
+    for i in search:
+        res['items'].append(i.get_safe())
+    return res
 
 
 def clear_part(session_id: str):
@@ -124,6 +117,10 @@ def update_amount(session_id: str, amount: float):
     selection = session.selection
     selection.subtotal['amount'] = amount
     return utility.update_selection(session, selection)
+
+
+def cart_item_from_part(part: dict, amount: float):
+    return utility.get_cart_item_from_part(part, amount)
 
 
 def set_linked_params(items: dict) -> dict:

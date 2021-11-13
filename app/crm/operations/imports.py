@@ -1,4 +1,5 @@
-from app.crm.variables import category_ids, nomenclatyre_types
+from app.core.models.items.generic_item import GenericItem
+from app.crm.variables import category_ids, nomenclature_types
 
 
 def import_data(tree):
@@ -33,36 +34,47 @@ def parse_offer(obj):
     if collection_id in category_ids.keys():
         item = category_ids[collection_id]
     else:
-        return
+        item = GenericItem
     item = item.objects(id=id).first()
+    if item is None:
+        return
     item.price = float(obj.find("{urn:1C.ru:commerceml_2}Цены")[0][2].text)
     item.amount = float(obj.find("{urn:1C.ru:commerceml_2}Количество").text)
     item.save()
 
 
 def parse_object(obj, type):
-    req = obj.find("{urn:1C.ru:commerceml_2}ХарактеристикиТовара")
-    if req is None:
-        return
-    if type in nomenclatyre_types.keys():
-        create_object(obj, nomenclatyre_types[type])
+    # req = obj.find("{urn:1C.ru:commerceml_2}ХарактеристикиТовара")
+    if type in nomenclature_types.keys():
+        create_object(obj, nomenclature_types[type], type)
     else:
-        return
+        create_object(obj, GenericItem, type)
 
 
-def create_object(obj, obj_type):
+def create_object(obj, obj_type, nomeclature_type):
     res = obj_type()
     res.id = obj[0].text
+    if obj_type == GenericItem:
+        res.NomenclatureType = nomeclature_type
+        res.type = nomeclature_type
+        res.category_id = res.id[:res.id.find('#')]
     res.name = obj[2].text
+    res.MeasureCode = obj[3].attrib['Код'].strip()
     res.measure = obj[3].attrib['НаименованиеПолное']
+    res.MeasureInt = obj[3].attrib['МеждународноеСокращение']
+    res.MeasureName = obj[3].attrib['НаименованиеПолное']
 
     req = obj.find("{urn:1C.ru:commerceml_2}ХарактеристикиТовара")
-    for i in req:
-        if i[1].text in obj_type.crm_parameters.keys():
+    if req is not None:
+        for i in req:
             param = i[2].text
             try:
                 param = float(i[2].text)
             except:
                 pass
-            res.parameters[obj_type.crm_parameters[i[1].text]] = param
+            if i[1].text in obj_type.crm_parameters.keys():
+                res.parameters[obj_type.crm_parameters[i[1].text]] = param
+            else:
+                res.parameters[i[1].text] = param
+
     res.save()

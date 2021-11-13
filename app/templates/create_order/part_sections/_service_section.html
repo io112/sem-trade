@@ -1,0 +1,9 @@
+<div v-if="!selected_part" class="form-group">
+  <label class="form-control-label" for="input-query">Название услуги</label>
+  <p-inputtext class="w-100" v-model="selected_service.name" type="text"></p-inputtext>
+</div>
+
+<div class="mt-3 form-group">
+  <label class="form-control-label" for="part-input-amount">Стоимость</label>
+  <p-inputnumber class="w-100" v-model="selected_service.amount" :min="1" mode="decimal" :max-fraction-digits="2"></p-inputnumber>
+</div>

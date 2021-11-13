@@ -33,11 +33,6 @@ class ItemsQuerySet(QuerySet):
 class BaseItem(Document):
     crm_parameters = {}
     not_zero_amount = {'amount': {'$not': {'$eq': 0}}}
-    MeasureCode = '796'
-    MeasureName = 'Штука'
-    MeasureInt = 'PCE'
-    MeasureText = 'штук'
-    NomenclatureType = ''
     id = StringField(primary_key=True)
     category_id = StringField()
     parameters = DictField()
@@ -50,10 +45,10 @@ class BaseItem(Document):
     meta = {'collection': 'items',
             'allow_inheritance': True, 'queryset_class': ItemsQuerySet,
             'indexes': [
-                {'fields': ['$name', "$price"],
+                {'fields': ['$name'],
                  'default_language': 'english',
                  'name': 'search_idx',
-                 'weights': {'name': 1}
+                 # "_type": 1
                  }
             ]
             }
@@ -61,18 +56,15 @@ class BaseItem(Document):
     def __init__(self, *args, **values):
         super().__init__(*args, **values)
         self.is_finish = False
+        self.MeasureCode = '796'
+        self.MeasureName = 'Штука'
+        self.MeasureInt = 'PCE'
+        self.MeasureText = 'штук'
+        self.NomenclatureType = ''
 
     def get_safe(self) -> dict:
         res = document_to_dict(self)
         return res
-
-    @staticmethod
-    def get_param_name() -> str:
-        return "base"
-
-    @staticmethod
-    def get_category_id() -> str:
-        return 'base'
 
     def get_selection_name(self) -> str:
         return f'base'

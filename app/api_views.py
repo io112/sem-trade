@@ -133,7 +133,7 @@ def update_selection_items():
 @sid_required
 def find_part():
     data = json.loads(request.data)
-    res = selection_controller.find_part(data['collection'], data['query'], data.get('only_present'),
+    res = selection_controller.find_part(data['query'], data.get('only_present'),
                                          data.get('amount', 1))
     return jsonify(res)
 
@@ -226,8 +226,26 @@ def set_part():
 @login_required
 def move_part_to_cart():
     sid = request.cookies.get('current_order')
+    data = json.loads(request.data)
+    part = data['part']
+    amount = data['amount']
     try:
-        session_controller.add_part_to_cart(sid)
+        session_controller.add_part_to_cart(sid, part, amount)
+    except Exception as e:
+        traceback.print_exc()
+        return Response(str(e), status=409)
+    return jsonify('success')
+
+
+@app.route('/api/make_order/submit_service', methods=['POST'])
+@sid_required
+@login_required
+def move_service_to_cart():
+    sid = request.cookies.get('current_order')
+    data = json.loads(request.data)
+    service = data['service']
+    try:
+        session_controller.add_part_to_cart(sid, service, service['amount'])
     except Exception as e:
         traceback.print_exc()
         return Response(str(e), status=409)
@@ -281,13 +299,16 @@ def calc_part_price():
     return jsonify(res.dict())
 
 
-@app.route('/api/make_order/del_selected_part', methods=['POST'])
+@app.route('/api/make_order/calc_item_price', methods=['POST'])
 @sid_required
 @login_required
-def del_selected_part():
+def calc_item_price():
     sid = request.cookies.get('current_order')
     d = json.loads(request.data)
-    return jsonify(selection_controller.del_item_from_selection(sid, d.get('item_index')))
+    part = d.get('part')
+    amount = d.get('amount')
+    res = price_controller.PartPrice.calc_part_price(part, amount)
+    return jsonify(res.dict())
 
 
 @app.route('/api/make_order/set_job_type', methods=['POST'])

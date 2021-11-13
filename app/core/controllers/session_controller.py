@@ -1,4 +1,5 @@
 import app.core.utilities.session_utility as utility
+from app.core.controllers import selection_controller
 from app.core.models.cart import Cart
 from app.core.models.items.composite_item import CompositeItem
 from app.core.models.selection import RVDSelection
@@ -75,17 +76,12 @@ def del_cart_item(sid: str, item_id: int):
     return utility.get_cart(sid).get_safe()
 
 
-def add_part_to_cart(sid: str):
+def add_part_to_cart(sid: str, part, amount):
     session = utility.get_session(sid)
-    selection: RVDSelection = session.selection
-    if selection.part is None:
-        raise ValueError('Запчасть не выделена')
-    if selection.part.amount <= 0:
-        raise ValueError('Выбрано 0 или меньше предметов')
+    item = selection_controller.cart_item_from_part(part, amount)
     if session.cart is None:
         session.cart = Cart()
-    session.cart.items.append(selection.part)
-    del session.selection
+    session.cart.items.append(item)
     session.save()
 
 

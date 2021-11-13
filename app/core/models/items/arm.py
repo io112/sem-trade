@@ -1,27 +1,19 @@
 from app.core.models.items.base import BaseItem
+from app.crm.meta import *
 
 
 class Arm(BaseItem):
     crm_parameters = {'Диаметр': 'diameter',
                       'Производитель': 'vendor', 'Тип рукава': 'arm_type'}
-    MeasureCode = '006'
-    MeasureName = 'Метр'
-    MeasureInt = 'MTR'
-    MeasureText = 'метров'
-    NomenclatureType = 'Рукав'
 
     def __init__(self, *args, **values):
         super().__init__(*args, **values)
-        self.type = self.get_param_name()
-        self.category_id = self.get_category_id()
-
-    @staticmethod
-    def get_param_name() -> str:
-        return "arm"
-
-    @staticmethod
-    def get_category_id() -> str:
-        return "d9da1352-656c-11ea-8182-002590a66847"
+        self.type = ARM_PARAM_NAME
+        self.category_id = ARM_CAT_ID
+        self.MeasureCode = '006'
+        self.MeasureName = 'Метр'
+        self.MeasureInt = 'MTR'
+        self.NomenclatureType = ARM_NOMENCLATURE_TYPE
 
     def get_selection_name(self) -> str:
         arm_type = self.parameters.get('arm_type', '')
