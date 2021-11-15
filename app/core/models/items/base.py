@@ -41,6 +41,11 @@ class BaseItem(Document):
     name = StringField()
     price = FloatField()
     measure = StringField()
+    MeasureCode = StringField()
+    MeasureName = StringField()
+    MeasureInt = StringField()
+    MeasureText = StringField()
+    NomenclatureType = StringField()
 
     meta = {'collection': 'items',
             'allow_inheritance': True, 'queryset_class': ItemsQuerySet,
