@@ -22,7 +22,7 @@
   </div>
   <div class="text-center mt-4 mb-4" v-cloak>
     <h5 class="h4">
-      Сумма: [[ cart? cart.subtotal: 0 ]] ₽
+      Сумма: [[ (cart && cart.subtotal)? cart.subtotal: 0 ]] ₽
     </h5>
   </div>
   <hr class="my-4">

@@ -35,6 +35,8 @@ class CreateOrderView(BaseAuthView):
             'API_COMMENT_SET': url_for('order_comment_api.OrderComment'.lower()),
             'API_COMMENT_GET': url_for('order_comment_api.OrderComment'.lower()),
             'API_CARTS_GET': url_for('order_carts_api.OrderCarts'.lower()),
+            'API_CARTS_CREATE': url_for('make_order_api.MakeOrder'.lower()),
+            'API_CARTS_DELETE': url_for('make_order_api.MakeOrder'.lower()),
         }
 
     def dispatch_request(self):
