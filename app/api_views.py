@@ -128,6 +128,15 @@ def update_selection_items():
     return jsonify(selection_controller.add_item_to_selection(sid, data['part'], data['type']))
 
 
+@app.route('/api/make_order/del_selected_part', methods=['POST'])
+@login_required
+@sid_required
+def del_selected_part():
+    sid = request.cookies.get('current_order')
+    data = json.loads(request.data)
+    return jsonify(selection_controller.del_item_from_selection(sid, data['item_index']))
+
+
 @app.route('/api/make_order/find_part', methods=['POST'])
 @login_required
 @sid_required
