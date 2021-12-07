@@ -53,13 +53,13 @@ function init() {
 }
 
 function writeToSession(sid, data) {
-    return send("/api/make_order/update_selection_items", data)
+    return send("/api/bp/update_selection_items", data)
 }
 
 
 async function getCurrentSelection() {
     let only_present = $('#rvd_only_present').is(':checked')
-    let resp = await request('/api/make_order/get_offer', {'only_present': only_present});
+    let resp = await request('/api/bp/get_offer', {'only_present': only_present});
     if (resp !== 'NaN') {
         current_selection = resp['selection']
         parameters = resp['parameters']
@@ -112,7 +112,7 @@ function updateAllSections() {
 }
 
 function addToCart() {
-    send("/api/make_order/submit_selection", {'sid': sid}).then(
+    send("/api/bp/submit_selection", {'sid': sid}).then(
         (ans) => {
             if (ans === 'success') {
                 updateAllSections()
@@ -132,7 +132,7 @@ function submitSelection() {
     }
     current_selection['items'] = data;
     console.log(current_selection)
-    return send("/api/make_order/update_selection_items", current_selection).then(updateAllSections)
+    return send("/api/bp/update_selection_items", current_selection).then(updateAllSections)
 }
 
 function updateSections(data) {
@@ -233,12 +233,12 @@ function dropSection(sectionId) {
         'type': current_selection['items'][sectionId]['type'],
         'part_name': current_selection['items'][sectionId]['part_name']
     }
-    send("/api/make_order/update_selection_items", current_selection).then(updateAllSections)
+    send("/api/bp/update_selection_items", current_selection).then(updateAllSections)
 }
 
 function deleteSection(sectionId) {
     delete current_selection['items'][sectionId]
-    send("/api/make_order/update_selection_items", current_selection).then(defineSections)
+    send("/api/bp/update_selection_items", current_selection).then(defineSections)
 }
 
 class BasicSection {

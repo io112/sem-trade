@@ -10,7 +10,7 @@ app.config['SECRET_KEY'] = constants.secret_key
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-from app import base_views, api_views
+from app.views import views
 
 db.init()
 check_super_user()

@@ -48,7 +48,7 @@ def get_filtered_params(session_id, only_present):
     return {'candidates': candidates, 'parameters': parameters, 'selection': selection.get_safe()}
 
 
-def get_suggestion(session_id, only_present, part_params, part_type):
+def get_suggestion(session_id, only_present, part_params: dict, part_type: str):
     only_present = True if (only_present == 'true' or only_present is True) else False
     session = Session.objects(id=session_id)[0]
     if session.selection is None:

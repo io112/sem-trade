@@ -1,6 +1,14 @@
-from app import misc
+import random
+import string
+
 from app.core.models.session import Session
 from app.core.utilities import session_utility
+
+
+def get_random_string(length):
+    letters = string.ascii_lowercase + string.digits
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
 
 
 def check_session(sid):
@@ -10,9 +18,9 @@ def check_session(sid):
 
 
 def start_session(user=''):
-    sid = misc.get_random_string(15)
+    sid = get_random_string(15)
     while check_session(sid):
-        sid = misc.get_random_string(15)
+        sid = get_random_string(15)
     session = Session(id=sid)
     session.user = user
     session.save()

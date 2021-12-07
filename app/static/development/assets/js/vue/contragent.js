@@ -18,22 +18,29 @@ const RVDContragent = {
             this.findContragent();
         });
         this.getContragent();
+        emitter.on('newOrder', e => this.getContragent())
     },
     methods: {
         async getContragent() {
-            let resp = await request('/api/make_order/get_contragent')
+            let resp = await get(API_CONTRAGENT_GET)
             if (Object.keys(resp).length !== 0) {
                 this.contragent = resp;
-                this.query.query = this.contragent['name'] + ' ' + ( this.contragent.surname? this.contragent.surname: '');
+                this.query.query = this.contragent['name'] + ' ' + (this.contragent.surname ? this.contragent.surname : '');
                 emitter.emit('setContragent', this.contragent)
+            } else {
+                this.contragent = null
+                this.suggestion = []
+                this.query.query = ''
+                emitter.emit('setContragent', null)
             }
+            this.$forceUpdate();
         },
         async setContragent(contragent_id) {
-            let resp = await request('/api/make_order/set_contragent', {
+            let resp = await put(API_CONTRAGENT_SET, {
                 id: contragent_id,
             })
             this.contragent = resp;
-            this.query.query = this.contragent['name'] + ' ' + ( this.contragent.surname? this.contragent.surname: '');
+            this.query.query = this.contragent['name'] + ' ' + (this.contragent.surname ? this.contragent.surname : '');
             emitter.emit('setContragent', this.contragent)
             this.$forceUpdate();
 
@@ -42,14 +49,14 @@ const RVDContragent = {
             if (this.contragent) {
                 return
             }
-            let resp = await request('/api/contragent/find_contragents', {
+            let resp = await get(API_CONTRAGENT_FIND, {
                 query: this.query.query,
             })
             document.getElementById("client_div").style.display = 'block';
             this.suggestion = resp
         },
         async dropContragent() {
-            let resp = await request('/api/make_order/remove_contragent')
+            let resp = await del(API_CONTRAGENT_DEL)
             this.contragent = null
             this.suggestion = []
             this.query.query = ''

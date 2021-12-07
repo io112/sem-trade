@@ -79,3 +79,8 @@
     </div>
   </div>
 </div>
+<script>
+    {% for k, v in api_urls.items() %}
+        const {{ k }} = "{{ v }}"
+    {% endfor %}
+</script>

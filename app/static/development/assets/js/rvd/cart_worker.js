@@ -1,20 +1,6 @@
 let is_org_slider = ""
 window.addEventListener("load", init);
 
-// ENDPOINTS
-const get_carts_endpoint = 'api/make_order/get_carts'
-const get_cart_endpoint = '/api/make_order/get_cart'
-const find_contragents_endpoint = 'api/contragent/find_contragents'
-const remove_contragent_endpoint = 'api/make_order/remove_contragent'
-const set_contragent_endpoint = 'api/make_order/set_contragent'
-const get_contragent_endpoint = 'api/make_order/get_contragent'
-const cancel_order_endpoint = 'api/make_order/cancel'
-const del_cart_item_endpoint = 'api/make_order/del_cart_item'
-const create_contragent_endpoint = 'api/contragent/create_contragent'
-const set_comment_endpoint = 'api/make_order/set_comment'
-const get_comment_endpoint = 'api/make_order/get_comment'
-const checkout_endpoint = 'api/make_order/checkout'
-
 let current_part = undefined
 
 function init() {
@@ -33,9 +19,7 @@ function init() {
 function init_cw() {
     is_org_slider = $('#contragent_is_org');
     $('#comment_text').on('blur', set_comment);
-    $('#checkout_btn').on('click', checkout);
     is_org_slider.on('change', change_contragent_type);
-    // get_contragent();
     render_comment();
 }
 
@@ -53,126 +37,29 @@ var saveData = (function () {
 }());
 
 
-function find_part() {
-    let form_data = $('#part_form').serializeArray()
-    request('/api/make_order/find_part', form_data).then(resp => render_parts(resp))
-
-}
-
-function submit_part() {
-    update_part()
-    send('/api/make_order/submit_part').then((resp) => {
-        if (resp === 'success') {
-            current_part = undefined
-            render_parts(current_part)
-            $('#addPartModal').modal('hide');
-            // update_cart();
-        }
-    })
-
-}
-
-function render_parts(list) {
-    const parts_list = $('#parts_list')
-    if (list === undefined) {
-        parts_list.empty()
-        $('#part_price').html(0)
-        $('#part_total').html(0)
-        $('#part-input-amount').val(0)
-        $('#part_search').show()
-        return;
-    }
-    parts_list.empty();
-    if (list['current_part']) {
-        $('#part_search').hide()
-        let part = list['current_part']
-        let item = part['item']
-        console.lg(part)
-        parts_list.append(get_part(item['name'], item['amount'], item['_id'], true, item['type']))
-        $('#part_price').html(part['price'])
-        $('#part_total').html(part['total_price'])
-        $('#part-input-amount').val(part['amount'])
-        return
-    }
-    if (list['items'] === undefined)
-        return
-    list['items'].forEach(part => {
-        parts_list.append(get_part(part['name'], part['amount'], part['_id'], false, part['type']))
-    })
-}
-
-function get_part(name, amount, id, is_selected, type) {
-    name = `${name} : ${amount}`
-    return `<a href="#!" onclick="set_part('${id}', '${type}')" class="list-group-item list-group-item-action ${is_selected ? 'active' : ''}" aria-current="true">
-              ${name}
-            </a>`
-}
-
-function clear_part() {
-    current_part = undefined
-    send('/api/make_order/clear_part').then(res => {
-        if (res === 'success') {
-            render_parts(current_part)
-        }
-    })
-}
-
-function update_part() {
-    if (current_part !== undefined)
-        set_part(current_part['item']['_id'], current_part['item']['type'])
-}
-
-function set_part(id, collection) {
-    let req = {
-        'collection': collection, 'part_id': id,
-        'amount': tryParseFloat($('#part-input-amount').val())
-    }
-    send('/api/make_order/set_part', req).then(resp => {
-        current_part = resp['current_part']
-        render_parts(resp)
-    })
-}
-
-function checkout() {
-    set_comment();
-    // fetch(checkout_endpoint, {
-    //     method: 'POST',
-    //     body: JSON.stringify({'sid': sid})
-    // })
-    //     .then(resp => resp.blob()).then(blob => {
-    //     saveData('orders.xml', blob)
-    // })
-
-    send(checkout_endpoint).then(resp => {
-        if (!resp.status || resp.status === 200) {
-            window.location.href = '/'
-        }
-    })
-
-}
-
 function set_comment() {
-    send(set_comment_endpoint, $('#comment_text').val()).then()
+    request(API_COMMENT_SET, {
+        'comment': $('#comment_text').val()
+    })
 }
 
-function render_comment() {
-    send(get_comment_endpoint).then(comment => {
-        $('#comment_text').val(comment)
-    })
+async function render_comment() {
+    let resp = await get(API_COMMENT_GET)
+    $('#comment_text').val(resp)
 }
 
 function init_sessions() {
     get_sessions()
 }
 
-function get_sessions() {
-    request(get_carts_endpoint, {'sorting': '+last_modified'}).then(carts => {
-        render_changer(carts)
-    })
+async function get_sessions() {
+    let resp = await get(API_CARTS_GET, {'sorting': '+last_modified'})
+    render_changer(resp)
 }
 
 function render_changer(data) {
     data = data['data']
+    console.log(data)
     const nav = $('#nav-pager')
     nav.empty()
     const list = $('<ul>').attr('class', 'pagination pagination-lg')

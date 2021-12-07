@@ -9,12 +9,6 @@ from app.core.controllers import session_controller
 from app.core.sessions import check_session, start_session
 
 
-def get_random_string(length):
-    letters = string.ascii_lowercase + string.digits
-    result_str = ''.join(random.choice(letters) for i in range(length))
-    return result_str
-
-
 def check_sid(sid):
     if sid is None:
         return False
@@ -43,13 +37,13 @@ def sid_required(view):
         if sid is not None:
             cs = check_sid(sid)
             if cs:
-                resp = make_cookie_resp('home', sid)
+                resp = make_cookie_resp('frontend.create_order.create_order', sid)
             else:
-                resp = make_cookie_resp('home')
+                resp = make_cookie_resp('frontend.create_order.create_order')
             return resp
         sid = request.cookies.get('current_order')
         if not check_sid(sid):
-            return make_cookie_resp('home')
+            return make_cookie_resp('frontend.create_order.create_order')
         return view(**kwargs)
 
     return wrapped_view

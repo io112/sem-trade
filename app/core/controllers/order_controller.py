@@ -7,12 +7,13 @@ from bson import ObjectId
 from flask import render_template
 
 import app.core.utilities.order_utility as utility
-from app.api_views import msk_timezone
 from app.constants import *
 from app.core.models.items.composite_item import CompositeItem
 from app.core.models.order import Order
 from app.core.models.user import User
 from app.core.utilities import session_utility
+
+msk_timezone = pytz.timezone('Europe/Moscow')
 
 
 def get_all_orders(user=None, limit=None, offset=None) -> dict:

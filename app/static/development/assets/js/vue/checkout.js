@@ -15,9 +15,12 @@ const RVDCheckout = {
     },
     methods: {
         async checkout() {
-            let resp = request('/api/make_order/checkout')
+            let resp = get(API_CHECKOUT)
             if (resp) {
-                window.location.href = '/'
+                setTimeout(() => {
+                    emitter.emit('newOrder');
+                }, 300);
+
             }
         },
         setContragent(contragent) {

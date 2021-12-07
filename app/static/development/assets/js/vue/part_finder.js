@@ -42,12 +42,13 @@ const PartFinder = {
             this.validate();
         });
         this.validate();
+        emitter.on('newOrder', e => this.dropPart())
     },
     methods: {
         async searchParts() {
             if (this.selected_part)
                 return
-            let resp = await request('/api/make_order/find_part', {
+            let resp = await request(API_PART_SEARCH, {
                 'only_present': this.form.only_present,
                 'amount': this.form.amount,
                 'query': this.form.query,
@@ -56,7 +57,7 @@ const PartFinder = {
             this.$forceUpdate();
         },
         async setPart(part) {
-            let resp = await request('/api/make_order/calc_item_price', {
+            let resp = await request(API_PART_CALC, {
                 'part': part,
                 'amount': this.form.amount,
             });
@@ -90,12 +91,12 @@ const PartFinder = {
             }
             let resp = ''
             if (!this.is_service)
-                resp = await request('/api/make_order/submit_part', {
+                resp = await request(API_PART_SUBMIT, {
                     'part': this.selected_part,
                     'amount': this.form.amount,
                 });
             else
-                resp = await request('/api/make_order/submit_service', {
+                resp = await request(API_SERVICE_SUBMIT, {
                     'service': this.selected_service,
                     'amount': this.selected_service['amount'],
                 });
