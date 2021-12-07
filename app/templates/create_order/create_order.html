@@ -8,6 +8,7 @@
   <script src="https://unpkg.com/primevue@3.8.2/column/column.min.js"></script>
   <script src="https://unpkg.com/primevue@3.8.2/columngroup/columngroup.min.js"></script>
   <script src="https://unpkg.com/primevue@3.8.2/card/card.min.js"></script>
+  <script src="https://unpkg.com/primevue@3.8.2/textarea/textarea.min.js"></script>
   <script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
 
 {% endblock %}
@@ -56,11 +57,14 @@
           <hr class="my-4"/>
           <!-- Description -->
           <h6 class="heading-small text-muted mb-4">Комментарии</h6>
-          <div class="pl-lg-4">
+          <div class="pl-lg-4" id="comment">
             <div class="form-group">
               <label for="comment_text" class="form-control-label">Комментарий к заказу</label>
-              <textarea id="comment_text" rows="4" class="form-control"
-                        placeholder="Собрать к 20:30"></textarea>
+              <p-textarea v-model="comment.comment" type="text" class="form-control"
+                          v-cloak></p-textarea>
+
+{#              <textarea id="comment_text" rows="4" class="form-control"#}
+{#                        placeholder="Собрать к 20:30"></textarea>#}
             </div>
           </div>
         </div>
@@ -101,6 +105,7 @@
 {% block additional_scripts %}
   <script src="../static/{{ commit_hash }}/assets/js/rvd/cart_worker.js"></script>
   <script src="../static/{{ commit_hash }}/assets/js/vue/rvd_picker.js"></script>
+  <script src="../static/{{ commit_hash }}/assets/js/vue/comment.js"></script>
   <script src="../static/{{ commit_hash }}/assets/js/vue/part_finder.js"></script>
   <script src="../static/{{ commit_hash }}/assets/js/vue/cart.js"></script>
   <script src="../static/{{ commit_hash }}/assets/js/vue/contragent.js"></script>
