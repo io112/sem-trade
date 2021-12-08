@@ -1,0 +1,59 @@
+{% extends 'base/base.html' %}
+
+{% block pagename %}Мои корзины{% endblock %}
+
+{% block additional_head %}
+  <script src="https://unpkg.com/primevue@^3/datatable/datatable.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/column/column.min.js"></script>
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div id="cartsapp" class="card-body">
+          <p-datatable :value="carts" :lazy="true" :paginator="true"
+                       :rows="rows" ref="dt"
+                       data-key="_id" :first="offset"
+                       v-model:total-records="totalRecords" :loading="loading" @page="onPage($event)"
+                       @sort="onSort($event)"
+                       :global-filterFields="['_id','created_at', 'contragent.name', 'selection.subtotal.total_price']"
+                       responsive-layout="scroll"
+                       v-cloak>
+            <p-column field="_id" header="ID" filter-field="_id" filter-match-mode="contains"
+                      ref="_id" :sortable="true">
+            </p-column>
+            <p-column field="created_at" header="Дата создания" filter-match-mode="contains" ref="created_at"
+                      :sortable="true">
+            </p-column>
+            <p-column field="contragent.name" header="Контрагент" filter-field="contragent.name"
+                      ref="contragent.name" :sortable="true">
+            </p-column>
+            <p-column field="selection.subtotal.total_price" header="Сумма"
+                      filter-field="selection.subtotal.total_price"
+                      ref="selection.subtotal.total_price" :sortable="true">
+              <template #body="{data}">
+                [[ data.selection.subtotal.total_price ]]₽
+              </template>
+            </p-column>
+            <p-column header-style="width: 4rem; text-align: center"
+                      body-style="text-align: center; overflow: visible">
+              <template #body="{data}">
+                <div class="d-flex">
+                  <a @click="openCart([[ data._id ]])" class="nav-link" href="#!"><i
+                      class="fa fa-edit text-blue"></i></a>
+                  <a @click="deleteCart([[ data._id ]])" class="nav-link" href="#!"><i
+                      class="fa fa-trash-alt text-red"></i></a>
+                </div>
+              </template>
+            </p-column>
+          </p-datatable>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block additional_scripts %}
+  <script src="../static/{{ commit_hash }}/assets/js/vue/carts/carts.js"></script>
+{% endblock %}

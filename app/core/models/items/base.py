@@ -53,7 +53,6 @@ class BaseItem(Document):
                 {'fields': ['$name'],
                  'default_language': 'english',
                  'name': 'search_idx',
-                 # "_type": 1
                  }
             ]
             }

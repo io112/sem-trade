@@ -10,7 +10,9 @@ def get_contragent(cid: str):
 
 
 def find_contragents(query: str):
-    contragent = Contragent.objects.search_text(query)
+    querymod = {'name__icontains': query}
+
+    contragent = Contragent.objects(**querymod)
     contr_list = queryset_to_list(contragent)
     for i in range(len(contr_list)):
         contr_list[i]['_id'] = str(contr_list[i]['_id'])

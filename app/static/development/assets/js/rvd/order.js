@@ -26,7 +26,7 @@ function init() {
 // }
 
 function print_upd() {
-    textRequest(`/api/orders/${order_id}/download_upd`).then(data => {
+    get(API_ORDER_UPD_GET, {order_id: order_id}).then(data => {
         w = window.open(window.location.href, "_blank");
         //w.document.open();
         w.document.write(data);
@@ -38,13 +38,12 @@ function print_upd() {
 
 function print_bill() {
     let windowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
-    textRequest(`/api/orders/${order_id}/download_bill`).then(data => {
+    get(API_ORDER_BILL_GET, {order_id: order_id}).then(data => {
         w = window.open(window.location.href, "_blank", windowFeatures);
         //w.document.open();
         w.document.write(data);
         //w.document.close();
         w.addEventListener("load", () => {
-            alert('a')
             w.window.print();
             w.window.close();
 
@@ -52,10 +51,9 @@ function print_bill() {
     })
 }
 
-function get_orders_list() {
-    send('/api/orders/get_order', order_id).then(data => {
-        render_page(data);
-    })
+async function get_orders_list() {
+    let resp = await get(API_ORDER_GET, {order_id: order_id})
+    render_page(resp);
 }
 
 function render_page(data) {
@@ -92,28 +90,28 @@ function render_item_list(list) {
 
 function save_upd_num() {
     let upd_num = $('#upd_num').val();
-    send(`/api/orders/${order_id}/set_upd`, upd_num).then(data => {
+    put(API_ORDER_UPD_SET, {order_id: order_id, upd_num: upd_num}).then(data => {
         console.log('УПД сохранен');
         render_page(data);
     })
 }
 
-function close_order() {
-    let upd_num = $('#upd_num').val();
-    send(`/api/orders/${order_id}/close`, upd_num).then(data => {
-        if (data.responseText === undefined) {
-            render_page(data);
-        }
-    })
+async function close_order() {
+    let resp = await request(API_ORDER_MAKE_OP, {order_id: order_id, operation: 'close'})
+    if (typeof resp === "string") {
+        alert(resp)
+    } else {
+        render_page(resp);
+    }
 }
 
-function checkout_order() {
-    let upd_num = $('#upd_num').val();
-    send(`/api/orders/${order_id}/checkout`).then(data => {
-        if (data.responseText === undefined) {
-            render_page(data)
-        }
-    })
+async function checkout_order() {
+    let resp = await request(API_ORDER_MAKE_OP, {order_id: order_id, operation: 'checkout'})
+    if (typeof resp === "string") {
+        alert(resp)
+    } else {
+        render_page(resp);
+    }
 }
 
 

@@ -15,17 +15,20 @@ const RVDCart = {
     mounted() {
         this.getCart()
         emitter.on('updateCart', e => this.updateCart())
+        emitter.on('newOrder', e => this.updateCart())
     },
     methods: {
         async getCart() {
-            let resp = await request('/api/make_order/get_cart', {'sorting': '+last_modified'})
+            let resp = await get(API_CART_GET, {'sorting': '+last_modified'})
             this.cart = resp;
             emitter.emit('setCart', this.cart)
+            this.$forceUpdate();
         },
         async deleteItem(index) {
-            let resp = await request('/api/make_order/del_cart_item', {'id': index})
+            let resp = await del(API_CART_DEL, {'id': index})
             this.cart = resp;
             emitter.emit('setCart', this.cart)
+            this.$forceUpdate();
         },
         async updateCart() {
             this.getCart();

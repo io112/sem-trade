@@ -1,14 +1,13 @@
 {% extends 'base/base.html' %}
 
 {% block additional_head %}
-  <script src="https://unpkg.com/primevue@3.8.2/dropdown/dropdown.min.js"></script>
-  <script src="https://unpkg.com/primevue@3.8.2/core/core.min.js"></script>
-  <script src="https://unpkg.com/primevue@3.8.2/inputswitch/inputswitch.min.js"></script>
-  <script src="https://unpkg.com/primevue@3.8.2/datatable/datatable.min.js"></script>
-  <script src="https://unpkg.com/primevue@3.8.2/column/column.min.js"></script>
-  <script src="https://unpkg.com/primevue@3.8.2/columngroup/columngroup.min.js"></script>
-  <script src="https://unpkg.com/primevue@3.8.2/card/card.min.js"></script>
-  <script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
+  <script src="https://unpkg.com/primevue@^3/dropdown/dropdown.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/inputswitch/inputswitch.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/datatable/datatable.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/column/column.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/columngroup/columngroup.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/card/card.min.js"></script>
+  <script src="https://unpkg.com/primevue@^3/textarea/textarea.min.js"></script>
 
 {% endblock %}
 
@@ -25,7 +24,7 @@
             </div>
             <div class="flex-fill justify-content-end text-right">
               <div>
-                <a class="col-md-1" href="#!" onclick="del_order()">
+                <a class="col-md-1" href="#!" onclick="del_cart()">
                   <i class="fa fa-trash-alt text-red">
                   </i>
                 </a>
@@ -56,11 +55,14 @@
           <hr class="my-4"/>
           <!-- Description -->
           <h6 class="heading-small text-muted mb-4">Комментарии</h6>
-          <div class="pl-lg-4">
+          <div class="pl-lg-4" id="comment">
             <div class="form-group">
               <label for="comment_text" class="form-control-label">Комментарий к заказу</label>
-              <textarea id="comment_text" rows="4" class="form-control"
-                        placeholder="Собрать к 20:30"></textarea>
+              <p-textarea v-model="comment.comment" type="text" class="form-control"
+                          v-cloak></p-textarea>
+
+              {#              <textarea id="comment_text" rows="4" class="form-control"#}
+              {#                        placeholder="Собрать к 20:30"></textarea>#}
             </div>
           </div>
         </div>
@@ -88,7 +90,11 @@
         </div>
       </div>
     </div>
-    <nav id="nav-pager" aria-label="..." class="pt-3 ml-3">
+    <nav id="nav-pager" aria-label="..." class="pt-3 ml-3 d-flex align-items-center">
+      <p-paginator :first="data.current_cart_idx" :rows="1" :page-link-size="15" :total-records="data.carts.length"
+      @page="openCart($event)">
+      </p-paginator>
+      <p-button label="Создать корзину" class="p-button-rounded  p-button-success" @click="createCart"></p-button>
     </nav>
   </div>
   <!-- Modal -->
@@ -99,13 +105,14 @@
 {% endblock %}
 
 {% block additional_scripts %}
-  <script src="../static/{{ commit_hash }}/assets/js/rvd/cart_worker.js"></script>
-  <script src="../static/{{ commit_hash }}/assets/js/vue/rvd_picker.js"></script>
-  <script src="../static/{{ commit_hash }}/assets/js/vue/part_finder.js"></script>
-  <script src="../static/{{ commit_hash }}/assets/js/vue/cart.js"></script>
-  <script src="../static/{{ commit_hash }}/assets/js/vue/contragent.js"></script>
-  <script src="../static/{{ commit_hash }}/assets/js/vue/checkout.js"></script>
+  <script src="../static/{{ commit_hash }}/assets/js/vue/make_order/cart_worker.js"></script>
+  <script src="../static/{{ commit_hash }}/assets/js/vue/make_order/rvd_picker.js"></script>
+  <script src="../static/{{ commit_hash }}/assets/js/vue/make_order/comment.js"></script>
+  <script src="../static/{{ commit_hash }}/assets/js/vue/make_order/part_finder.js"></script>
+  <script src="../static/{{ commit_hash }}/assets/js/vue/make_order/cart.js"></script>
+  <script src="../static/{{ commit_hash }}/assets/js/vue/make_order/carts.js"></script>
+  <script src="../static/{{ commit_hash }}/assets/js/vue/make_order/contragent.js"></script>
+  <script src="../static/{{ commit_hash }}/assets/js/vue/make_order/checkout.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"
           integrity="sha256-qXBd/EfAdjOA2FGrGAG+b3YBn2tn5A6bhz+LSgYD96k=" crossorigin="anonymous"></script>
 {% endblock %}
-

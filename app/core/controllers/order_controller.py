@@ -7,17 +7,18 @@ from bson import ObjectId
 from flask import render_template
 
 import app.core.utilities.order_utility as utility
-from app.api_views import msk_timezone
 from app.constants import *
 from app.core.models.items.composite_item import CompositeItem
 from app.core.models.order import Order
 from app.core.models.user import User
 from app.core.utilities import session_utility
 
+msk_timezone = pytz.timezone('Europe/Moscow')
 
-def get_all_orders(user=None, limit=None, offset=None) -> dict:
+
+def get_all_orders(user=None, limit=None, offset=None, sorting=None) -> dict:
     res = []
-    orders = utility.get_orders(user, limit, offset)
+    orders = utility.get_orders(user, limit, offset, sorting)
     if orders is None:
         return {}
     for i in orders:
@@ -37,10 +38,11 @@ def check_presence(order_id: str) -> List[str]:
             total_amount = i.amount
             for j in i.items:
                 need_amount = j.amount * total_amount
-                available_amount = j.item.amount
-                if need_amount > available_amount:
-                    res.append(f'Не хватает {j.item.name} требуется: {need_amount}, '
-                               f'доступно: {available_amount}')
+                if j.item:
+                    available_amount = j.item.amount
+                    if need_amount > available_amount:
+                        res.append(f'Не хватает {j.item.name} требуется: {need_amount}, '
+                                   f'доступно: {available_amount}')
         else:
             need_amount = i.amount
             available_amount = i.item.amount
@@ -123,8 +125,9 @@ def checkout_order(order_id) -> Order:
             total_amount = i.amount
             for j in i.items:
                 need_amount = j.amount * total_amount
-                j.item.amount -= need_amount
-                j.item.save()
+                if j.item:
+                    j.item.amount -= need_amount
+                    j.item.save()
         else:
             need_amount = i.amount
             i.item.amount -= need_amount

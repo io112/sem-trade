@@ -35,6 +35,8 @@ def update_modified(sender, document):
         for i in cart.items:
             price += i.total_price
         cart.subtotal = round(price, 2)
+    if document.created_at is None:
+        document.created_at = msk_timezone.localize(datetime.now())
 
 
 @update_modified.apply
@@ -42,6 +44,7 @@ class Session(Document):
     id = StringField(primary_key=True)
     user = StringField()
     last_modified = DateTimeField()
+    created_at = DateTimeField()
     data = DictField()
     selection = EmbeddedDocumentField(RVDSelection)
     contragent = ReferenceField(Contragent)

@@ -1,6 +1,3 @@
-const {createApp, ref, watch} = Vue;
-const emitter = mitt();
-
 const RVDPicker = {
     compilerOptions: {
         delimiters: ['[[', ']]'],
@@ -84,6 +81,7 @@ const RVDPicker = {
     mounted() {
         this.resetWatchers();
         this.getSelection();
+        emitter.on('newOrder', e => this.reloadSelection())
     },
     components: {
         "p-dropdown": primevue.dropdown,
@@ -101,7 +99,7 @@ const RVDPicker = {
             }, {deep: true});
         },
         async updateRVDType() {
-            let resp = await request('/api/make_order/set_job_type', {
+            let resp = await put(API_SELECTION_JOB_SET, {
                 'job_type': this.current_selection.job_type,
             })
             this.updateSelection(resp);
@@ -132,7 +130,7 @@ const RVDPicker = {
                 this.selected_part.name = this.part.name;
                 this.selected_part.price = this.part.amount;
             } else {
-                let resp = await request('/api/make_order/suggest_part', {
+                let resp = await request(API_SELECTION_PART_SEARCH, {
                     'only_present': this.only_present,
                     'part_type': this.part.type,
                     'part_params': this.part.parameters,
@@ -195,7 +193,7 @@ const RVDPicker = {
                 this.part.full_price = this.part.price;
                 return
             }
-            let resp = await request('/api/make_order/calc_part_price', {
+            let resp = await request(API_SELECTION_PART_CALC, {
                 'part': this.part,
                 'type': this.current_selection.job_type,
             })
@@ -227,7 +225,7 @@ const RVDPicker = {
         }
         ,
         async addItemToSelection() {
-            let resp = await request('/api/make_order/add_item_to_selection', {
+            let resp = await request(API_SELECTION_PART_ADD, {
                 'part': this.part,
                 'type': this.current_selection.job_type,
             })
@@ -238,19 +236,19 @@ const RVDPicker = {
         }
         ,
         async getSelection() {
-            let resp = await request('/api/make_order/update_selection')
+            let resp = await get(API_SELECTION_UPDATE)
             this.updateSelection(resp);
         }
         ,
         async updateAmount() {
-            let resp = await request('/api/make_order/update_amount', {
+            let resp = await put(API_SELECTION_AMOUNT_UPDATE, {
                 'amount': this.subtotal.amount,
             })
             this.updateSelection(resp);
         }
         ,
         async delItem(idx) {
-            let resp = await request('/api/make_order/del_selected_part', {
+            let resp = await del(API_SELECTION_PART_DEL, {
                 'item_index': idx
             })
             this.updateSelection(resp);
@@ -266,7 +264,7 @@ const RVDPicker = {
             this.part.id = p.item._id
             this.calcPrice();
             this.resetWatchers();
-            let resp = await request('/api/make_order/del_selected_part', {
+            let resp = await del(API_SELECTION_PART_DEL, {
                 'item_index': idx
             })
             this.updateSelection(resp);
@@ -280,16 +278,23 @@ const RVDPicker = {
             }
             this.resetWatchers();
             this.checkErrors();
+            this.$forceUpdate();
         }
         ,
         async addToCart() {
-            let resp = await request('/api/make_order/submit_selection')
+            let resp = await get(API_SELECTION_SUBMIT)
             this.clearSelection();
             this.getSelection();
             this.part.type = null;
             this.current_selection.job_type = null;
             $('#addModal').modal('hide');
             emitter.emit('updateCart');
+        },
+        async reloadSelection() {
+            this.clearSelection();
+            this.part.type = null;
+            this.current_selection.job_type = null;
+            this.getSelection();
         }
     }
 }

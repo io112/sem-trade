@@ -2,7 +2,7 @@ from app.core.models.order import Order
 from app.core.models.user import User
 
 
-def get_orders(user=None, limit=None, offset=None):
+def get_orders(user=None, limit=None, offset=None, sorting='-number'):
     if user is not None:
         user = User.get_by_username(user)
         res = Order.objects(user=user)
@@ -12,7 +12,7 @@ def get_orders(user=None, limit=None, offset=None):
         res = res.skip(offset)
     if limit:
         res = res.limit(limit)
-    return res.order_by('-_number')
+    return res.order_by(sorting)
 
 
 def count_orders(user=None):
