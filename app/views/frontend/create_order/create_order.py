@@ -1,6 +1,5 @@
-from flask import url_for as flask_url_for
 from flask_restful import url_for
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from app.constants import commit_hash
 from app.misc import sid_required
@@ -8,7 +7,7 @@ from app.views.frontend.base import BaseAuthView
 
 
 class CreateOrderView(BaseAuthView):
-    decorators = [sid_required]
+    decorators = [sid_required, login_required]
     template_name = 'create_order/create_order.html'
 
     def __init__(self):

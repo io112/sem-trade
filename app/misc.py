@@ -53,7 +53,7 @@ def redirect_restore_pass(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if current_user.change_password:
-            return redirect(url_for('login_change_pass'))
+            return redirect(url_for('frontend.auth.change_password'))
         return view(**kwargs)
 
     return wrapped_view
