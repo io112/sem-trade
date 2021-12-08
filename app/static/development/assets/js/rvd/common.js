@@ -1,3 +1,6 @@
+const {createApp, ref, watch} = Vue;
+const emitter = mitt();
+
 async function request(endpoint, data = {}) {
     if (data === undefined)
         data = []

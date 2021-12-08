@@ -16,7 +16,7 @@ class BaseAuthView(View):
     def render_template(self, context):
         return render_template(self.get_template_name(), api_urls=self.api_urls, **context)
 
-    def dispatch_request(self):
+    def dispatch_request(self, *args):
         raise NotImplementedError()
 
 

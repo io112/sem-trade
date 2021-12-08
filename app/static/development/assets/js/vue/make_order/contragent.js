@@ -46,7 +46,7 @@ const RVDContragent = {
 
         },
         async findContragent() {
-            if (this.contragent) {
+            if (this.contragent || this.query.query === '') {
                 return
             }
             let resp = await get(API_CONTRAGENT_FIND, {
@@ -61,6 +61,7 @@ const RVDContragent = {
             this.suggestion = []
             this.query.query = ''
             emitter.emit('setContragent', null)
+            this.$forceUpdate();
         }
     }
 }

@@ -1,6 +1,3 @@
-const {createApp, ref, watch} = Vue;
-const emitter = mitt();
-
 const RVDPicker = {
     compilerOptions: {
         delimiters: ['[[', ']]'],

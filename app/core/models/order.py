@@ -60,7 +60,10 @@ class Order(Document):
         if self.contragent:
             res['contragent'] = self.contragent.get_safe()
         res['_id'] = str(res['_id'])
-        res['user'] = self.user.get_safe()
+        try:
+            res['user'] = self.user.get_safe()
+        except:
+            res['user'] = {}
         return res
 
     def get_db_dict(self):

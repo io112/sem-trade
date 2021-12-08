@@ -15,9 +15,13 @@ class Contragent(Document):
 
     meta = {'indexes': [
         {'fields': ['$name', "$phone", '$surname'],
-         'default_language': 'english',
+         'default_language': 'russian',
          'name': 'search_idx',
          'weights': {'name': 1, 'phone': 1, 'surname': 1}
+         },
+        {'fields': ['$name', "$phone", '$surname'],
+         'default_language': 'russian',
+         'name': 'contragent_search_idx',
          }
     ]}
 

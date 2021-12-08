@@ -47,7 +47,7 @@ class PartSubmit(MakeOrderBase):
     # @bp.route('/submit_part', methods=['POST'])
     # @sid_required
     # @login_required
-    def get(self):
+    def post(self):
         data = self.parser.parse_args()
         sid = data[self.CURRENT_ORDER_COOKIE]
         part = data['part']
@@ -57,4 +57,4 @@ class PartSubmit(MakeOrderBase):
         except Exception as e:
             traceback.print_exc()
             return str(e), 409
-        return {'success'}
+        return 'success'

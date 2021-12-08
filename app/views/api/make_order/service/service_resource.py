@@ -21,4 +21,4 @@ class SubmitService(MakeOrderBase):
         except Exception as e:
             traceback.print_exc()
             return str(e), 409
-        return {'success'}
+        return 'success'
